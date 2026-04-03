@@ -1,0 +1,77 @@
+.section {
+  position: relative;
+  padding: var(--space-24) 0;
+  background: var(--color-bg);
+  overflow: hidden;
+  transition: background 0.3s ease;
+}
+.glow1 { top: -100px; left: -150px; opacity: 0.12; }
+.glow2 { bottom: -100px; right: -150px; opacity: 0.1; }
+.header {
+  text-align: center;
+  margin-bottom: var(--space-16);
+}
+.grid { position: relative; z-index: 1; }
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  transition: all 0.35s ease;
+  animation: fade-up 0.6s ease both;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.card_primary::before {
+  background: radial-gradient(circle at top left, rgba(11,114,204,0.08), transparent 70%);
+}
+.card_teal::before {
+  background: radial-gradient(circle at top left, rgba(16,189,178,0.07), transparent 70%);
+}
+.card:hover {
+  transform: translateY(-5px);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+.card_primary:hover { box-shadow: var(--shadow-md), 0 0 30px rgba(11,114,204,0.12); }
+.card_teal:hover { box-shadow: var(--shadow-md), 0 0 30px rgba(16,189,178,0.1); }
+.card:hover::before { opacity: 1; }
+
+.cardTop { margin-bottom: 4px; }
+.cardIcon {
+  font-size: 2rem;
+  line-height: 1;
+}
+.cardTitle {
+  font-size: var(--text-h4);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+}
+.cardDesc {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  flex: 1;
+}
+.cardLink {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-primary-400);
+  transition: color 0.2s;
+  margin-top: auto;
+}
+.card_teal .cardLink { color: var(--color-tertiary-400); }
+.cardLink:hover { color: var(--color-primary-300); }

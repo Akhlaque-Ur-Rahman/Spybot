@@ -1,0 +1,16 @@
+{
+  "name": "SpyBot — AI-Powered Threat Intelligence",
+  "short_name": "SpyBot",
+  "description": "See every threat before it sees you. AI-powered vendor risk and cyber intelligence platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060E18",
+  "theme_color": "#0B72CC",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
