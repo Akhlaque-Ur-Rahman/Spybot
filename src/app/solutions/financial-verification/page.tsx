@@ -3,8 +3,10 @@ import Challenges, { ChallengeItem } from '@/components/Challenges';
 import Benefits, { BenefitItem } from '@/components/Benefits';
 import Lifecycle, { StepItem } from '@/components/Lifecycle';
 import DemoSection from '@/components/DemoSection';
+import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { Landmark, TrendingDown, Clock, ShieldAlert, CircleDollarSign, Receipt, PiggyBank, Search, CheckCircle2 } from 'lucide-react';
 import { Metadata } from 'next';
+import { CTA_LINKS } from '@/site';
 
 export const metadata: Metadata = {
   title: 'Financial Verification APIs | Penny Drop & Income Analysis',
@@ -19,19 +21,19 @@ const financialChallenges: ChallengeItem[] = [
     icon: <ShieldAlert size={24} strokeWidth={1.5} />,
     title: 'Payout Failures & Fraud',
     desc: 'Sending payouts to unverified or deactivated bank accounts results in high transaction failure rates and massive financial exposure to fraud.',
-    color: '#EF4444',
+    tone: 'danger',
   },
   {
     icon: <Clock size={24} strokeWidth={1.5} />,
     title: 'Manual Statement Analysis',
     desc: 'Lending teams waste days manually reading PDF bank statements to calculate average balances and identify risky transaction patterns.',
-    color: '#F59E0B',
+    tone: 'warning',
   },
   {
     icon: <TrendingDown size={24} strokeWidth={1.5} />,
     title: 'High Loan Drop-offs',
     desc: 'Lengthy credit assessment processes frustrate borrowers. If you cannot approve a loan instantly, the customer will find a competitor who can.',
-    color: '#3B82F6',
+    tone: 'info',
   },
 ];
 
@@ -94,36 +96,42 @@ export default function FinancialVerificationPage() {
     <main>
       <PageHeader 
         label="Financial APIs"
-        title="Zero-Risk"
-        gradientText="Account Verification"
-        description="Ensure payouts always reach the right person. Authenticate bank accounts instantly with Penny Drop, and automate credit underwriting with advanced statement analysis."
-        primaryCta={{ label: 'Test Penny Drop', href: '#apikeys' }}
-        secondaryCta={{ label: 'API Documentation', href: '/docs' }}
+        title="When payout risk slows growth,"
+        gradientText="verify financial intent instantly"
+        description="Use penny drop validation and income analysis workflows to reduce failed transfers, speed up credit decisions, and improve trust in every payout-linked action."
+        primaryCta={{ label: 'Test financial workflows', href: CTA_LINKS.sandbox }}
+        secondaryCta={{ label: 'Explore marketplace coverage', href: CTA_LINKS.solutionsCatalog }}
       />
       
-      <Challenges 
-        label="The Risk"
-        title="Why unverified accounts"
-        gradientText="cost millions"
-        subtitle="Without real-time financial verification, businesses face severe risks including bounced transfers, money laundering compliance failures, and bad lending decisions."
-        data={financialChallenges}
-      />
+      <SectionScrollReveal>
+        <Benefits
+          label="The Financial Suite"
+          title="Intelligent"
+          gradientText="Banking APIs"
+          subtitle="Eliminate manual underwriting. Our APIs bridge the gap between user identity and their financial reality."
+          data={financialBenefits}
+        />
+      </SectionScrollReveal>
 
-      <Benefits 
-        label="The Financial Suite"
-        title="Intelligent"
-        gradientText="Banking APIs"
-        subtitle="Eliminate manual underwriting. Our APIs bridge the gap between user identity and their financial reality."
-        data={financialBenefits}
-      />
+      <SectionScrollReveal>
+        <Challenges
+          label="The Risk"
+          title="Why unverified accounts"
+          gradientText="cost millions"
+          subtitle="Without real-time financial verification, businesses face severe risks including bounced transfers, money laundering compliance failures, and bad lending decisions."
+          data={financialChallenges}
+        />
+      </SectionScrollReveal>
 
-      <Lifecycle 
-        label="Penny Drop Flow"
-        title="How account validation"
-        gradientText="works"
-        subtitle="A massive technical undertaking reduced to a single, sub-second API request."
-        data={financialSteps}
-      />
+      <SectionScrollReveal>
+        <Lifecycle
+          label="Penny Drop Flow"
+          title="How account validation"
+          gradientText="works"
+          subtitle="A massive technical undertaking reduced to a single, sub-second API request."
+          data={financialSteps}
+        />
+      </SectionScrollReveal>
 
       <DemoSection />
     </main>

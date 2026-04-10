@@ -1,6 +1,7 @@
 import styles from './Benefits.module.css';
 import { LibraryBig, Hammer, Globe, Lock, FileText, Building2 } from 'lucide-react';
 import React from 'react';
+import { CTA_LINKS } from '@/site';
 
 export interface BenefitItem {
   icon: React.ReactNode;
@@ -87,7 +88,7 @@ export default function Benefits({
               </div>
               <h3 className={styles.cardTitle}>{b.title}</h3>
               <p className={styles.cardDesc}>{b.desc}</p>
-              <a href="#apikeys" className={styles.cardLink} aria-label={`Learn more about ${b.title}`}>
+              <a href={CTA_LINKS.solutionsCatalog} className={styles.cardLink} aria-label={`Learn more about ${b.title}`}>
                 Learn more →
               </a>
             </div>

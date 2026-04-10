@@ -30,7 +30,7 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--space-16);
   align-items: center;
-  padding-top: 80px;
+  padding-top: var(--site-hero-padding-top);
   padding-bottom: 60px;
   flex: 1;
   position: relative;

@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import styles from './Hero.module.css';
 import { Rocket } from 'lucide-react';
+import { CTA_LINKS } from '@/site';
 
 const stats = [
   { value: '99.99%', label: 'Uptime SLA' },
@@ -103,24 +104,24 @@ export default function Hero() {
         {/* Left — copy */}
         <div className={styles.copy}>
           <div className={`badge badge-teal badge-dot ${styles.heroBadge}`}>
-            #1 Identity & Onboarding Platform
+            Built for high-trust digital onboarding
           </div>
 
           <h1 className={styles.headline}>
-            <span className="font-display">Instant Verification.</span>
+            <span className="font-display">Stop onboarding bottlenecks</span>
             <br />
-            <span className={`font-display text-gradient`}>Zero Friction.</span>
+            <span className={`font-display text-gradient`}>before they cost conversion.</span>
           </h1>
 
           <p className={styles.subheadline}>
-            SpyBot delivers a comprehensive B2B Digital Identity Verification and User Onboarding platform — reducing onboarding costs by up to 80% with hundreds of secure RESTful APIs.
+            SpyBot helps fintech, telecom, gaming, and marketplace teams verify users and businesses faster, reduce fraud exposure, and launch compliant identity flows without rebuilding their stack.
           </p>
 
           <div className={styles.heroCtas}>
-            <a href="#apikeys" className="btn btn-primary btn-lg" aria-label="Get API Keys">
-              <Rocket size={18} /> Start Integrating Free
+            <a href={CTA_LINKS.sandbox} className="btn btn-primary btn-lg" aria-label="Get sandbox access">
+              <Rocket size={18} /> Get Sandbox Access
             </a>
-            <a href="#platform" className="btn btn-secondary btn-lg" aria-label="Explore Platform">
+            <a href={CTA_LINKS.superflowStudio} className="btn btn-secondary btn-lg" aria-label="Explore workflow orchestration">
               Explore Superflow
             </a>
           </div>
@@ -168,10 +169,10 @@ export default function Hero() {
             <div className={styles.riskScore}>
               <div className={styles.riskLabel}>Identity Trust Score</div>
               <div className={styles.riskBar}>
-                <div className={styles.riskFill} style={{ width: '92%', background: '#10BDB2' }} />
+                <div className={styles.riskFill} style={{ width: '92%', background: 'var(--color-tertiary-400)' }} />
               </div>
               <div className={styles.riskMeta}>
-                <span style={{ color: '#10BDB2' }}>92 / 100</span>
+                <span style={{ color: 'var(--color-tertiary-400)' }}>92 / 100</span>
                 <span>Highly Verified</span>
               </div>
             </div>

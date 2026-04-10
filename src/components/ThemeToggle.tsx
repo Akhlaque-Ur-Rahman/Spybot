@@ -2,9 +2,9 @@
 import { useRef, useEffect, useState } from 'react';
 import { useTheme, type Theme } from '@/context/ThemeContext';
 import styles from './ThemeToggle.module.css';
-import { Sun, Moon, Monitor, Check } from 'lucide-react';
+import { Sun, Moon, Monitor, Check, type LucideIcon } from 'lucide-react';
 
-const OPTIONS: { value: Theme; Icon: any; label: string }[] = [
+const OPTIONS: { value: Theme; Icon: LucideIcon; label: string }[] = [
   { value: 'light',  Icon: Sun,     label: 'Light'  },
   { value: 'dark',   Icon: Moon,    label: 'Dark'   },
   { value: 'system', Icon: Monitor, label: 'System' },

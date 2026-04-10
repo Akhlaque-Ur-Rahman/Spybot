@@ -1,7 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useState, useEffect, useCallback } from 'react';
 import styles from './Navbar.module.css';
 import ThemeToggle from './ThemeToggle';
+import { CTA_LINKS, ROUTES, industryNavItems, solutionNavItems } from '@/site';
 import {
   BadgeCheck,
   Building2,
@@ -12,45 +14,94 @@ import {
   Smartphone,
   Gamepad2,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  Layers
 } from 'lucide-react';
 
 const navLinks = [
-  { label: 'API Marketplace', href: '#marketplace' },
+  { label: 'API Marketplace', href: ROUTES.apiMarketplace },
   {
     label: 'Solutions',
-    href: '#solutions',
-    dropdown: [
-      { label: 'Identity Verification', href: '/solutions/identity-verification', icon: <BadgeCheck size={18} strokeWidth={1.5} />, desc: 'Aadhaar, PAN, Voter ID validation' },
-      { label: 'KYB Suite', href: '/solutions/kyb-suite', icon: <Building2 size={18} strokeWidth={1.5} />, desc: 'MCA, GST, and MSME checks' },
-      { label: 'Financial Verification', href: '/solutions/financial-verification', icon: <Landmark size={18} strokeWidth={1.5} />, desc: 'Penny Drop & Income Analysis' },
-      { label: 'Video KYC & eSign', href: '/solutions/video-kyc', icon: <Video size={18} strokeWidth={1.5} />, desc: 'V-CIP KYC and seamless digital signatures' },
-    ],
+    href: ROUTES.solutions,
+    dropdown: solutionNavItems.map((item, index) => ({
+      ...item,
+      icon: [
+        <BadgeCheck key="identity" size={18} strokeWidth={1.5} />,
+        <Building2 key="kyb" size={18} strokeWidth={1.5} />,
+        <Landmark key="financial" size={18} strokeWidth={1.5} />,
+        <Video key="video" size={18} strokeWidth={1.5} />,
+      ][index],
+    })),
   },
   {
     label: 'Industries',
-    href: '/industries',
-    dropdown: [
-      { label: 'Fintech & Banks', href: '/industries/fintech', icon: <CreditCard size={18} strokeWidth={1.5} />, desc: 'Instant lending and account opening' },
-      { label: 'E-commerce', href: '/industries/ecommerce', icon: <ShoppingCart size={18} strokeWidth={1.5} />, desc: 'Vendor onboarding & fraud prevention' },
-      { label: 'Telecom', href: '/industries/telecom', icon: <Smartphone size={18} strokeWidth={1.5} />, desc: 'SIM issuance and compliance' },
-      { label: 'Gaming', href: '/industries/gaming', icon: <Gamepad2 size={18} strokeWidth={1.5} />, desc: 'Age verification and RMG compliance' },
-    ],
+    href: ROUTES.industries,
+    dropdown: industryNavItems.map((item, index) => ({
+      ...item,
+      icon: [
+        <CreditCard key="fintech" size={18} strokeWidth={1.5} />,
+        <ShoppingCart key="ecommerce" size={18} strokeWidth={1.5} />,
+        <Smartphone key="telecom" size={18} strokeWidth={1.5} />,
+        <Gamepad2 key="gaming" size={18} strokeWidth={1.5} />,
+      ][index],
+    })),
   },
-  { label: 'Resources', href: '#resources' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'Resources', href: ROUTES.resources },
+  { label: 'FAQ', href: ROUTES.faq },
 ];
+
+function slugify(label: string) {
+  return label.toLowerCase().replace(/\s+/g, '-');
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
+  const closeDropdown = useCallback(() => setActiveDropdown(null), []);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!activeDropdown) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setActiveDropdown(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [activeDropdown]);
+
+  useEffect(() => {
+    if (!activeDropdown) return;
+    const onDown = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const root = target.closest('[data-dropdown-root]');
+      if (root?.getAttribute('data-dropdown-root') === activeDropdown) return;
+      setActiveDropdown(null);
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [activeDropdown]);
+
+  useEffect(() => {
+    if (!activeDropdown) return;
+    const el = document.querySelector(`[data-dropdown-root="${CSS.escape(activeDropdown)}"]`);
+    if (!(el instanceof HTMLElement)) return;
+    const onFocusOut = (e: FocusEvent) => {
+      const next = e.relatedTarget as Node | null;
+      if (next && el.contains(next)) return;
+      setActiveDropdown(null);
+    };
+    el.addEventListener('focusout', onFocusOut);
+    return () => el.removeEventListener('focusout', onFocusOut);
+  }, [activeDropdown]);
 
   return (
     <>
@@ -62,9 +113,9 @@ export default function Navbar() {
             Bank-grade security, trusted by leading enterprises
           </span>
           <div className={styles.topLinks}>
-            <a href="#support" aria-label="Go to Support">Support</a>
+            <Link href={ROUTES.support} aria-label="Go to Support">Support</Link>
             <span>|</span>
-            <a href="#contact" aria-label="Contact Sales Team">Contact Sales</a>
+            <Link href={ROUTES.contact} aria-label="Contact Sales Team">Contact Sales</Link>
           </div>
         </div>
       </div>
@@ -73,7 +124,7 @@ export default function Navbar() {
       <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`} aria-label="Main Navigation">
         <div className={`container ${styles.navInner}`}>
           {/* Logo */}
-          <a href="/" className={styles.logo} aria-label="SpyBot Homepage">
+          <Link href={ROUTES.home} className={styles.logo} aria-label="SpyBot Homepage">
             <div className={styles.logoIcon} aria-hidden="true">
               <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
                 <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" fill="none" stroke="#1E8FE1" strokeWidth="1.5"/>
@@ -86,49 +137,102 @@ export default function Navbar() {
               <span className={styles.logoName}>SpyBot</span>
               <span className={styles.logoSub}>DIGITAL IDENTITY</span>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop links */}
           <div className={styles.navLinks} role="menubar">
-            {navLinks.map((link) => (
-              <div
-                key={link.label}
-                className={styles.navItem}
-                onMouseEnter={() => link.dropdown && setActiveDropdown(link.label)}
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                <a 
-                  href={link.href} 
-                  className={styles.navLink} 
-                  role="menuitem"
-                  aria-haspopup={link.dropdown ? 'true' : 'false'}
-                  aria-expanded={activeDropdown === link.label}
+            {navLinks.map((link) => {
+              const dropdownSlug = slugify(link.label);
+              const hasDropdown = Boolean(link.dropdown);
+
+              return (
+                <div
+                  key={link.label}
+                  className={`${styles.navItem} ${activeDropdown === link.label ? styles.navItemOpen : ''}`}
+                  data-dropdown-root={hasDropdown ? link.label : undefined}
+                  onMouseEnter={() => hasDropdown && setActiveDropdown(link.label)}
+                  onMouseLeave={() => hasDropdown && closeDropdown()}
                 >
-                  {link.label}
-                  {link.dropdown && <ChevronDown size={14} className={styles.chevron} aria-hidden="true" />}
-                </a>
-                {link.dropdown && activeDropdown === link.label && (
-                  <div className={styles.dropdown} role="menu" aria-label={`${link.label} submenu`}>
-                    {link.dropdown.map((item) => (
-                      <a key={item.label} href={item.href || '#'} className={styles.dropdownItem} role="menuitem">
-                        <span className={styles.dropdownIcon} aria-hidden="true">{item.icon}</span>
-                        <div>
-                          <div className={styles.dropdownLabel}>{item.label}</div>
-                          <div className={styles.dropdownDesc}>{item.desc}</div>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+                  {hasDropdown ? (
+                    <button
+                      type="button"
+                      className={styles.navLink}
+                      role="menuitem"
+                      id={`nav-trigger-${dropdownSlug}`}
+                      aria-haspopup="true"
+                      aria-expanded={activeDropdown === link.label}
+                      aria-controls={`nav-menu-${dropdownSlug}`}
+                      onClick={() =>
+                        setActiveDropdown((d) => (d === link.label ? null : link.label))
+                      }
+                      onFocus={() => setActiveDropdown(link.label)}
+                    >
+                      {link.label}
+                      <ChevronDown size={14} className={styles.chevron} aria-hidden="true" />
+                    </button>
+                  ) : (
+                    <Link href={link.href} className={styles.navLink} role="menuitem">
+                      {link.label}
+                    </Link>
+                  )}
+
+                  {hasDropdown && activeDropdown === link.label && (
+                    <div className={styles.dropdownShell} role="presentation">
+                      <div
+                        id={`nav-menu-${dropdownSlug}`}
+                        className={styles.dropdown}
+                        role="menu"
+                        aria-label={`${link.label} submenu`}
+                        aria-labelledby={`nav-trigger-${dropdownSlug}`}
+                      >
+                        <Link
+                          href={link.href}
+                          className={styles.dropdownItem}
+                          role="menuitem"
+                          onClick={closeDropdown}
+                        >
+                          <span className={styles.dropdownIcon} aria-hidden="true">
+                            <Layers size={18} strokeWidth={1.5} />
+                          </span>
+                          <div>
+                            <div className={styles.dropdownLabel}>
+                              {link.label === 'Solutions' ? 'All solutions' : 'All industries'}
+                            </div>
+                            <div className={styles.dropdownDesc}>
+                              {link.label === 'Solutions'
+                                ? 'Browse the full solution catalog'
+                                : 'Browse industry playbooks and use cases'}
+                            </div>
+                          </div>
+                        </Link>
+                        {link.dropdown!.map((item) => (
+                          <Link
+                            key={item.label}
+                            href={item.href}
+                            className={styles.dropdownItem}
+                            role="menuitem"
+                            onClick={closeDropdown}
+                          >
+                            <span className={styles.dropdownIcon} aria-hidden="true">{item.icon}</span>
+                            <div>
+                              <div className={styles.dropdownLabel}>{item.label}</div>
+                              <div className={styles.dropdownDesc}>{item.desc}</div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           {/* CTA buttons */}
           <div className={styles.navCtas}>
             <ThemeToggle />
-            <a href="#apikeys" className="btn btn-secondary btn-sm" aria-label="Get API Keys">Get API Keys</a>
-            <a href="#demo" className="btn btn-primary btn-sm" aria-label="Book a Demo">Book a Demo</a>
+            <Link href={CTA_LINKS.sandbox} className="btn btn-secondary btn-sm" aria-label="Get sandbox access">Get Sandbox Access</Link>
+            <Link href={CTA_LINKS.demo} className="btn btn-primary btn-sm" aria-label="Book a Demo">Book a Demo</Link>
           </div>
 
           {/* Hamburger */}
@@ -146,7 +250,7 @@ export default function Navbar() {
         {mobileOpen && (
           <div className={styles.mobileMenu} role="menu">
             {navLinks.map((link) => (
-              <a 
+            <Link 
                 key={link.label} 
                 href={link.href} 
                 className={styles.mobileLink} 
@@ -154,12 +258,12 @@ export default function Navbar() {
                 role="menuitem"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <div className={styles.mobileCtas}>
               <ThemeToggle />
-              <a href="#apikeys" className="btn btn-secondary" aria-label="Get API Keys">Get API Keys</a>
-              <a href="#demo" className="btn btn-primary" aria-label="Book a Demo">Book a Demo</a>
+              <Link href={CTA_LINKS.sandbox} className="btn btn-secondary" aria-label="Get sandbox access">Get Sandbox Access</Link>
+              <Link href={CTA_LINKS.demo} className="btn btn-primary" aria-label="Book a Demo">Book a Demo</Link>
             </div>
           </div>
         )}

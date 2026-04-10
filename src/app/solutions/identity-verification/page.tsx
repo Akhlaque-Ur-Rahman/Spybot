@@ -3,12 +3,15 @@ import Challenges, { ChallengeItem } from '@/components/Challenges';
 import Benefits, { BenefitItem } from '@/components/Benefits';
 import Lifecycle, { StepItem } from '@/components/Lifecycle';
 import DemoSection from '@/components/DemoSection';
-import { Fingerprint, Clock, FileWarning, Landmark, ScanFace, Database, ShieldCheck, Zap } from 'lucide-react';
+import { Camera, Fingerprint, Clock, FileWarning, Landmark, ScanFace, Database, ShieldCheck, Zap } from 'lucide-react';
 import { Metadata } from 'next';
+import { CTA_LINKS } from '@/site';
+import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 
 export const metadata: Metadata = {
   title: 'Identity Verification APIs | Aadhaar, PAN, Voter ID',
-  description: 'Instantly verify Indian identities using our advanced APIs. Reduce onboarding time to seconds with automated Aadhaar, PAN, and Voter ID extraction and validation.',
+  description:
+    'Instantly verify Indian identities using our advanced APIs. Reduce onboarding time to seconds with automated Aadhaar, PAN, and Voter ID extraction and validation.',
   alternates: {
     canonical: '/solutions/identity-verification',
   },
@@ -19,19 +22,19 @@ const identityChallenges: ChallengeItem[] = [
     icon: <Clock size={24} strokeWidth={1.5} />,
     title: 'Slow Manual Reviews',
     desc: 'Waiting days for manual document reviews damages conversion. Users abandon flows that aren’t instant and seamless.',
-    color: '#EF4444',
+    tone: 'danger',
   },
   {
     icon: <FileWarning size={24} strokeWidth={1.5} />,
     title: 'Document Forgery',
     desc: 'High-quality forgeries can bypass basic checks, exposing your platform to financial and regulatory risks.',
-    color: '#F59E0B',
+    tone: 'warning',
   },
   {
     icon: <Database size={24} strokeWidth={1.5} />,
     title: 'Fragmented Sources',
     desc: 'Integrating individual Govt APIs (UIDAI, NSDL) is complex and requires constant maintenance to deal with downtime.',
-    color: '#3B82F6',
+    tone: 'info',
   },
 ];
 
@@ -89,44 +92,47 @@ const identitySteps: StepItem[] = [
   },
 ];
 
-// Reusing Camera icon from lucide-react inside the array so we need an import
-import { Camera } from 'lucide-react';
-
 export default function IdentityVerificationPage() {
   return (
     <main>
-      <PageHeader 
+      <PageHeader
         label="Identity APIs"
-        title="Flawless, Instant"
-        gradientText="Identity Verification"
-        description="Verify users in seconds, not days. Prevent fraud and ensure total compliance with our comprehensive suite of Aadhaar, PAN, and Voter ID verification APIs."
-        primaryCta={{ label: 'Get API Keys', href: '#apikeys' }}
-        secondaryCta={{ label: 'Read Docs', href: '/docs' }}
-      />
-      
-      <Challenges 
-        label="The Friction"
-        title="Why traditional KYC"
-        gradientText="fails"
-        subtitle="Legacy processes force customers to wait, resulting in up to 40% drop-off rates and increased operational overhead."
-        data={identityChallenges}
+        title="When identity friction kills conversion,"
+        gradientText="verify users in seconds"
+        description="Reduce manual reviews, prevent document fraud, and move legitimate users through onboarding faster with Aadhaar, PAN, and document verification workflows designed for modern digital products."
+        primaryCta={{ label: 'Request sandbox access', href: CTA_LINKS.sandbox }}
+        secondaryCta={{ label: 'Explore the API marketplace', href: CTA_LINKS.solutionsCatalog }}
       />
 
-      <Benefits 
-        label="The Identity Suite"
-        title="Everything you need to"
-        gradientText="verify users"
-        subtitle="One unified API integration unlocks direct access to all major Indian identity databases, fortified by AI."
-        data={identityBenefits}
-      />
+      <SectionScrollReveal>
+        <Benefits
+          label="The Identity Suite"
+          title="Everything you need to"
+          gradientText="verify users"
+          subtitle="One unified API integration unlocks direct access to all major Indian identity databases, fortified by AI."
+          data={identityBenefits}
+        />
+      </SectionScrollReveal>
 
-      <Lifecycle 
-        label="The Flow"
-        title="Frictionless verification"
-        gradientText="in 5 steps"
-        subtitle="We handle the heavy lifting of OCR, deduplication, and database matching. You get a simple yes or no."
-        data={identitySteps}
-      />
+      <SectionScrollReveal>
+        <Challenges
+          label="The Friction"
+          title="Why traditional KYC"
+          gradientText="fails"
+          subtitle="Legacy processes force customers to wait, resulting in up to 40% drop-off rates and increased operational overhead."
+          data={identityChallenges}
+        />
+      </SectionScrollReveal>
+
+      <SectionScrollReveal>
+        <Lifecycle
+          label="The Flow"
+          title="Frictionless verification"
+          gradientText="in 5 steps"
+          subtitle="We handle the heavy lifting of OCR, deduplication, and database matching. You get a simple yes or no."
+          data={identitySteps}
+        />
+      </SectionScrollReveal>
 
       <DemoSection />
     </main>

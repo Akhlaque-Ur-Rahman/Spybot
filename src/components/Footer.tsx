@@ -1,18 +1,5 @@
 import styles from './Footer.module.css';
-
-const footerLinks = {
-  Identity_APIs: ['Aadhaar Suite', 'PAN Suite', 'Voter ID', 'Driving License', 'Background Check', 'Telecom Verification'],
-  KYB_APIs: ['MCA Verification', 'GST Suite', 'MSME / Udyam', 'FSSAI License', 'Business Background Check'],
-  Solutions: ['Video KYC', 'Superflow Builder', 'Bank Penny Drop', 'Income Analysis', 'OCR Extraction'],
-  Company: ['About Us', 'Careers', 'Contact Sales', 'Developer Portal', 'API Status', 'Privacy Policy'],
-};
-
-const socialLinks = [
-  { icon: '𝕏', href: '#', label: 'X (Twitter)' },
-  { icon: 'in', href: '#', label: 'LinkedIn' },
-  { icon: '⎔', href: '#', label: 'GitHub' },
-  { icon: '🎮', href: '#', label: 'Discord' },
-];
+import { footerColumns, socialLinks } from '@/site';
 
 export default function Footer() {
   return (
@@ -52,13 +39,13 @@ export default function Footer() {
 
           {/* Link columns */}
           <div className={styles.linkColumns}>
-            {Object.entries(footerLinks).map(([col, links]) => (
+            {Object.entries(footerColumns).map(([col, links]) => (
               <div key={col} className={styles.linkCol}>
-                <h4 className={styles.colTitle}>{col.replace('_', ' ')}</h4>
+                <h4 className={styles.colTitle}>{col}</h4>
                 <ul>
                   {links.map((link) => (
-                    <li key={link}>
-                      <a href="#" className={styles.footerLink}>{link}</a>
+                    <li key={link.label}>
+                      <a href={link.href} className={styles.footerLink}>{link.label}</a>
                     </li>
                   ))}
                 </ul>

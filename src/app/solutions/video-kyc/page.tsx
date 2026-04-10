@@ -3,12 +3,27 @@ import Challenges, { ChallengeItem } from '@/components/Challenges';
 import Benefits, { BenefitItem } from '@/components/Benefits';
 import Lifecycle, { StepItem } from '@/components/Lifecycle';
 import DemoSection from '@/components/DemoSection';
-import { Video, UserRoundX, SignalLow, BadgeAlert, MonitorPlay, ShieldCheck, MapPin, CalendarClock, ScanFace, FileCheck } from 'lucide-react';
+import CoverageCarousel from '@/components/CoverageCarousel';
+import {
+  Video,
+  UserRoundX,
+  SignalLow,
+  BadgeAlert,
+  MonitorPlay,
+  ShieldCheck,
+  MapPin,
+  CalendarClock,
+  ScanFace,
+  FileCheck,
+} from 'lucide-react';
 import { Metadata } from 'next';
+import { CTA_LINKS } from '@/site';
+import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 
 export const metadata: Metadata = {
   title: 'Video KYC & V-CIP | Compliant Customer Onboarding',
-  description: 'Conduct seamless Video KYC (V-CIP) to meet RBI guidelines. High-quality video encryption, AI liveness checks, and guided agent workflows.',
+  description:
+    'Conduct seamless Video KYC (V-CIP) to meet RBI guidelines. High-quality video encryption, AI liveness checks, and guided agent workflows.',
   alternates: {
     canonical: '/solutions/video-kyc',
   },
@@ -19,19 +34,19 @@ const videoChallenges: ChallengeItem[] = [
     icon: <UserRoundX size={24} strokeWidth={1.5} />,
     title: 'High Abandonment Rates',
     desc: 'Clunky third-party video apps or complex scheduling workflows cause users to abandon the KYC process right before completion.',
-    color: '#EF4444',
+    tone: 'danger',
   },
   {
     icon: <SignalLow size={24} strokeWidth={1.5} />,
     title: 'Low Bandwidth Failures',
     desc: 'India has vast tier-2 and tier-3 markets where network connectivity drops frequently, terminating active video streams and ruining conversions.',
-    color: '#F59E0B',
+    tone: 'warning',
   },
   {
     icon: <BadgeAlert size={24} strokeWidth={1.5} />,
     title: 'Regulatory Audits',
     desc: 'Falling short of RBI V-CIP guidelines regarding geotagging, video archival, and concurrent auditor access can result in severe legal penalties.',
-    color: '#3B82F6',
+    tone: 'info',
   },
 ];
 
@@ -92,38 +107,46 @@ const videoSteps: StepItem[] = [
 export default function VideoKycPage() {
   return (
     <main>
-      <PageHeader 
+      <PageHeader
         label="Video KYC (V-CIP)"
-        title="Human trust,"
-        gradientText="Digital speed"
-        description="Complete high-friction regulatory onboarding seamlessly. Our intelligent Video KYC platform combines AI face matching with adaptive streaming to maximize approval rates anywhere in India."
-        primaryCta={{ label: 'Book a V-CIP Demo', href: '#demo' }}
-        secondaryCta={{ label: 'Read Guidelines', href: '/docs' }}
-      />
-      
-      <Challenges 
-        label="The Friction"
-        title="The challenge of remote"
-        gradientText="Customer Interaction"
-        subtitle="Moving branches to browsers is hard. Poor tech stacks lead to dropped calls, frustrated users, and non-compliance fines."
-        data={videoChallenges}
+        title="When high-trust onboarding needs"
+        gradientText="human assurance without the delay"
+        description="Deliver compliant video verification experiences that reduce abandonment, adapt to poor networks, and give compliance teams stronger evidence without slowing down approvals."
+        primaryCta={{ label: 'Book a V-CIP consultation', href: CTA_LINKS.demo }}
+        secondaryCta={{ label: 'Explore support options', href: CTA_LINKS.support }}
       />
 
-      <Benefits 
-        label="The Platform Features"
-        title="Enterprise-Grade"
-        gradientText="Video verification"
-        subtitle="We built a video platform specifically engineered for the rigorous demands of banking compliance and identity assurance."
-        data={videoBenefits}
-      />
+      <CoverageCarousel label="V-CIP building blocks" />
 
-      <Lifecycle 
-        label="The V-CIP Flow"
-        title="From click to"
-        gradientText="Compliance"
-        subtitle="A fully guided, frictionless experience for both your customers and your verification agents."
-        data={videoSteps}
-      />
+      <SectionScrollReveal>
+        <Benefits
+          label="The Platform Features"
+          title="Enterprise-Grade"
+          gradientText="Video verification"
+          subtitle="We built a video platform specifically engineered for the rigorous demands of banking compliance and identity assurance."
+          data={videoBenefits}
+        />
+      </SectionScrollReveal>
+
+      <SectionScrollReveal>
+        <Lifecycle
+          label="The V-CIP Flow"
+          title="From click to"
+          gradientText="Compliance"
+          subtitle="A fully guided, frictionless experience for both your customers and your verification agents."
+          data={videoSteps}
+        />
+      </SectionScrollReveal>
+
+      <SectionScrollReveal>
+        <Challenges
+          label="The Friction"
+          title="The challenge of remote"
+          gradientText="Customer Interaction"
+          subtitle="Moving branches to browsers is hard. Poor tech stacks lead to dropped calls, frustrated users, and non-compliance fines."
+          data={videoChallenges}
+        />
+      </SectionScrollReveal>
 
       <DemoSection />
     </main>

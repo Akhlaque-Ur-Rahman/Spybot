@@ -38,7 +38,7 @@ export default function DecisionFlow() {
             <span className="text-gradient">Workflow Builder</span>
           </h2>
           <p className="section-subtitle" style={{ marginTop: 16 }}>
-            Don't waste engineering months. Orchestrate complex onboarding journeys combining ID, income, and background checks via our drag-and-drop Superflow.
+            Don&apos;t waste engineering months. Orchestrate complex onboarding journeys combining ID, income, and background checks via our drag-and-drop Superflow.
           </p>
         </div>
 

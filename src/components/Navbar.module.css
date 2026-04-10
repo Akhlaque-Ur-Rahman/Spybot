@@ -1,6 +1,8 @@
 .topBar {
   background: var(--color-topbar-bg);
   border-bottom: 1px solid var(--color-border-subtle);
+  min-height: var(--site-topbar-height);
+  box-sizing: border-box;
   padding: 8px 0;
   font-size: 0.75rem;
   color: var(--color-text-secondary);
@@ -24,7 +26,7 @@
 
 .nav {
   position: sticky;
-  top: 33px;
+  top: var(--site-topbar-height);
   z-index: 99;
   background: var(--color-nav-bg);
   backdrop-filter: blur(16px);
@@ -82,7 +84,13 @@
   gap: var(--space-1);
   margin-left: auto;
 }
-.navItem { position: relative; }
+.navItem {
+  position: relative;
+  z-index: 1;
+}
+.navItemOpen {
+  z-index: 200;
+}
 .navLink {
   display: flex;
   align-items: center;
@@ -98,12 +106,35 @@
   color: var(--color-text-primary);
   background: var(--color-surface-raised);
 }
+button.navLink {
+  font: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  margin: 0;
+}
 .navLink svg { opacity: 0.6; }
+.chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.navItemOpen .chevron {
+  transform: rotate(180deg);
+}
+
+/* Invisible hover bridge: padding is still inside .navItem so the pointer never hits a dead zone */
+.dropdownShell {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  padding-top: 6px;
+  min-width: 260px;
+  z-index: 200;
+}
 
 .dropdown {
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
+  position: relative;
   width: 260px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);

@@ -1,12 +1,20 @@
 import styles from './Challenges.module.css';
 import { TrendingDown, UserX, Timer, Blocks, Settings, Globe } from 'lucide-react';
 import React from 'react';
+import { ChallengeTone } from '@/site';
 
 export interface ChallengeItem {
   icon: React.ReactNode;
   title: string;
   desc: string;
+  tone: ChallengeTone;
+}
+
+interface ChallengeToneStyle {
+  background: string;
+  border: string;
   color: string;
+  accent: string;
 }
 
 export const defaultChallenges: ChallengeItem[] = [
@@ -14,39 +22,72 @@ export const defaultChallenges: ChallengeItem[] = [
     icon: <TrendingDown size={24} strokeWidth={1.5} />,
     title: 'High Onboarding Drop-offs',
     desc: 'Complex KYC forms cause a 40% drop-off rate. SpyBot’s instant verification SDKs slash onboarding time to under 60 seconds.',
-    color: '#EF4444',
+    tone: 'danger',
   },
   {
     icon: <UserX size={24} strokeWidth={1.5} />,
     title: 'Fraud & Impersonation',
     desc: 'Deepfakes and forged documents are on the rise. We stop fraud at the gate with AI liveness detection and data tampering checks.',
-    color: '#F59E0B',
+    tone: 'warning',
   },
   {
     icon: <Timer size={24} strokeWidth={1.5} />,
     title: 'Developer Bottlenecks',
     desc: 'Building custom KYC flows takes months of engineering. Launch instantly with Superflow, our no-code workflow orchestration builder.',
-    color: '#3B82F6',
+    tone: 'info',
   },
   {
     icon: <Blocks size={24} strokeWidth={1.5} />,
     title: 'Fragmented Providers',
     desc: 'Juggling different APIs for ID, banking, and background checks is a nightmare. Get everything under one unified roof with SpyBot.',
-    color: '#10BDB2',
+    tone: 'accent',
   },
   {
     icon: <Settings size={24} strokeWidth={1.5} />,
     title: 'Manual KYC Processes',
     desc: 'Manual verification doesn’t scale and introduces severe human error. SpyBot automates 95% of identity and document screening.',
-    color: '#8B5CF6',
+    tone: 'accent',
   },
   {
     icon: <Globe size={24} strokeWidth={1.5} />,
     title: 'Global Compliance Hurdles',
     desc: 'Expanding globally means new ID formats. We securely process passports, Emirates IDs, and RC checks across borders.',
-    color: '#22C55E',
+    tone: 'success',
   },
 ];
+
+const toneStyles: Record<ChallengeTone, ChallengeToneStyle> = {
+  danger: {
+    background: 'rgba(var(--color-danger-rgb), 0.08)',
+    border: '1px solid rgba(var(--color-danger-rgb), 0.18)',
+    color: 'var(--color-danger)',
+    accent: 'var(--color-danger)',
+  },
+  warning: {
+    background: 'rgba(var(--color-warning-rgb), 0.08)',
+    border: '1px solid rgba(var(--color-warning-rgb), 0.18)',
+    color: 'var(--color-warning)',
+    accent: 'var(--color-warning)',
+  },
+  info: {
+    background: 'rgba(var(--color-info-rgb), 0.08)',
+    border: '1px solid rgba(var(--color-info-rgb), 0.18)',
+    color: 'var(--color-info)',
+    accent: 'var(--color-info)',
+  },
+  accent: {
+    background: 'rgba(var(--color-tertiary-rgb), 0.08)',
+    border: '1px solid rgba(var(--color-tertiary-rgb), 0.18)',
+    color: 'var(--color-tertiary-400)',
+    accent: 'var(--color-tertiary-400)',
+  },
+  success: {
+    background: 'rgba(var(--color-success-rgb), 0.08)',
+    border: '1px solid rgba(var(--color-success-rgb), 0.18)',
+    color: 'var(--color-success)',
+    accent: 'var(--color-success)',
+  },
+};
 
 interface ChallengesProps {
   label?: string;
@@ -81,12 +122,16 @@ export default function Challenges({
         <div className={`grid-3 ${styles.grid}`}>
           {data.map((c, i) => (
             <div key={c.title} className={styles.card} style={{ animationDelay: `${i * 0.1}s` }}>
-              <div className={styles.cardIcon} style={{ background: c.color + '18', border: `1px solid ${c.color}40`, color: c.color }} aria-hidden="true">
+              <div
+                className={styles.cardIcon}
+                style={toneStyles[c.tone]}
+                aria-hidden="true"
+              >
                 {c.icon}
               </div>
               <h3 className={styles.cardTitle}>{c.title}</h3>
               <p className={styles.cardDesc}>{c.desc}</p>
-              <div className={styles.cardAccent} style={{ background: c.color }} aria-hidden="true" />
+              <div className={styles.cardAccent} style={{ background: toneStyles[c.tone].accent as string }} aria-hidden="true" />
             </div>
           ))}
         </div>

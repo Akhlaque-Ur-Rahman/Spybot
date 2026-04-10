@@ -29,29 +29,27 @@ function applyTheme(resolved: 'light' | 'dark') {
   document.documentElement.setAttribute('data-theme', resolved);
 }
 
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') return 'system';
+  const stored = localStorage.getItem('spybot-theme');
+  return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('system');
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(() => getSystemTheme());
+  const resolvedTheme = theme === 'system' ? systemTheme : theme;
 
   useEffect(() => {
-    // Read persisted preference
-    const stored = localStorage.getItem('spybot-theme') as Theme | null;
-    const initial: Theme = stored ?? 'system';
-    setThemeState(initial);
-
-    const resolved = initial === 'system' ? getSystemTheme() : initial;
-    setResolvedTheme(resolved);
-    applyTheme(resolved);
-  }, []);
+    applyTheme(resolvedTheme);
+  }, [resolvedTheme]);
 
   // Listen to system preference changes
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const handler = () => {
       if (theme === 'system') {
-        const resolved = getSystemTheme();
-        setResolvedTheme(resolved);
-        applyTheme(resolved);
+        setSystemTheme(getSystemTheme());
       }
     };
     mq.addEventListener('change', handler);
@@ -61,9 +59,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const setTheme = (t: Theme) => {
     setThemeState(t);
     localStorage.setItem('spybot-theme', t);
-    const resolved = t === 'system' ? getSystemTheme() : t;
-    setResolvedTheme(resolved);
-    applyTheme(resolved);
+    if (t === 'system') {
+      setSystemTheme(getSystemTheme());
+    }
   };
 
   return (

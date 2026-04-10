@@ -3,8 +3,11 @@ import Challenges, { ChallengeItem } from '@/components/Challenges';
 import Benefits, { BenefitItem } from '@/components/Benefits';
 import Lifecycle, { StepItem } from '@/components/Lifecycle';
 import DemoSection from '@/components/DemoSection';
+import CoverageCarousel from '@/components/CoverageCarousel';
+import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { Building2, SearchX, Users, Network, FileCheck2, ScanSearch, Handshake, MapPin } from 'lucide-react';
 import { Metadata } from 'next';
+import { CTA_LINKS } from '@/site';
 
 export const metadata: Metadata = {
   title: 'KYB Suite | Automated Business Verification',
@@ -19,19 +22,19 @@ const kybChallenges: ChallengeItem[] = [
     icon: <SearchX size={24} strokeWidth={1.5} />,
     title: 'Manual MCA Navigations',
     desc: 'Compliance teams spend hours manually searching Ministry of Corporate Affairs (MCA) portals to verify basic corporate registration details.',
-    color: '#EF4444',
+    tone: 'danger',
   },
   {
     icon: <Users size={24} strokeWidth={1.5} />,
     title: 'Hidden UBOs',
     desc: 'Identifying Ultimate Beneficial Owners across complex, multi-layered shell companies is nearly impossible without automated network analysis.',
-    color: '#F59E0B',
+    tone: 'warning',
   },
   {
     icon: <Network size={24} strokeWidth={1.5} />,
     title: 'Fragmented Vendor Checks',
     desc: 'Verifying GST, MSME status, and individual Director PANs requires juggling multiple disconnected systems, causing massive onboarding delays.',
-    color: '#3B82F6',
+    tone: 'info',
   },
 ];
 
@@ -94,36 +97,44 @@ export default function KybSuitePage() {
     <main>
       <PageHeader 
         label="Automated KYB"
-        title="Onboard Businesses"
-        gradientText="in Minutes, Not Days"
-        description="Replace manual corporate registry lookups with instant APIs. Automate merchant, vendor, and B2B client onboarding with our comprehensive MCA, GST, and MSME verification suite."
-        primaryCta={{ label: 'Explore KYB APIs', href: '#apikeys' }}
-        secondaryCta={{ label: 'View Sandbox', href: '/docs' }}
+        title="When business onboarding stalls revenue,"
+        gradientText="automate due diligence at scale"
+        description="Replace portal hopping and fragmented KYB operations with company verification workflows that help teams approve merchants, vendors, and B2B customers faster."
+        primaryCta={{ label: 'Explore KYB workflows', href: CTA_LINKS.solutionsCatalog }}
+        secondaryCta={{ label: 'Talk to a specialist', href: CTA_LINKS.contact }}
       />
       
-      <Challenges 
-        label="The Compliance Bottleneck"
-        title="Why B2B Onboarding is"
-        gradientText="Painful"
-        subtitle="Business verification is notoriously complex, leading to week-long delays, dropped B2B leads, and increased vulnerability to corporate fraud."
-        data={kybChallenges}
-      />
+      <CoverageCarousel label="KYB signals" />
 
-      <Benefits 
-        label="The Corporate Suite"
-        title="Deep Corporate"
-        gradientText="Intelligence"
-        subtitle="Uncover the truth behind any business entity. From immediate GST checks to unwinding complex director networks."
-        data={kybBenefits}
-      />
+      <SectionScrollReveal>
+        <Lifecycle
+          label="The KYB Journey"
+          title="Automating the"
+          gradientText="Due Diligence"
+          subtitle="A streamlined workflow that transforms disjointed corporate registries into a single, reliable verdict."
+          data={kybSteps}
+        />
+      </SectionScrollReveal>
 
-      <Lifecycle 
-        label="The KYB Journey"
-        title="Automating the"
-        gradientText="Due Diligence"
-        subtitle="A streamlined workflow that transforms disjointed corporate registries into a single, reliable verdict."
-        data={kybSteps}
-      />
+      <SectionScrollReveal>
+        <Challenges
+          label="The Compliance Bottleneck"
+          title="Why B2B Onboarding is"
+          gradientText="Painful"
+          subtitle="Business verification is notoriously complex, leading to week-long delays, dropped B2B leads, and increased vulnerability to corporate fraud."
+          data={kybChallenges}
+        />
+      </SectionScrollReveal>
+
+      <SectionScrollReveal>
+        <Benefits
+          label="The Corporate Suite"
+          title="Deep Corporate"
+          gradientText="Intelligence"
+          subtitle="Uncover the truth behind any business entity. From immediate GST checks to unwinding complex director networks."
+          data={kybBenefits}
+        />
+      </SectionScrollReveal>
 
       <DemoSection />
     </main>
