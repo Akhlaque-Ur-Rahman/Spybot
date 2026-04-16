@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Metadata } from 'next';
 import { CTA_LINKS } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 
 export const metadata: Metadata = {
@@ -114,6 +115,7 @@ export default function VideoKycPage() {
         description="Deliver compliant video verification experiences that reduce abandonment, adapt to poor networks, and give compliance teams stronger evidence without slowing down approvals."
         primaryCta={{ label: 'Book a V-CIP consultation', href: CTA_LINKS.demo }}
         secondaryCta={{ label: 'Explore support options', href: CTA_LINKS.support }}
+        media={MEDIA_CLIPS.videoKyc}
       />
 
       <CoverageCarousel label="V-CIP building blocks" />

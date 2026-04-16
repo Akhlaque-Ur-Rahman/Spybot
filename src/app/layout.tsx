@@ -99,7 +99,7 @@ const jsonLd = {
       url: SITE_URL,
       logo: {
         '@type': 'ImageObject',
-        url: `${SITE_URL}/og-image.png`,
+        url: `${SITE_URL}/media/spybot-brand-logo.jpeg`,
       },
       sameAs: [
         'https://twitter.com/SpyBotID',

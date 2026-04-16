@@ -8,6 +8,7 @@ import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { Smartphone, Signal, UserMinus, ShieldAlert, ScanFace, FileSignature, Fingerprint, Store } from 'lucide-react';
 import { Metadata } from 'next';
 import { CTA_LINKS } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 
 export const metadata: Metadata = {
   title: 'Identity Verification for Telecom | SpyBot',
@@ -96,6 +97,7 @@ export default function TelecomIndustryPage() {
         description="Help telecom teams prevent fake SIM issuance, improve point-of-sale identity quality, and maintain stronger compliance control across distributed acquisition networks."
         primaryCta={{ label: 'Explore telecom workflows', href: CTA_LINKS.industryUseCases }}
         secondaryCta={{ label: 'Talk to sales', href: CTA_LINKS.contact }}
+        media={MEDIA_CLIPS.identityVerification}
       />
       
       <CoverageCarousel label="Telecom & DoT" />

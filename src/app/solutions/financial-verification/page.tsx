@@ -7,6 +7,7 @@ import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { Landmark, TrendingDown, Clock, ShieldAlert, CircleDollarSign, Receipt, PiggyBank, Search, CheckCircle2 } from 'lucide-react';
 import { Metadata } from 'next';
 import { CTA_LINKS } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 
 export const metadata: Metadata = {
   title: 'Financial Verification APIs | Penny Drop & Income Analysis',
@@ -101,6 +102,7 @@ export default function FinancialVerificationPage() {
         description="Use penny drop validation and income analysis workflows to reduce failed transfers, speed up credit decisions, and improve trust in every payout-linked action."
         primaryCta={{ label: 'Test financial workflows', href: CTA_LINKS.sandbox }}
         secondaryCta={{ label: 'Explore marketplace coverage', href: CTA_LINKS.solutionsCatalog }}
+        media={MEDIA_CLIPS.financialVerification}
       />
       
       <SectionScrollReveal>

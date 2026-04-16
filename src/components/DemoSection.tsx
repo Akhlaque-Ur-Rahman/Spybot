@@ -3,6 +3,10 @@ import { useRef, useState } from 'react';
 import styles from './DemoSection.module.css';
 import { Rocket, Target, BarChart3, ShieldCheck, CheckCircle2, Star } from 'lucide-react';
 import { CTA_LINKS } from '@/site';
+import { MEDIA_CLIPS, mediaEncodingFormat } from '@/lib/site-media';
+
+const demoClip = MEDIA_CLIPS.demoSpotlight;
+const demoClipType = mediaEncodingFormat(demoClip.src);
 
 const formFields = [
   { id: 'firstName', label: 'First Name', type: 'text', placeholder: 'Alex' },
@@ -85,6 +89,24 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
                 <div className={styles.proofSub}>from 500+ onboarding and product teams</div>
               </div>
             </div>
+
+            <figure className={styles.clipFigure}>
+              <video
+                className={styles.clipVideo}
+                controls
+                playsInline
+                preload="metadata"
+                poster={demoClip.poster}
+                aria-label={demoClip.title}
+              >
+                <source src={demoClip.src} type={demoClipType} />
+              </video>
+              <figcaption className={styles.clipCaption}>
+                <strong>{demoClip.title}</strong>
+                <span className={styles.clipCaptionSep}> — </span>
+                {demoClip.description}
+              </figcaption>
+            </figure>
           </div>
 
           {/* Right — form */}

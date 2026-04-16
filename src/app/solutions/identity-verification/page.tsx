@@ -6,6 +6,7 @@ import DemoSection from '@/components/DemoSection';
 import { Camera, Fingerprint, Clock, FileWarning, Landmark, ScanFace, Database, ShieldCheck, Zap } from 'lucide-react';
 import { Metadata } from 'next';
 import { CTA_LINKS } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 
 export const metadata: Metadata = {
@@ -102,6 +103,7 @@ export default function IdentityVerificationPage() {
         description="Reduce manual reviews, prevent document fraud, and move legitimate users through onboarding faster with Aadhaar, PAN, and document verification workflows designed for modern digital products."
         primaryCta={{ label: 'Request sandbox access', href: CTA_LINKS.sandbox }}
         secondaryCta={{ label: 'Explore the API marketplace', href: CTA_LINKS.solutionsCatalog }}
+        media={MEDIA_CLIPS.identityVerification}
       />
 
       <SectionScrollReveal>

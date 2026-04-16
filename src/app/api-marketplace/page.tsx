@@ -18,6 +18,7 @@ import DecisionFlow from '@/components/DecisionFlow';
 import CoverageCarousel from '@/components/CoverageCarousel';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { CTA_LINKS, ROUTES } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 
 export const metadata: Metadata = {
   title: 'API Marketplace | Identity Verification, KYC, KYB, Fraud APIs',
@@ -125,6 +126,7 @@ export default function ApiMarketplacePage() {
         description="Replace fragmented KYC, KYB, payout, and fraud tools with a marketplace designed to help product, risk, and compliance teams solve approval bottlenecks faster."
         primaryCta={{ label: 'Request sandbox access', href: '#sandbox-access' }}
         secondaryCta={{ label: 'Talk to an architect', href: CTA_LINKS.contact }}
+        media={MEDIA_CLIPS.apiMarketplace}
       />
 
       <CoverageCarousel label="Marketplace coverage" />

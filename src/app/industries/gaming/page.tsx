@@ -8,6 +8,7 @@ import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { Gamepad2, UserX, Landmark, ShieldAlert, CircleDollarSign, Fingerprint, Banknote, ShieldCheck } from 'lucide-react';
 import { Metadata } from 'next';
 import { CTA_LINKS } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 
 export const metadata: Metadata = {
   title: 'Identity Verification for RMG & Gaming | SpyBot',
@@ -96,6 +97,7 @@ export default function GamingIndustryPage() {
         description="Stop underage access, reduce duplicate-account abuse, and automate payout-linked verification steps without disrupting legitimate player journeys."
         primaryCta={{ label: 'Explore gaming workflows', href: CTA_LINKS.industryUseCases }}
         secondaryCta={{ label: 'Request sandbox access', href: CTA_LINKS.sandbox }}
+        media={MEDIA_CLIPS.identityVerification}
       />
       
       <CoverageCarousel label="RMG & payouts" />

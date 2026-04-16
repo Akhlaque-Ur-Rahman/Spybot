@@ -1,5 +1,7 @@
+import Link from 'next/link';
 import styles from './Footer.module.css';
-import { footerColumns, socialLinks } from '@/site';
+import BrandLogoMark from '@/components/BrandLogoMark';
+import { footerColumns, socialLinks, ROUTES } from '@/site';
 import type { NavMenuItem } from '@/lib/cms/types';
 
 export default function Footer({
@@ -18,20 +20,9 @@ export default function Footer({
         {/* Top — logo + desc */}
         <div className={styles.top}>
           <div className={styles.brand}>
-            <div className={styles.logo}>
-              <div className={styles.logoIcon} aria-hidden="true">
-                <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
-                  <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" fill="none" stroke="#1E8FE1" strokeWidth="1.5"/>
-                  <circle cx="14" cy="14" r="5" fill="#0B72CC" opacity="0.8"/>
-                  <circle cx="14" cy="14" r="2" fill="#10BDB2"/>
-                  <line x1="14" y1="9" x2="14" y2="2" stroke="#1E8FE1" strokeWidth="1.5" opacity="0.6"/>
-                </svg>
-              </div>
-              <div className={styles.logoText}>
-                <span className={styles.logoName}>SpyBot</span>
-                <span className={styles.logoSub}>DIGITAL IDENTITY</span>
-              </div>
-            </div>
+            <Link href={ROUTES.home} className={styles.logo} aria-label="SpyBot homepage">
+              <BrandLogoMark width={168} height={42} plain decorative />
+            </Link>
             <p className={styles.brandDesc}>
               A comprehensive B2B Digital Identity Verification platform. 
               Reduce user onboarding costs effortlessly.

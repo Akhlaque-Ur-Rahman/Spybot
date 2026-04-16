@@ -5,6 +5,7 @@ import SupportSlaStrip from '@/components/SupportSlaStrip';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { CTA_LINKS, ROUTES } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 
 export const metadata: Metadata = {
   title: 'Support | Verification Workflows, API Guidance, Onboarding Help',
@@ -25,6 +26,7 @@ export default function SupportPage() {
         description="Pick a pathway so your request reaches the right team. For self-serve answers, start with FAQs—then escalate with context when you need a specialist."
         primaryCta={{ label: 'Read the FAQ', href: CTA_LINKS.faq }}
         secondaryCta={{ label: 'Contact the team', href: CTA_LINKS.contact }}
+        media={MEDIA_CLIPS.trustOps}
       />
 
       <SectionScrollReveal>

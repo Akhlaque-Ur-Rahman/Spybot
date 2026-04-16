@@ -6,6 +6,7 @@ import CardSlider from '@/components/CardSlider';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { CTA_LINKS, ROUTES } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 import styles from './resources.module.css';
 
 export const metadata: Metadata = {
@@ -45,6 +46,7 @@ export default function ResourcesPage() {
         description="Scan topics, open the guides that match your bottleneck, then validate changes in sandbox with the same checks you plan to run in production."
         primaryCta={{ label: 'Book a consultation', href: CTA_LINKS.contact }}
         secondaryCta={{ label: 'API marketplace', href: CTA_LINKS.solutionsCatalog }}
+        media={MEDIA_CLIPS.resourceLibrary}
       />
 
       <CoverageCarousel label="Popular topics" />

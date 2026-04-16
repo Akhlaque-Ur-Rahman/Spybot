@@ -6,6 +6,7 @@ import CardSlider from '@/components/CardSlider';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { CTA_LINKS, ROUTES, industryNavItems } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 import styles from './industries.module.css';
 
 export const metadata: Metadata = {
@@ -57,6 +58,7 @@ export default function IndustriesPage() {
         description="Start from the industry page that matches your operating reality—each brief focuses on the checks and routing patterns that tend to matter most."
         primaryCta={{ label: 'See marketplace use cases', href: CTA_LINKS.industryUseCases }}
         secondaryCta={{ label: 'Talk to a specialist', href: CTA_LINKS.contact }}
+        media={MEDIA_CLIPS.industriesHub}
       />
 
       <DirectoryGrid

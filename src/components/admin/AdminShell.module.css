@@ -31,13 +31,33 @@
 }
 
 .navLink {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md, 8px);
   color: var(--color-text-secondary);
   text-decoration: none;
   font-size: var(--text-body-sm);
   transition: background 0.15s ease, color 0.15s ease;
+}
+
+.navIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: inherit;
+}
+
+.navIcon svg {
+  display: block;
+}
+
+.navLabel {
+  min-width: 0;
 }
 
 .navLink:hover {
@@ -122,11 +142,12 @@
     --admin-sidebar-w: 72px;
   }
 
-  .navLink span {
+  .navLabel {
     display: none;
   }
 
   .navLink {
+    justify-content: center;
     text-align: center;
     font-size: var(--text-xs);
     padding: var(--space-2);

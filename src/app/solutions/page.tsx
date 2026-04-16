@@ -6,6 +6,7 @@ import CardSlider from '@/components/CardSlider';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { CTA_LINKS, ROUTES, solutionNavItems } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 import styles from './solutions.module.css';
 
 export const metadata: Metadata = {
@@ -57,6 +58,7 @@ export default function SolutionsPage() {
         description="These pages are an index into deeper solution briefs. Choose the module that matches your bottleneck—identity, business, financial, or assisted verification—then orchestrate the sequence in Superflow."
         primaryCta={{ label: 'Explore the API marketplace', href: CTA_LINKS.solutionsCatalog }}
         secondaryCta={{ label: 'Talk to solutions', href: CTA_LINKS.contact }}
+        media={MEDIA_CLIPS.solutionsHub}
       />
 
       <DirectoryGrid

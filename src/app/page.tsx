@@ -6,6 +6,22 @@ import DecisionFlow from '@/components/DecisionFlow';
 import DemoSection from '@/components/DemoSection';
 import type { Metadata } from 'next';
 import { getPublishedPageBySlug } from '@/lib/cms/service';
+import { MEDIA_BRAND_LOGO, MEDIA_CLIPS, mediaEncodingFormat, siteOrigin } from '@/lib/site-media';
+
+const origin = siteOrigin();
+const heroEncodingFormat = mediaEncodingFormat(MEDIA_CLIPS.homeHero.src);
+const heroVideoJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  '@id': `${origin}/#hero-video`,
+  name: MEDIA_CLIPS.homeHero.title,
+  description: MEDIA_CLIPS.homeHero.description,
+  thumbnailUrl: `${origin}${MEDIA_BRAND_LOGO}`,
+  contentUrl: `${origin}${MEDIA_CLIPS.homeHero.src}`,
+  encodingFormat: heroEncodingFormat,
+  isFamilyFriendly: true,
+  publisher: { '@id': `${origin}/#organization` },
+};
 
 export const metadata: Metadata = {
   title: 'B2B Identity Verification And Onboarding Platform',
@@ -25,6 +41,10 @@ export default async function Home() {
 
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(heroVideoJsonLd) }}
+      />
       {(!hasOverrides || enabledKeys.has('hero')) && <Hero />}
       {(!hasOverrides || enabledKeys.has('challenges')) && <Challenges />}
       {(!hasOverrides || enabledKeys.has('lifecycle')) && <Lifecycle />}

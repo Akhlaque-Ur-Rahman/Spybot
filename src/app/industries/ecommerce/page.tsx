@@ -8,6 +8,7 @@ import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { ShoppingCart, MapPin, Box, ShieldAlert, Building2, Store, Truck, ShieldCheck } from 'lucide-react';
 import { Metadata } from 'next';
 import { CTA_LINKS } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 
 export const metadata: Metadata = {
   title: 'Identity Verification for E-Commerce | SpyBot',
@@ -96,6 +97,7 @@ export default function EcommerceIndustryPage() {
         description="Protect seller onboarding, reduce COD and refund abuse, and build stronger trust signals across every buyer and merchant workflow."
         primaryCta={{ label: 'Explore marketplace workflows', href: CTA_LINKS.industryUseCases }}
         secondaryCta={{ label: 'Book a use-case review', href: CTA_LINKS.contact }}
+        media={MEDIA_CLIPS.kybSuite}
       />
       
       <CoverageCarousel label="Marketplace verification" />

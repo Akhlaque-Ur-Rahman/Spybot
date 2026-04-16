@@ -7,6 +7,7 @@ import CoverageCarousel from '@/components/CoverageCarousel';
 import { Landmark, TrendingDown, Clock, ShieldAlert, CircleDollarSign, CheckCircle2, FileCheck2, UserCheck, ShieldCheck } from 'lucide-react';
 import { Metadata } from 'next';
 import { CTA_LINKS } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 
 export const metadata: Metadata = {
@@ -97,6 +98,7 @@ export default function FintechIndustryPage() {
         description="Give fintech and banking teams a faster path to account opening, underwriting, and fraud prevention with verification workflows designed for regulated, high-volume onboarding."
         primaryCta={{ label: 'Explore fintech workflows', href: CTA_LINKS.industryUseCases }}
         secondaryCta={{ label: 'Talk to an expert', href: CTA_LINKS.contact }}
+        media={MEDIA_CLIPS.financialVerification}
       />
 
       <CoverageCarousel label="Fintech coverage" />

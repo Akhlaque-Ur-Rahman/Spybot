@@ -3,22 +3,37 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
+import type { LucideIcon } from 'lucide-react';
+import {
+  CloudUpload,
+  FileText,
+  History,
+  Image as ImageIcon,
+  Inbox,
+  LayoutDashboard,
+  Menu,
+  Search,
+  Settings,
+  Users,
+} from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { AdminApiProvider } from '@/components/admin/AdminApiContext';
 import styles from './AdminShell.module.css';
 
-const links = [
-  { href: '/admin', label: 'Overview', short: '◉' },
-  { href: '/admin/content', label: 'Content', short: '§' },
-  { href: '/admin/media', label: 'Media', short: '▣' },
-  { href: '/admin/navigation', label: 'Navigation', short: '≡' },
-  { href: '/admin/seo', label: 'SEO', short: '◎' },
-  { href: '/admin/forms', label: 'Forms', short: '✉' },
-  { href: '/admin/users', label: 'Users', short: '👤' },
-  { href: '/admin/settings', label: 'Settings', short: '⚙' },
-  { href: '/admin/publish', label: 'Publish', short: '▶' },
-  { href: '/admin/audit', label: 'Audit', short: '⌚' },
+const links: { href: string; label: string; Icon: LucideIcon }[] = [
+  { href: '/admin', label: 'Overview', Icon: LayoutDashboard },
+  { href: '/admin/content', label: 'Content', Icon: FileText },
+  { href: '/admin/media', label: 'Media', Icon: ImageIcon },
+  { href: '/admin/navigation', label: 'Navigation', Icon: Menu },
+  { href: '/admin/seo', label: 'SEO', Icon: Search },
+  { href: '/admin/forms', label: 'Forms', Icon: Inbox },
+  { href: '/admin/users', label: 'Users', Icon: Users },
+  { href: '/admin/settings', label: 'Settings', Icon: Settings },
+  { href: '/admin/publish', label: 'Publish', Icon: CloudUpload },
+  { href: '/admin/audit', label: 'Audit', Icon: History },
 ];
+
+const iconProps = { size: 18, strokeWidth: 1.75 } as const;
 
 export default function AdminShell({
   csrfToken,
@@ -53,15 +68,19 @@ export default function AdminShell({
                 link.href === '/admin'
                   ? pathname === '/admin'
                   : pathname === link.href || pathname.startsWith(`${link.href}/`);
+              const Icon = link.Icon;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
+                  title={link.label}
                   className={`${styles.navLink} ${active ? styles.navLinkActive : ''}`}
                   onClick={() => setDrawerOpen(false)}
                 >
-                  <span aria-hidden="true">{link.short} </span>
-                  <span>{link.label}</span>
+                  <span className={styles.navIcon} aria-hidden="true">
+                    <Icon {...iconProps} />
+                  </span>
+                  <span className={styles.navLabel}>{link.label}</span>
                 </Link>
               );
             })}

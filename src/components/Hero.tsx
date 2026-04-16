@@ -3,6 +3,10 @@ import { useEffect, useRef } from 'react';
 import styles from './Hero.module.css';
 import { Rocket } from 'lucide-react';
 import { CTA_LINKS } from '@/site';
+import { MEDIA_CLIPS, mediaEncodingFormat } from '@/lib/site-media';
+
+const heroClip = MEDIA_CLIPS.homeHero;
+const heroVideoType = mediaEncodingFormat(heroClip.src);
 
 const stats = [
   { value: '99.99%', label: 'Uptime SLA' },
@@ -27,6 +31,15 @@ const severityColor: Record<string, string> = {
 
 export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) {
+      v.muted = true;
+      void v.play().catch(() => {});
+    }
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -94,6 +107,22 @@ export default function Hero() {
 
   return (
     <section className={styles.hero} id="hero">
+      <div className={styles.heroVideoWrap} aria-hidden="true">
+        <video
+          ref={videoRef}
+          className={styles.heroVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={heroClip.poster}
+          tabIndex={-1}
+        >
+          <source src={heroClip.src} type={heroVideoType} />
+        </video>
+        <div className={styles.heroScrim} />
+      </div>
       <canvas ref={canvasRef} className={styles.canvas} aria-hidden />
 
       {/* Glow orbs */}

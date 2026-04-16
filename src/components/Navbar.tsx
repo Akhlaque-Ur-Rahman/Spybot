@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import styles from './Navbar.module.css';
 import ThemeToggle from './ThemeToggle';
+import BrandLogoMark from '@/components/BrandLogoMark';
 import { CTA_LINKS, ROUTES, industryNavItems, solutionNavItems } from '@/site';
 import {
   BadgeCheck,
@@ -149,19 +150,8 @@ export default function Navbar({
       <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`} aria-label="Main Navigation">
         <div className={`container ${styles.navInner}`}>
           {/* Logo */}
-          <Link href={ROUTES.home} className={styles.logo} aria-label="SpyBot Homepage">
-            <div className={styles.logoIcon} aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" fill="none" stroke="#1E8FE1" strokeWidth="1.5"/>
-                <circle cx="14" cy="14" r="5" fill="#0B72CC" opacity="0.8"/>
-                <circle cx="14" cy="14" r="2" fill="#10BDB2"/>
-                <line x1="14" y1="9" x2="14" y2="2" stroke="#1E8FE1" strokeWidth="1.5" opacity="0.6"/>
-              </svg>
-            </div>
-            <div className={styles.logoText}>
-              <span className={styles.logoName}>SpyBot</span>
-              <span className={styles.logoSub}>DIGITAL IDENTITY</span>
-            </div>
+          <Link href={ROUTES.home} className={styles.logo} aria-label="SpyBot homepage">
+            <BrandLogoMark width={160} height={40} plain decorative />
           </Link>
 
           {/* Desktop links */}

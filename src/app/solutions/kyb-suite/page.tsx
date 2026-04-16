@@ -8,6 +8,7 @@ import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { Building2, SearchX, Users, Network, FileCheck2, ScanSearch, Handshake, MapPin } from 'lucide-react';
 import { Metadata } from 'next';
 import { CTA_LINKS } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 
 export const metadata: Metadata = {
   title: 'KYB Suite | Automated Business Verification',
@@ -102,6 +103,7 @@ export default function KybSuitePage() {
         description="Replace portal hopping and fragmented KYB operations with company verification workflows that help teams approve merchants, vendors, and B2B customers faster."
         primaryCta={{ label: 'Explore KYB workflows', href: CTA_LINKS.solutionsCatalog }}
         secondaryCta={{ label: 'Talk to a specialist', href: CTA_LINKS.contact }}
+        media={MEDIA_CLIPS.kybSuite}
       />
       
       <CoverageCarousel label="KYB signals" />

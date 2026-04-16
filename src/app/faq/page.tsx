@@ -4,6 +4,7 @@ import FaqAccordion from '@/components/FaqAccordion';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { CTA_LINKS, ROUTES } from '@/site';
+import { MEDIA_CLIPS } from '@/lib/site-media';
 
 export const metadata: Metadata = {
   title: 'FAQ | Identity Verification, KYC, KYB, Support',
@@ -78,6 +79,7 @@ export default function FaqPage() {
         description="Search by topic below. If you need account-specific guidance, route through Support or Contact so we can reference your environment and rollout stage."
         primaryCta={{ label: 'Contact support', href: CTA_LINKS.support }}
         secondaryCta={{ label: 'Talk to sales', href: CTA_LINKS.contact }}
+        media={MEDIA_CLIPS.trustOps}
       />
 
       <SectionScrollReveal>
