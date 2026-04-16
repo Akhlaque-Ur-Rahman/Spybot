@@ -47,8 +47,8 @@ To show the site and CMS to someone **without deploying** (local DB stays local)
 
 ## Deploying (e.g. Vercel)
 
-- Set **`DATABASE_URL`** to a hosted Postgres (Neon, Supabase, etc.); run `pnpm db:push` / `pnpm db:seed` against it once.
-- Set **`NEXTAUTH_URL`** to your production site origin (e.g. `https://your-app.vercel.app`).
+- Set **`DATABASE_URL`** to a hosted Postgres (Neon, Supabase, etc.); run `pnpm db:push` / `pnpm db:seed` against it once. Add the same variable under **Vercel → Project → Settings → Environment Variables** for *Production* (and *Preview* if you use previews). The CMS segment is **`force-dynamic`**, so the build can complete even if you only add `DATABASE_URL` for runtime—but the admin UI will not load data until it is set.
+- Set **`NEXTAUTH_URL`** to your production site origin (e.g. `https://your-app.vercel.app`) and **`NEXTAUTH_SECRET`** to a random string.
 - The **`build`** script runs **`prisma generate`** before `next build`, and **`pnpm.onlyBuiltDependencies`** allows Prisma’s install scripts when using pnpm 10 (fixes “Ignored build scripts” on CI).
 
 ## Launch Checklist
