@@ -1,6 +1,6 @@
 'use client';
 
-import { UserRole } from '@prisma/client';
+import type { UserRole } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAdminApi } from '@/components/admin/AdminApiContext';
@@ -9,7 +9,8 @@ import pageStyles from '@/components/admin/adminPage.module.css';
 
 export type UserRow = { id: string; email: string; name: string | null; role: UserRole };
 
-const roles: UserRole[] = [UserRole.OWNER, UserRole.EDITOR, UserRole.REVIEWER];
+/** Prisma enum values — keep as strings so this file does not import `@prisma/client` at runtime (browser bundle). */
+const roles = ['OWNER', 'EDITOR', 'REVIEWER'] as const satisfies readonly UserRole[];
 
 export default function UsersRolesClient({ users }: { users: UserRow[] }) {
   const router = useRouter();

@@ -20,6 +20,10 @@ npm run dev
 
 Admin login is at `http://localhost:<port>/admin/login` (check the terminal for the exact URL).
 
+## Client demo over the internet (Cloudflare Tunnel)
+
+To show the site and CMS to someone **without deploying** (local DB stays local), use **Cloudflare Tunnel** and set **`NEXTAUTH_URL`** to the tunnel URL as documented in **[docs/cloudflare-tunnel.md](docs/cloudflare-tunnel.md)**.
+
 ## CMS Routes
 
 - `/admin` dashboard overview
@@ -40,6 +44,12 @@ Admin login is at `http://localhost:<port>/admin/login` (check the terminal for 
 - Role-based checks in admin API handlers.
 - CSRF token verification for sensitive write paths.
 - Basic in-memory request rate limiting in API guards.
+
+## Deploying (e.g. Vercel)
+
+- Set **`DATABASE_URL`** to a hosted Postgres (Neon, Supabase, etc.); run `pnpm db:push` / `pnpm db:seed` against it once.
+- Set **`NEXTAUTH_URL`** to your production site origin (e.g. `https://your-app.vercel.app`).
+- The **`build`** script runs **`prisma generate`** before `next build`, and **`pnpm.onlyBuiltDependencies`** allows Prisma’s install scripts when using pnpm 10 (fixes “Ignored build scripts” on CI).
 
 ## Launch Checklist
 
