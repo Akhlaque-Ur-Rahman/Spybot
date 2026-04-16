@@ -5,87 +5,74 @@ import CoverageCarousel from '@/components/CoverageCarousel';
 import CardSlider from '@/components/CardSlider';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
+import { getManagedBlock, getManagedPageBySlug, getManagedPageSeoBySlug } from '@/lib/cms/page-content';
 import { CTA_LINKS, ROUTES, solutionNavItems } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 import styles from './solutions.module.css';
 
-export const metadata: Metadata = {
-  title: 'Solutions | Identity Verification, KYB, Financial Verification, Video KYC',
-  description:
-    'Explore SpyBot solutions for identity verification, KYB, financial verification, and video KYC workflows built to improve onboarding conversion and compliance outcomes.',
-  alternates: {
-    canonical: ROUTES.solutions,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getManagedPageSeoBySlug(ROUTES.solutions);
+  return {
+    title: seo?.title ?? 'Solutions | Identity Verification, KYB, Financial Verification, Video KYC',
+    description:
+      seo?.description ??
+      'Explore SpyBot solutions for identity verification, KYB, financial verification, and video KYC workflows built to improve onboarding conversion and compliance outcomes.',
+    alternates: {
+      canonical: ROUTES.solutions,
+    },
+  };
+}
 
-const solutionDirectory = solutionNavItems.map((s) => ({
-  title: s.label,
-  description: s.desc,
-  href: s.href,
-  badge: 'Solution',
-}));
+export default async function SolutionsPage() {
+  const cmsPage = await getManagedPageBySlug(ROUTES.solutions);
+  const pageHeader = getManagedBlock(cmsPage, 'pageHeader', 'pageHeader');
+  const directoryGrid = getManagedBlock(cmsPage, 'directoryGrid', 'directoryGrid');
+  const coverage = getManagedBlock(cmsPage, 'coverageCarousel', 'coverageCarousel');
+  const sliderSection = getManagedBlock(cmsPage, 'sliderSection', 'sliderSection');
+  const utilityCtaBand = getManagedBlock(cmsPage, 'utilityCtaBand', 'utilityCtaBand');
 
-const pickSlides = [
-  {
-    tag: 'B2C onboarding',
-    title: 'Start with Identity Verification',
-    desc: 'When drop-offs come from slow document checks and database matching, consolidate Aadhaar, PAN, and OCR into one decisioning flow.',
-  },
-  {
-    tag: 'Merchants & partners',
-    title: 'Lead with KYB Suite',
-    desc: 'When risk is business-side—marketplaces, lending partners, or vendors—prioritize MCA, GST, and director intelligence before payouts.',
-  },
-  {
-    tag: 'Underwriting & payouts',
-    title: 'Add Financial Verification',
-    desc: 'When you need bank-linked confidence, automate penny drop and statement signals before releasing funds or credit.',
-  },
-  {
-    tag: 'High-assurance moments',
-    title: 'Use Video KYC & eSign',
-    desc: 'When regulation or risk demands human assurance, run adaptive V-CIP with auditable archives.',
-  },
-];
-
-export default function SolutionsPage() {
   return (
     <main>
       <PageHeader
-        label="Solutions"
-        title="Pick a verification lane,"
-        gradientText="then compose the workflow"
-        description="These pages are an index into deeper solution briefs. Choose the module that matches your bottleneck—identity, business, financial, or assisted verification—then orchestrate the sequence in Superflow."
-        primaryCta={{ label: 'Explore the API marketplace', href: CTA_LINKS.solutionsCatalog }}
-        secondaryCta={{ label: 'Talk to solutions', href: CTA_LINKS.contact }}
-        media={MEDIA_CLIPS.solutionsHub}
+        label={pageHeader?.label ?? 'Solutions'}
+        title={pageHeader?.title ?? 'Pick a verification lane,'}
+        gradientText={pageHeader?.gradientText ?? 'then compose the workflow'}
+        description={pageHeader?.description ?? 'These pages are an index into deeper solution briefs. Choose the module that matches your bottleneck, identity, business, financial, or assisted verification, then orchestrate the sequence in Superflow.'}
+        primaryCta={pageHeader?.primaryCta ?? { label: 'Explore the API marketplace', href: CTA_LINKS.solutionsCatalog }}
+        secondaryCta={pageHeader?.secondaryCta ?? { label: 'Talk to solutions', href: CTA_LINKS.contact }}
+        media={pageHeader?.media ?? MEDIA_CLIPS.solutionsHub}
       />
 
       <DirectoryGrid
-        id="solutions-index"
-        heading="Solution catalog"
-        subheading="Each route links to a focused brief with capabilities, integration notes, and typical operating models."
-        items={solutionDirectory}
+        id={directoryGrid?.id ?? 'solutions-index'}
+        heading={directoryGrid?.heading ?? 'Solution catalog'}
+        subheading={directoryGrid?.subheading ?? 'Each route links to a focused brief with capabilities, integration notes, and typical operating models.'}
+        items={directoryGrid?.items ?? solutionNavItems.map((s) => ({
+          title: s.label,
+          description: s.desc,
+          href: s.href,
+          badge: 'Solution',
+        }))}
       />
 
-      <CoverageCarousel />
+      <CoverageCarousel label={coverage?.label ?? 'Coverage'} items={coverage?.items} />
 
       <SectionScrollReveal>
         <section className={styles.compare} aria-labelledby="compare-heading">
           <div className="container">
             <h2 id="compare-heading" className={styles.compareTitle}>
-              Which module fits <span className="text-gradient">first</span>?
+              {sliderSection?.heading ?? 'Which module fits'} <span className="text-gradient">{sliderSection?.gradientText ?? 'first'}</span>?
             </h2>
-            <CardSlider items={pickSlides} ariaLabel="Solution selection guidance" />
+            <CardSlider items={sliderSection?.items ?? []} ariaLabel={sliderSection?.ariaLabel ?? 'Solution selection guidance'} />
           </div>
         </section>
       </SectionScrollReveal>
 
       <UtilityCtaBand
-        title="Need a cross-module rollout plan?"
-        description="We help teams sequence identity, KYB, and financial checks so the journey stays fast for legitimate users and strict at the riskiest steps."
-        primary={{ label: 'Book a consultation', href: CTA_LINKS.contact }}
-        secondary={{ label: 'Browse FAQs', href: CTA_LINKS.faq }}
+        title={utilityCtaBand?.title ?? 'Need a cross-module rollout plan?'}
+        description={utilityCtaBand?.description ?? 'We help teams sequence identity, KYB, and financial checks so the journey stays fast for legitimate users and strict at the riskiest steps.'}
+        primary={utilityCtaBand?.primary ?? { label: 'Book a consultation', href: CTA_LINKS.contact }}
+        secondary={utilityCtaBand?.secondary ?? { label: 'Browse FAQs', href: CTA_LINKS.faq }}
       />
     </main>
   );

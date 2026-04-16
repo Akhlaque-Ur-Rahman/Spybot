@@ -1,6 +1,7 @@
 import styles from './Challenges.module.css';
 import { TrendingDown, UserX, Timer, Blocks, Settings, Globe } from 'lucide-react';
 import React from 'react';
+import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import { ChallengeTone } from '@/site';
 
 export interface ChallengeItem {
@@ -9,6 +10,13 @@ export interface ChallengeItem {
   desc: string;
   tone: ChallengeTone;
 }
+
+export type ChallengeDataItem = {
+  icon: CmsIconName;
+  title: string;
+  desc: string;
+  tone: ChallengeTone;
+};
 
 interface ChallengeToneStyle {
   background: string;
@@ -95,6 +103,13 @@ interface ChallengesProps {
   gradientText?: string;
   subtitle?: string;
   data?: ChallengeItem[];
+  content?: {
+    label?: string;
+    title?: string;
+    gradientText?: string;
+    subtitle?: string;
+    items: ChallengeDataItem[];
+  };
 }
 
 export default function Challenges({
@@ -102,25 +117,37 @@ export default function Challenges({
   title = "Traditional Onboarding is",
   gradientText = "Broken",
   subtitle = "Outdated KYC processes lose customers and drain resources. SpyBot gives you the identity intelligence advantage to onboard fast and securely.",
-  data = defaultChallenges
+  data = defaultChallenges,
+  content,
 }: ChallengesProps) {
+  const resolvedLabel = content?.label ?? label;
+  const resolvedTitle = content?.title ?? title;
+  const resolvedGradientText = content?.gradientText ?? gradientText;
+  const resolvedSubtitle = content?.subtitle ?? subtitle;
+  const resolvedData = content
+    ? content.items.map((item) => ({
+        ...item,
+        icon: renderCmsIcon(item.icon),
+      }))
+    : data;
+
   return (
     <section className={styles.section} id="challenges">
       <div className={`glow-orb glow-orb-blue ${styles.glow}`} style={{ width: 400, height: 400 }} aria-hidden="true" />
       <div className="container">
         <div className={styles.header}>
-          <p className="section-label">{label}</p>
+          <p className="section-label">{resolvedLabel}</p>
           <h2 className="section-title">
-            {title}{' '}
-            {gradientText && <span className="text-gradient">{gradientText}</span>}
+            {resolvedTitle}{' '}
+            {resolvedGradientText && <span className="text-gradient">{resolvedGradientText}</span>}
           </h2>
           <p className="section-subtitle" style={{ marginTop: 16 }}>
-            {subtitle}
+            {resolvedSubtitle}
           </p>
         </div>
 
         <div className={`grid-3 ${styles.grid}`}>
-          {data.map((c, i) => (
+          {resolvedData.map((c, i) => (
             <div key={c.title} className={styles.card} style={{ animationDelay: `${i * 0.1}s` }}>
               <div
                 className={styles.cardIcon}

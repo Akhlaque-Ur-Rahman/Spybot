@@ -1,5 +1,6 @@
 import styles from './DecisionFlow.module.css';
 import { Settings, Component, MousePointerClick, Shuffle, Zap, Lightbulb } from 'lucide-react';
+import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 
 const decisions = [
   {
@@ -26,19 +27,62 @@ const contextItems = [
   { icon: <Zap size={20} strokeWidth={1.5} />, title: 'Instant Execution', desc: 'Sub-second API responses ensure zero UI latency' },
 ];
 
-export default function DecisionFlow() {
+type DecisionFlowItem = {
+  question: string;
+  yes: string;
+  no: string;
+};
+
+type DecisionFlowCapability = {
+  icon: CmsIconName;
+  title: string;
+  desc: string;
+};
+
+export default function DecisionFlow({
+  label = 'Superflow Orchestration',
+  title = 'No-Code',
+  gradientText = 'Workflow Builder',
+  subtitle = "Don't waste engineering months. Orchestrate complex onboarding journeys combining ID, income, and background checks via our drag-and-drop Superflow.",
+  panelTitle = 'Superflow Canvas',
+  panelBadge = 'ACTIVE',
+  items = decisions,
+  capabilitiesHeading = 'Superflow Capabilities:',
+  capabilities,
+  noteTitle = 'Developer Friendly',
+  noteText = 'Prefer writing code? The entire platform is built API-first. You can bypass the No-Code builder and consume our REST APIs directly.',
+}: {
+  label?: string;
+  title?: string;
+  gradientText?: string;
+  subtitle?: string;
+  panelTitle?: string;
+  panelBadge?: string;
+  items?: DecisionFlowItem[];
+  capabilitiesHeading?: string;
+  capabilities?: DecisionFlowCapability[];
+  noteTitle?: string;
+  noteText?: string;
+}) {
+  const resolvedCapabilities = capabilities
+    ? capabilities.map((item) => ({
+        ...item,
+        icon: renderCmsIcon(item.icon, 'small'),
+      }))
+    : contextItems;
+
   return (
     <section className={styles.section} id="superflow">
       <div className={`glow-orb glow-orb-teal ${styles.glow}`} style={{ width: 400, height: 400 }} aria-hidden="true" />
       <div className="container">
         <div className={styles.header}>
-          <p className="section-label">Superflow Orchestration</p>
+          <p className="section-label">{label}</p>
           <h2 className="section-title">
-            No-Code{' '}
-            <span className="text-gradient">Workflow Builder</span>
+            {title}{' '}
+            <span className="text-gradient">{gradientText}</span>
           </h2>
           <p className="section-subtitle" style={{ marginTop: 16 }}>
-            Don&apos;t waste engineering months. Orchestrate complex onboarding journeys combining ID, income, and background checks via our drag-and-drop Superflow.
+            {subtitle}
           </p>
         </div>
 
@@ -46,10 +90,10 @@ export default function DecisionFlow() {
           {/* Left — decision tree */}
           <div className={styles.treePanel}>
             <div className={styles.treePanelHeader}>
-              <span className={styles.treePanelTitle}>Superflow Canvas</span>
-              <span className={`badge badge-teal badge-dot`} style={{ fontSize: '0.62rem' }}>ACTIVE</span>
+              <span className={styles.treePanelTitle}>{panelTitle}</span>
+              <span className={`badge badge-teal badge-dot`} style={{ fontSize: '0.62rem' }}>{panelBadge}</span>
             </div>
-            {decisions.map((d, i) => (
+            {items.map((d, i) => (
               <div key={i} className={styles.decisionNode}>
                 <div className={styles.questionBubble}>
                   <span className={styles.questionIcon} aria-hidden="true" style={{ display: 'flex', alignItems: 'center' }}>
@@ -74,8 +118,8 @@ export default function DecisionFlow() {
 
           {/* Right — context cards */}
           <div className={styles.contextPanel}>
-            <p className={styles.contextHeading}>Superflow Capabilities:</p>
-            {contextItems.map((item) => (
+            <p className={styles.contextHeading}>{capabilitiesHeading}</p>
+            {resolvedCapabilities.map((item) => (
               <div key={item.title} className={styles.contextCard}>
                 <span className={styles.contextIcon} aria-hidden="true">{item.icon}</span>
                 <div>
@@ -90,9 +134,9 @@ export default function DecisionFlow() {
                 <Lightbulb size={24} strokeWidth={1.5} />
               </div>
               <div>
-                <div className={styles.aiNoteTitle}>Developer Friendly</div>
+                <div className={styles.aiNoteTitle}>{noteTitle}</div>
                 <div className={styles.aiNoteText}>
-                  Prefer writing code? The entire platform is built API-first. You can bypass the No-Code builder and consume our REST APIs directly.
+                  {noteText}
                 </div>
               </div>
             </div>

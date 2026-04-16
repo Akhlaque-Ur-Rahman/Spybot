@@ -1,6 +1,7 @@
 import styles from './Benefits.module.css';
 import { LibraryBig, Hammer, Globe, Lock, FileText, Building2 } from 'lucide-react';
 import React from 'react';
+import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import { CTA_LINKS } from '@/site';
 
 export interface BenefitItem {
@@ -9,6 +10,13 @@ export interface BenefitItem {
   desc: string;
   highlight: 'primary' | 'teal';
 }
+
+export type BenefitDataItem = {
+  icon: CmsIconName;
+  title: string;
+  desc: string;
+  highlight: 'primary' | 'teal';
+};
 
 export const defaultBenefits: BenefitItem[] = [
   {
@@ -55,6 +63,13 @@ interface BenefitsProps {
   gradientText?: string;
   subtitle?: string;
   data?: BenefitItem[];
+  content?: {
+    label?: string;
+    title?: string;
+    gradientText?: string;
+    subtitle?: string;
+    items: BenefitDataItem[];
+  };
 }
 
 export default function Benefits({
@@ -62,26 +77,38 @@ export default function Benefits({
   title = "The Complete Identity",
   gradientText = "Ecosystem",
   subtitle = "SpyBot doesn't just read documents — it gives you the intelligence, automation, and scale to confidently onboard any user or business.",
-  data = defaultBenefits
+  data = defaultBenefits,
+  content,
 }: BenefitsProps) {
+  const resolvedLabel = content?.label ?? label;
+  const resolvedTitle = content?.title ?? title;
+  const resolvedGradientText = content?.gradientText ?? gradientText;
+  const resolvedSubtitle = content?.subtitle ?? subtitle;
+  const resolvedData = content
+    ? content.items.map((item) => ({
+        ...item,
+        icon: renderCmsIcon(item.icon, 'xl'),
+      }))
+    : data;
+
   return (
     <section className={styles.section} id="benefits">
       <div className={`glow-orb glow-orb-blue ${styles.glow1}`} style={{ width: 450, height: 450 }} aria-hidden="true" />
       <div className={`glow-orb glow-orb-teal ${styles.glow2}`} style={{ width: 350, height: 350 }} aria-hidden="true" />
       <div className="container">
         <div className={styles.header}>
-          <p className="section-label">{label}</p>
+          <p className="section-label">{resolvedLabel}</p>
           <h2 className="section-title">
-            {title}{' '}
-            {gradientText && <span className="text-gradient">{gradientText}</span>}
+            {resolvedTitle}{' '}
+            {resolvedGradientText && <span className="text-gradient">{resolvedGradientText}</span>}
           </h2>
           <p className="section-subtitle" style={{ marginTop: 16, marginInline: 'auto' }}>
-            {subtitle}
+            {resolvedSubtitle}
           </p>
         </div>
 
         <div className={`grid-3 ${styles.grid}`}>
-          {data.map((b, i) => (
+          {resolvedData.map((b, i) => (
             <div key={b.title} className={`${styles.card} ${styles[`card_${b.highlight}`]}`} style={{ animationDelay: `${i * 0.1}s` }}>
               <div className={styles.cardTop}>
                 <span className={styles.cardIcon} aria-hidden="true">{b.icon}</span>

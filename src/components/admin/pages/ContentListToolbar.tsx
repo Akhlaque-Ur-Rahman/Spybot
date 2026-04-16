@@ -15,6 +15,7 @@ export default function ContentListToolbar() {
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   async function createPage() {
     if (!key.trim() || !title.trim() || !slug.trim()) {
@@ -40,8 +41,28 @@ export default function ContentListToolbar() {
     }
   }
 
+  async function syncPages() {
+    setSyncing(true);
+    try {
+      const result = await fetchJson<{ createdPageKeys: string[] }>('/api/admin/content/sync', {
+        method: 'POST',
+        body: JSON.stringify({}),
+      });
+      const createdCount = result.createdPageKeys.length;
+      push(createdCount > 0 ? `${createdCount} website pages synced` : 'Website pages already synced', 'success');
+      router.refresh();
+    } catch (e) {
+      push(e instanceof Error ? e.message : 'Sync failed', 'error');
+    } finally {
+      setSyncing(false);
+    }
+  }
+
   return (
     <div className={pageStyles.row}>
+      <button type="button" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`} disabled={syncing} onClick={syncPages}>
+        {syncing ? 'Syncing…' : 'Sync website pages'}
+      </button>
       <button type="button" className={pageStyles.btn} onClick={() => setOpen(true)}>
         New page
       </button>

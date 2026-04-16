@@ -1,6 +1,7 @@
 import styles from './SupportPathways.module.css';
 import { Headphones, Mail, Clock, Shield } from 'lucide-react';
 import Link from 'next/link';
+import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import { ROUTES } from '@/site';
 
 const pathways = [
@@ -30,18 +31,42 @@ const pathways = [
   },
 ];
 
-export default function SupportPathways() {
+type SupportPathwayItem = {
+  icon: CmsIconName;
+  title: string;
+  desc: string;
+  action: { label: string; href: string };
+};
+
+export default function SupportPathways({
+  heading = 'Pick the right',
+  gradientText = 'path',
+  subheading = 'Different questions need different owners. Route your request so you get a faster, more precise answer.',
+  items,
+}: {
+  heading?: string;
+  gradientText?: string;
+  subheading?: string;
+  items?: SupportPathwayItem[];
+}) {
+  const resolvedItems = items
+    ? items.map((item) => ({
+        ...item,
+        icon: renderCmsIcon(item.icon),
+      }))
+    : pathways;
+
   return (
     <section className={styles.section} aria-labelledby="support-pathways-heading">
       <div className="container">
         <h2 id="support-pathways-heading" className={styles.heading}>
-          Pick the right <span className="text-gradient">path</span>
+          {heading} <span className="text-gradient">{gradientText}</span>
         </h2>
         <p className={styles.sub}>
-          Different questions need different owners. Route your request so you get a faster, more precise answer.
+          {subheading}
         </p>
         <div className={styles.grid}>
-          {pathways.map((p) => (
+          {resolvedItems.map((p) => (
             <article key={p.title} className={styles.card}>
               <div className={styles.icon} aria-hidden="true">
                 {p.icon}

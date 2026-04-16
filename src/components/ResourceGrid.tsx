@@ -39,14 +39,20 @@ const defaultTiles: ResourceTile[] = [
 
 type Props = {
   tiles?: ResourceTile[];
+  heading?: string;
+  gradientText?: string;
 };
 
-export default function ResourceGrid({ tiles = defaultTiles }: Props) {
+export default function ResourceGrid({
+  tiles = defaultTiles,
+  heading = 'Browse by',
+  gradientText = 'topic',
+}: Props) {
   return (
     <section className={styles.section} aria-labelledby="resource-grid-heading">
       <div className="container">
         <h2 id="resource-grid-heading" className={styles.heading}>
-          Browse by <span className="text-gradient">topic</span>
+          {heading} <span className="text-gradient">{gradientText}</span>
         </h2>
         <ul className={styles.grid}>
           {tiles.map((t) => (

@@ -1,11 +1,11 @@
-import Hero from '@/components/Hero';
+import { HeroSection } from '@/components/Hero';
 import Challenges from '@/components/Challenges';
 import Lifecycle from '@/components/Lifecycle';
 import Benefits from '@/components/Benefits';
 import DecisionFlow from '@/components/DecisionFlow';
 import DemoSection from '@/components/DemoSection';
 import type { Metadata } from 'next';
-import { getPublishedPageBySlug } from '@/lib/cms/service';
+import { getManagedBlock, getManagedPageBySlug, getManagedPageSeoBySlug } from '@/lib/cms/page-content';
 import { MEDIA_BRAND_LOGO, MEDIA_CLIPS, mediaEncodingFormat, siteOrigin } from '@/lib/site-media';
 
 const origin = siteOrigin();
@@ -23,21 +23,27 @@ const heroVideoJsonLd = {
   publisher: { '@id': `${origin}/#organization` },
 };
 
-export const metadata: Metadata = {
-  title: 'B2B Identity Verification And Onboarding Platform',
-  description:
-    'Reduce onboarding friction with SpyBot identity verification, KYB, financial verification, and orchestration workflows built for modern digital businesses.',
-  alternates: {
-    canonical: '/',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getManagedPageSeoBySlug('/');
+  return {
+    title: seo?.title ?? 'B2B Identity Verification And Onboarding Platform',
+    description:
+      seo?.description ??
+      'Reduce onboarding friction with SpyBot identity verification, KYB, financial verification, and orchestration workflows built for modern digital businesses.',
+    alternates: {
+      canonical: '/',
+    },
+  };
+}
 
 export default async function Home() {
-  const cmsPage = await getPublishedPageBySlug('/');
-  const enabledKeys = new Set(
-    cmsPage?.sections.filter((section) => section.blocks.length > 0).map((section) => section.key) ?? []
-  );
-  const hasOverrides = enabledKeys.size > 0;
+  const cmsPage = await getManagedPageBySlug('/');
+  const hero = getManagedBlock(cmsPage, 'hero', 'hero');
+  const challenges = getManagedBlock(cmsPage, 'challenges', 'challenges');
+  const lifecycle = getManagedBlock(cmsPage, 'lifecycle', 'lifecycle');
+  const benefits = getManagedBlock(cmsPage, 'benefits', 'benefits');
+  const decisionFlow = getManagedBlock(cmsPage, 'decisionFlow', 'decisionFlow');
+  const demo = getManagedBlock(cmsPage, 'demoSection', 'demoSection') ?? getManagedBlock(cmsPage, 'demo', 'demoSection');
 
   return (
     <main>
@@ -45,12 +51,28 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(heroVideoJsonLd) }}
       />
-      {(!hasOverrides || enabledKeys.has('hero')) && <Hero />}
-      {(!hasOverrides || enabledKeys.has('challenges')) && <Challenges />}
-      {(!hasOverrides || enabledKeys.has('lifecycle')) && <Lifecycle />}
-      {(!hasOverrides || enabledKeys.has('benefits')) && <Benefits />}
-      {(!hasOverrides || enabledKeys.has('decisionFlow')) && <DecisionFlow />}
-      {(!hasOverrides || enabledKeys.has('demo')) && <DemoSection />}
+      <HeroSection content={hero ?? undefined} />
+      <Challenges content={challenges ?? undefined} />
+      <Lifecycle content={lifecycle ?? undefined} />
+      <Benefits content={benefits ?? undefined} />
+      {decisionFlow ? (
+        <DecisionFlow
+          label={decisionFlow.label}
+          title={decisionFlow.title}
+          gradientText={decisionFlow.gradientText}
+          subtitle={decisionFlow.subtitle}
+          panelTitle={decisionFlow.panelTitle}
+          panelBadge={decisionFlow.panelBadge}
+          items={decisionFlow.decisions}
+          capabilitiesHeading={decisionFlow.capabilitiesHeading}
+          capabilities={decisionFlow.capabilities}
+          noteTitle={decisionFlow.noteTitle}
+          noteText={decisionFlow.noteText}
+        />
+      ) : (
+        <DecisionFlow />
+      )}
+      <DemoSection content={demo ?? undefined} />
     </main>
   );
 }

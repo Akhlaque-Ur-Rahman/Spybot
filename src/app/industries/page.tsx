@@ -5,87 +5,74 @@ import CoverageCarousel from '@/components/CoverageCarousel';
 import CardSlider from '@/components/CardSlider';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
+import { getManagedBlock, getManagedPageBySlug, getManagedPageSeoBySlug } from '@/lib/cms/page-content';
 import { CTA_LINKS, ROUTES, industryNavItems } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 import styles from './industries.module.css';
 
-export const metadata: Metadata = {
-  title: 'Industries | Fintech, E-commerce, Telecom, Gaming Verification',
-  description:
-    'See how SpyBot supports industry-specific onboarding and verification workflows for fintech, e-commerce, telecom, and gaming platforms.',
-  alternates: {
-    canonical: ROUTES.industries,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getManagedPageSeoBySlug(ROUTES.industries);
+  return {
+    title: seo?.title ?? 'Industries | Fintech, E-commerce, Telecom, Gaming Verification',
+    description:
+      seo?.description ??
+      'See how SpyBot supports industry-specific onboarding and verification workflows for fintech, e-commerce, telecom, and gaming platforms.',
+    alternates: {
+      canonical: ROUTES.industries,
+    },
+  };
+}
 
-const industryDirectory = industryNavItems.map((s) => ({
-  title: s.label,
-  description: s.desc,
-  href: s.href,
-  badge: 'Industry',
-}));
+export default async function IndustriesPage() {
+  const cmsPage = await getManagedPageBySlug(ROUTES.industries);
+  const pageHeader = getManagedBlock(cmsPage, 'pageHeader', 'pageHeader');
+  const directoryGrid = getManagedBlock(cmsPage, 'directoryGrid', 'directoryGrid');
+  const coverage = getManagedBlock(cmsPage, 'coverageCarousel', 'coverageCarousel');
+  const sliderSection = getManagedBlock(cmsPage, 'sliderSection', 'sliderSection');
+  const utilityCtaBand = getManagedBlock(cmsPage, 'utilityCtaBand', 'utilityCtaBand');
 
-const verticalSlides = [
-  {
-    tag: 'Regulated growth',
-    title: 'Fintech & banks',
-    desc: 'Optimize for KYC/KYB depth, audit evidence, and underwriting signals while keeping account opening fast.',
-  },
-  {
-    tag: 'Two-sided trust',
-    title: 'E-commerce',
-    desc: 'Verify sellers and high-risk merchants with business intelligence before payouts and dispute windows.',
-  },
-  {
-    tag: 'Channel compliance',
-    title: 'Telecom',
-    desc: 'Tighten activation and agent-assisted flows where SIM issuance and identity binding are under regulatory scrutiny.',
-  },
-  {
-    tag: 'Player safety',
-    title: 'Gaming',
-    desc: 'Balance age verification, deduplication, and payout checks without adding unnecessary friction for legitimate users.',
-  },
-];
-
-export default function IndustriesPage() {
   return (
     <main>
       <PageHeader
-        label="Industries"
-        title="Vertical playbooks for"
-        gradientText="fraud, compliance, and conversion"
-        description="Start from the industry page that matches your operating reality—each brief focuses on the checks and routing patterns that tend to matter most."
-        primaryCta={{ label: 'See marketplace use cases', href: CTA_LINKS.industryUseCases }}
-        secondaryCta={{ label: 'Talk to a specialist', href: CTA_LINKS.contact }}
-        media={MEDIA_CLIPS.industriesHub}
+        label={pageHeader?.label ?? 'Industries'}
+        title={pageHeader?.title ?? 'Vertical playbooks for'}
+        gradientText={pageHeader?.gradientText ?? 'fraud, compliance, and conversion'}
+        description={pageHeader?.description ?? 'Start from the industry page that matches your operating reality, each brief focuses on the checks and routing patterns that tend to matter most.'}
+        primaryCta={pageHeader?.primaryCta ?? { label: 'See marketplace use cases', href: CTA_LINKS.industryUseCases }}
+        secondaryCta={pageHeader?.secondaryCta ?? { label: 'Talk to a specialist', href: CTA_LINKS.contact }}
+        media={pageHeader?.media ?? MEDIA_CLIPS.industriesHub}
       />
 
       <DirectoryGrid
-        id="industries-index"
-        heading="Industry routes"
-        subheading="Jump into the vertical that matches your customers, partners, or regulatory environment."
-        items={industryDirectory}
+        id={directoryGrid?.id ?? 'industries-index'}
+        heading={directoryGrid?.heading ?? 'Industry routes'}
+        subheading={directoryGrid?.subheading ?? 'Jump into the vertical that matches your customers, partners, or regulatory environment.'}
+        items={directoryGrid?.items ?? industryNavItems.map((s) => ({
+          title: s.label,
+          description: s.desc,
+          href: s.href,
+          badge: 'Industry',
+        }))}
       />
 
-      <CoverageCarousel label="Vertical focus areas" />
+      <CoverageCarousel label={coverage?.label ?? 'Vertical focus areas'} items={coverage?.items} />
 
       <SectionScrollReveal>
         <section className={styles.spotlight} aria-labelledby="spotlight-heading">
           <div className="container">
             <h2 id="spotlight-heading" className={styles.spotlightTitle}>
-              What changes <span className="text-gradient">by vertical</span>
+              {sliderSection?.heading ?? 'What changes'} <span className="text-gradient">{sliderSection?.gradientText ?? 'by vertical'}</span>
             </h2>
-            <CardSlider items={verticalSlides} ariaLabel="Industry focus areas" />
+            <CardSlider items={sliderSection?.items ?? []} ariaLabel={sliderSection?.ariaLabel ?? 'Industry focus areas'} />
           </div>
         </section>
       </SectionScrollReveal>
 
       <UtilityCtaBand
-        title="Need a tailored operating model?"
-        description="We map industry-specific fraud patterns to verification sequences so your funnel stays defensible as you scale."
-        primary={{ label: 'Contact sales', href: CTA_LINKS.contact }}
-        secondary={{ label: 'Support', href: CTA_LINKS.support }}
+        title={utilityCtaBand?.title ?? 'Need a tailored operating model?'}
+        description={utilityCtaBand?.description ?? 'We map industry-specific fraud patterns to verification sequences so your funnel stays defensible as you scale.'}
+        primary={utilityCtaBand?.primary ?? { label: 'Contact sales', href: CTA_LINKS.contact }}
+        secondary={utilityCtaBand?.secondary ?? { label: 'Support', href: CTA_LINKS.support }}
       />
     </main>
   );

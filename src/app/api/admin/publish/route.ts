@@ -1,4 +1,4 @@
-import { UserRole } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
@@ -22,6 +22,26 @@ export async function POST(request: NextRequest) {
   const auth = await requireApiRole(UserRole.EDITOR);
   if (auth.error) return auth.error;
   const body = await request.json();
+
+  const current = await prisma.page.findUnique({
+    where: { key: body.pageKey },
+    include: { sections: { include: { blocks: true } } },
+  });
+  if (!current) {
+    return NextResponse.json({ error: 'Page not found' }, { status: 404 });
+  }
+
+  for (const section of current.sections) {
+    for (const block of section.blocks) {
+      await prisma.block.update({
+        where: { id: block.id },
+        data: {
+          liveJson:
+            block.draftJson === null ? Prisma.JsonNull : (block.draftJson as Prisma.InputJsonValue),
+        },
+      });
+    }
+  }
 
   const page = await prisma.page.update({
     where: { key: body.pageKey },

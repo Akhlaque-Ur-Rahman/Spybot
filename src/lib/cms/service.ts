@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db/prisma';
 import { unstable_cache } from 'next/cache';
+import { getFooterColumnsSetting } from '@/lib/cms/page-registry';
 import type { CmsPage, NavMenuItem } from '@/lib/cms/types';
 
 const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
@@ -34,6 +35,8 @@ export async function getPublishedPageBySlug(slug: string): Promise<CmsPage | nu
     title: page.title,
     slug: page.slug,
     status: page.status,
+    seoTitle: page.seoTitle,
+    seoDescription: page.seoDescription,
     sections: page.sections.map((section) => ({
       id: section.id,
       key: section.key,
@@ -69,10 +72,10 @@ export async function getHeaderMenu(): Promise<NavMenuItem[]> {
 export async function getFooterMenu(): Promise<Record<string, NavMenuItem[]>> {
   return unstable_cache(
     () =>
-      withCmsFallback({}, async () => {
+      withCmsFallback(getFooterColumnsSetting(), async () => {
       const setting = await prisma.siteSetting.findUnique({ where: { key: 'footer-columns' } });
       const parsed = setting?.valueJson as Record<string, NavMenuItem[]> | undefined;
-      return parsed ?? {};
+      return parsed ?? getFooterColumnsSetting();
     }),
     ['cms-footer-menu'],
     { revalidate: 120 }

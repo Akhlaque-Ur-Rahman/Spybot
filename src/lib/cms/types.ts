@@ -18,6 +18,8 @@ export type CmsPage = {
   title: string;
   slug: string;
   status: string;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
   sections: CmsPageSection[];
 };
 

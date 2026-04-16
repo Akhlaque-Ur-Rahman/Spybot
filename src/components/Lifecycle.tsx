@@ -1,6 +1,7 @@
 import styles from './Lifecycle.module.css';
 import { Camera, Search, CreditCard, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import React from 'react';
+import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 
 export interface StepItem {
   num: string;
@@ -8,6 +9,13 @@ export interface StepItem {
   desc: string;
   icon: React.ReactNode;
 }
+
+export type StepDataItem = {
+  num: string;
+  title: string;
+  desc: string;
+  icon: CmsIconName;
+};
 
 export const defaultSteps: StepItem[] = [
   {
@@ -48,6 +56,13 @@ interface LifecycleProps {
   gradientText?: string;
   subtitle?: string;
   data?: StepItem[];
+  content?: {
+    label?: string;
+    title?: string;
+    gradientText?: string;
+    subtitle?: string;
+    steps: StepDataItem[];
+  };
 }
 
 export default function Lifecycle({
@@ -55,25 +70,37 @@ export default function Lifecycle({
   title = "The Complete Verification",
   gradientText = "Journey",
   subtitle = "Five interconnected stages — from document capture to final approval — all orchestrated by SpyBot's blazing-fast identity APIs.",
-  data = defaultSteps
+  data = defaultSteps,
+  content,
 }: LifecycleProps) {
+  const resolvedLabel = content?.label ?? label;
+  const resolvedTitle = content?.title ?? title;
+  const resolvedGradientText = content?.gradientText ?? gradientText;
+  const resolvedSubtitle = content?.subtitle ?? subtitle;
+  const resolvedData = content
+    ? content.steps.map((item) => ({
+        ...item,
+        icon: renderCmsIcon(item.icon, 'large'),
+      }))
+    : data;
+
   return (
     <section className={styles.section} id="lifecycle">
       <div className={`glow-orb glow-orb-teal ${styles.glow}`} style={{ width: 500, height: 500 }} aria-hidden="true" />
       <div className="container">
         <div className={styles.header}>
-          <p className="section-label">{label}</p>
+          <p className="section-label">{resolvedLabel}</p>
           <h2 className="section-title">
-            {title}{' '}
-            {gradientText && <span className="text-gradient">{gradientText}</span>}
+            {resolvedTitle}{' '}
+            {resolvedGradientText && <span className="text-gradient">{resolvedGradientText}</span>}
           </h2>
           <p className="section-subtitle" style={{ marginTop: 16, marginInline: 'auto' }}>
-            {subtitle}
+            {resolvedSubtitle}
           </p>
         </div>
 
         <div className={styles.timeline}>
-          {data.map((step, i) => (
+          {resolvedData.map((step, i) => (
             <div key={step.num} className={`${styles.step} ${i % 2 === 0 ? styles.stepLeft : styles.stepRight}`}>
               <div className={styles.stepCard}>
                 <div className={styles.stepIcon} aria-hidden="true" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -92,7 +119,7 @@ export default function Lifecycle({
 
         {/* Horizontal layout for desktop */}
         <div className={styles.stepsRow}>
-          {data.map((step, i) => (
+          {resolvedData.map((step, i) => (
             <div key={step.num} className={styles.stepBlock}>
               <div className={styles.stepBlockIcon} aria-hidden="true" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginInline: 'auto' }}>
                 {step.icon}

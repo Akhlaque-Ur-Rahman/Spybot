@@ -4,9 +4,9 @@ import styles from './Hero.module.css';
 import { Rocket } from 'lucide-react';
 import { CTA_LINKS } from '@/site';
 import { MEDIA_CLIPS, mediaEncodingFormat } from '@/lib/site-media';
+import type { MediaClipMeta } from '@/lib/site-media';
 
 const heroClip = MEDIA_CLIPS.homeHero;
-const heroVideoType = mediaEncodingFormat(heroClip.src);
 
 const stats = [
   { value: '99.99%', label: 'Uptime SLA' },
@@ -30,8 +30,35 @@ const severityColor: Record<string, string> = {
 };
 
 export default function Hero() {
+  return <HeroSection />;
+}
+
+type HeroContent = {
+  badge?: string;
+  headline?: string;
+  headlineGradient?: string;
+  subheadline?: string;
+  primaryCta?: { label: string; href: string };
+  secondaryCta?: { label: string; href: string };
+  trustItems?: string[];
+  dashboardTitle?: string;
+  dashboardBadge?: string;
+  threats?: Array<{ label: string; severity: string; time: string }>;
+  riskLabel?: string;
+  riskScore?: string;
+  riskSummary?: string;
+  riskPercent?: number;
+  stats?: Array<{ value: string; label: string }>;
+  media?: MediaClipMeta;
+};
+
+export function HeroSection({ content }: { content?: HeroContent }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const resolvedClip = content?.media ?? heroClip;
+  const heroVideoType = mediaEncodingFormat(resolvedClip.src);
+  const resolvedStats = content?.stats ?? stats;
+  const resolvedThreats = content?.threats ?? threats;
 
   useEffect(() => {
     const v = videoRef.current;
@@ -116,10 +143,10 @@ export default function Hero() {
           loop
           playsInline
           preload="metadata"
-          poster={heroClip.poster}
+          poster={resolvedClip.poster}
           tabIndex={-1}
         >
-          <source src={heroClip.src} type={heroVideoType} />
+          <source src={resolvedClip.src} type={heroVideoType} />
         </video>
         <div className={styles.heroScrim} />
       </div>
@@ -133,34 +160,42 @@ export default function Hero() {
         {/* Left — copy */}
         <div className={styles.copy}>
           <div className={`badge badge-teal badge-dot ${styles.heroBadge}`}>
-            Built for high-trust digital onboarding
+            {content?.badge ?? 'Built for high-trust digital onboarding'}
           </div>
 
           <h1 className={styles.headline}>
-            <span className="font-display">Stop onboarding bottlenecks</span>
+            <span className="font-display">{content?.headline ?? 'Stop onboarding bottlenecks'}</span>
             <br />
-            <span className={`font-display text-gradient`}>before they cost conversion.</span>
+            <span className={`font-display text-gradient`}>{content?.headlineGradient ?? 'before they cost conversion.'}</span>
           </h1>
 
           <p className={styles.subheadline}>
-            SpyBot helps fintech, telecom, gaming, and marketplace teams verify users and businesses faster, reduce fraud exposure, and launch compliant identity flows without rebuilding their stack.
+            {content?.subheadline ??
+              'SpyBot helps fintech, telecom, gaming, and marketplace teams verify users and businesses faster, reduce fraud exposure, and launch compliant identity flows without rebuilding their stack.'}
           </p>
 
           <div className={styles.heroCtas}>
-            <a href={CTA_LINKS.sandbox} className="btn btn-primary btn-lg" aria-label="Get sandbox access">
-              <Rocket size={18} /> Get Sandbox Access
+            <a
+              href={content?.primaryCta?.href ?? CTA_LINKS.sandbox}
+              className="btn btn-primary btn-lg"
+              aria-label={content?.primaryCta?.label ?? 'Get sandbox access'}
+            >
+              <Rocket size={18} /> {content?.primaryCta?.label ?? 'Get Sandbox Access'}
             </a>
-            <a href={CTA_LINKS.superflowStudio} className="btn btn-secondary btn-lg" aria-label="Explore workflow orchestration">
-              Explore Superflow
+            <a
+              href={content?.secondaryCta?.href ?? CTA_LINKS.superflowStudio}
+              className="btn btn-secondary btn-lg"
+              aria-label={content?.secondaryCta?.label ?? 'Explore workflow orchestration'}
+            >
+              {content?.secondaryCta?.label ?? 'Explore Superflow'}
             </a>
           </div>
 
           {/* Trust badges */}
           <div className={styles.trustRow}>
-            <span className={styles.trustItem}>✓ SOC 2 Type II</span>
-            <span className={styles.trustItem}>✓ ISO 27001</span>
-            <span className={styles.trustItem}>✓ GDPR Ready</span>
-            <span className={styles.trustItem}>✓ NIST CSF</span>
+            {(content?.trustItems ?? ['SOC 2 Type II', 'ISO 27001', 'GDPR Ready', 'NIST CSF']).map((item) => (
+              <span key={item} className={styles.trustItem}>✓ {item}</span>
+            ))}
           </div>
         </div>
 
@@ -168,12 +203,14 @@ export default function Hero() {
         <div className={styles.dashboardWrap}>
           <div className={styles.dashboard}>
             <div className={styles.dashHeader}>
-              <span className={styles.dashTitle}>SpyBot Identity Pipeline</span>
-              <span className={`badge badge-teal badge-dot`} style={{ fontSize: '0.65rem' }}>LIVE</span>
+              <span className={styles.dashTitle}>{content?.dashboardTitle ?? 'SpyBot Identity Pipeline'}</span>
+              <span className={`badge badge-teal badge-dot`} style={{ fontSize: '0.65rem' }}>
+                {content?.dashboardBadge ?? 'LIVE'}
+              </span>
             </div>
 
             <div className={styles.threatList}>
-              {threats.map((t, i) => (
+              {resolvedThreats.map((t, i) => (
                 <div
                   key={t.label}
                   className={styles.threatItem}
@@ -196,13 +233,16 @@ export default function Hero() {
 
             {/* Mini gauge */}
             <div className={styles.riskScore}>
-              <div className={styles.riskLabel}>Identity Trust Score</div>
+              <div className={styles.riskLabel}>{content?.riskLabel ?? 'Identity Trust Score'}</div>
               <div className={styles.riskBar}>
-                <div className={styles.riskFill} style={{ width: '92%', background: 'var(--color-tertiary-400)' }} />
+                <div
+                  className={styles.riskFill}
+                  style={{ width: `${content?.riskPercent ?? 92}%`, background: 'var(--color-tertiary-400)' }}
+                />
               </div>
               <div className={styles.riskMeta}>
-                <span style={{ color: 'var(--color-tertiary-400)' }}>92 / 100</span>
-                <span>Highly Verified</span>
+                <span style={{ color: 'var(--color-tertiary-400)' }}>{content?.riskScore ?? '92 / 100'}</span>
+                <span>{content?.riskSummary ?? 'Highly Verified'}</span>
               </div>
             </div>
           </div>
@@ -218,7 +258,7 @@ export default function Hero() {
       <div className={styles.statsRow}>
         <div className="container">
           <div className={styles.statsInner}>
-            {stats.map((s) => (
+            {resolvedStats.map((s) => (
               <div key={s.label} className={styles.statItem}>
                 <span className={styles.statValue}>{s.value}</span>
                 <span className={styles.statLabel}>{s.label}</span>

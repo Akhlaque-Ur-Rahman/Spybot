@@ -1,5 +1,6 @@
 import styles from './ContactHighlights.module.css';
 import { MessageSquare, Timer, Shield } from 'lucide-react';
+import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 
 const items = [
   {
@@ -19,15 +20,36 @@ const items = [
   },
 ];
 
-export default function ContactHighlights() {
+type ContactHighlightItem = {
+  icon: CmsIconName;
+  title: string;
+  desc: string;
+};
+
+export default function ContactHighlights({
+  heading = 'What happens',
+  gradientText = 'after you reach out',
+  highlightItems,
+}: {
+  heading?: string;
+  gradientText?: string;
+  highlightItems?: ContactHighlightItem[];
+}) {
+  const resolvedItems = highlightItems
+    ? highlightItems.map((item) => ({
+        ...item,
+        icon: renderCmsIcon(item.icon),
+      }))
+    : items;
+
   return (
     <section className={styles.section} aria-labelledby="contact-highlights-heading">
       <div className="container">
         <h2 id="contact-highlights-heading" className={styles.heading}>
-          What happens <span className="text-gradient">after you reach out</span>
+          {heading} <span className="text-gradient">{gradientText}</span>
         </h2>
         <ul className={styles.grid}>
-          {items.map((it) => (
+          {resolvedItems.map((it) => (
             <li key={it.title} className={styles.card}>
               <span className={styles.icon} aria-hidden="true">
                 {it.icon}
