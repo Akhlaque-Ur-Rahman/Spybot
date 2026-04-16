@@ -1,0 +1,87 @@
+.wrap {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.sidebarSk {
+  border-right: 1px solid var(--color-border);
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 0%,
+    var(--color-surface-raised) 50%,
+    var(--color-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+.mainSk {
+  padding: var(--space-6);
+}
+
+.bar {
+  height: 28px;
+  width: 40%;
+  border-radius: 8px;
+  margin-bottom: var(--space-4);
+  background: var(--color-surface-raised);
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+.barShort {
+  height: 16px;
+  width: 65%;
+  border-radius: 6px;
+  margin-bottom: var(--space-6);
+  background: var(--color-surface-raised);
+  opacity: 0.7;
+  animation: shimmer 1.2s ease-in-out infinite 0.15s;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.card {
+  min-height: 120px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+  animation: shimmer 1.2s ease-in-out infinite 0.2s;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}
+
+@media (max-width: 900px) {
+  .wrap {
+    grid-template-columns: 72px 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebarSk {
+    display: none;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

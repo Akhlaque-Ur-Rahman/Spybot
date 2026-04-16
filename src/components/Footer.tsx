@@ -1,7 +1,15 @@
 import styles from './Footer.module.css';
 import { footerColumns, socialLinks } from '@/site';
+import type { NavMenuItem } from '@/lib/cms/types';
 
-export default function Footer() {
+export default function Footer({
+  cmsColumns,
+}: {
+  cmsColumns?: Record<string, NavMenuItem[]>;
+}) {
+  const columns: Record<string, readonly NavMenuItem[]> =
+    Object.keys(cmsColumns ?? {}).length ? (cmsColumns ?? {}) : footerColumns;
+
   return (
     <footer className={styles.footer} aria-labelledby="footer-heading">
       <h2 id="footer-heading" className="sr-only">Footer</h2>
@@ -39,11 +47,11 @@ export default function Footer() {
 
           {/* Link columns */}
           <div className={styles.linkColumns}>
-            {Object.entries(footerColumns).map(([col, links]) => (
+            {Object.entries(columns).map(([col, links]) => (
               <div key={col} className={styles.linkCol}>
                 <h4 className={styles.colTitle}>{col}</h4>
                 <ul>
-                  {links.map((link) => (
+                  {links.map((link: NavMenuItem) => (
                     <li key={link.label}>
                       <a href={link.href} className={styles.footerLink}>{link.label}</a>
                     </li>

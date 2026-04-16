@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { SmoothScrollProvider } from '@/context/SmoothScrollProvider';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import AppShell from '@/components/AppShell';
+import { getFooterMenu, getGlobalSettings, getHeaderMenu } from '@/lib/cms/service';
 
 const SITE_URL = 'https://spybot.ai';
 const SITE_NAME = 'SpyBot';
@@ -149,7 +149,13 @@ const jsonLd = {
 // Anti-FOUC: runs synchronously before React hydration to prevent theme flash
 const themeScript = `(function(){try{var t=localStorage.getItem('spybot-theme');var r=t==='light'?'light':t==='dark'?'dark':window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',r);}catch(e){}})();`;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const [headerMenu, footerMenu, globalSettings] = await Promise.all([
+    getHeaderMenu(),
+    getFooterMenu(),
+    getGlobalSettings<{ primaryCtaHref?: string; primaryCtaText?: string }>(),
+  ]);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -165,9 +171,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider>
           <SmoothScrollProvider>
-            <Navbar />
-            {children}
-            <Footer />
+            <AppShell
+              headerMenu={headerMenu}
+              footerMenu={footerMenu}
+              primaryCtaHref={globalSettings.primaryCtaHref}
+              primaryCtaText={globalSettings.primaryCtaText}
+            >
+              {children}
+            </AppShell>
           </SmoothScrollProvider>
         </ThemeProvider>
       </body>

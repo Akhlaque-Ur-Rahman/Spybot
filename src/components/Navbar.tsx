@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import styles from './Navbar.module.css';
 import ThemeToggle from './ThemeToggle';
 import { CTA_LINKS, ROUTES, industryNavItems, solutionNavItems } from '@/site';
@@ -17,8 +17,22 @@ import {
   ChevronDown,
   Layers
 } from 'lucide-react';
+import type { NavMenuItem } from '@/lib/cms/types';
 
-const navLinks = [
+type NavDropdownItem = {
+  label: string;
+  href: string;
+  desc: string;
+  icon: ReactNode;
+};
+
+type NavLink = {
+  label: string;
+  href: string;
+  dropdown?: NavDropdownItem[];
+};
+
+const navLinks: NavLink[] = [
   { label: 'API Marketplace', href: ROUTES.apiMarketplace },
   {
     label: 'Solutions',
@@ -54,10 +68,21 @@ function slugify(label: string) {
   return label.toLowerCase().replace(/\s+/g, '-');
 }
 
-export default function Navbar() {
+export default function Navbar({
+  menuItems,
+  primaryCtaHref = CTA_LINKS.demo,
+  primaryCtaText = 'Book a Demo',
+}: {
+  menuItems?: NavMenuItem[];
+  primaryCtaHref?: string;
+  primaryCtaText?: string;
+}) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const resolvedLinks: NavLink[] = menuItems?.length
+    ? menuItems.map((item) => ({ label: item.label, href: item.href }))
+    : navLinks;
 
   const closeDropdown = useCallback(() => setActiveDropdown(null), []);
 
@@ -141,7 +166,7 @@ export default function Navbar() {
 
           {/* Desktop links */}
           <div className={styles.navLinks} role="menubar">
-            {navLinks.map((link) => {
+            {resolvedLinks.map((link) => {
               const dropdownSlug = slugify(link.label);
               const hasDropdown = Boolean(link.dropdown);
 
@@ -232,7 +257,7 @@ export default function Navbar() {
           <div className={styles.navCtas}>
             <ThemeToggle />
             <Link href={CTA_LINKS.sandbox} className="btn btn-secondary btn-sm" aria-label="Get sandbox access">Get Sandbox Access</Link>
-            <Link href={CTA_LINKS.demo} className="btn btn-primary btn-sm" aria-label="Book a Demo">Book a Demo</Link>
+            <Link href={primaryCtaHref} className="btn btn-primary btn-sm" aria-label={primaryCtaText}>{primaryCtaText}</Link>
           </div>
 
           {/* Hamburger */}
@@ -249,7 +274,7 @@ export default function Navbar() {
         {/* Mobile menu */}
         {mobileOpen && (
           <div className={styles.mobileMenu} role="menu">
-            {navLinks.map((link) => (
+            {resolvedLinks.map((link) => (
             <Link 
                 key={link.label} 
                 href={link.href} 
@@ -263,7 +288,7 @@ export default function Navbar() {
             <div className={styles.mobileCtas}>
               <ThemeToggle />
               <Link href={CTA_LINKS.sandbox} className="btn btn-secondary" aria-label="Get sandbox access">Get Sandbox Access</Link>
-              <Link href={CTA_LINKS.demo} className="btn btn-primary" aria-label="Book a Demo">Book a Demo</Link>
+              <Link href={primaryCtaHref} className="btn btn-primary" aria-label={primaryCtaText}>{primaryCtaText}</Link>
             </div>
           </div>
         )}
