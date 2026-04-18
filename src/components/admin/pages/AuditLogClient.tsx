@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
+import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
 export type AuditRow = {
   id: string;
@@ -34,7 +35,8 @@ export default function AuditLogClient({ initialLogs, initialTotal }: { initialL
       setTotal(res.total);
       setOffset((o) => o + res.logs.length);
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Load failed', 'error');
+      logAdminClientError('AuditLogClient.loadMore', e);
+      push(e instanceof Error ? e.message : 'We could not load more activity.', 'error');
     } finally {
       setLoading(false);
     }

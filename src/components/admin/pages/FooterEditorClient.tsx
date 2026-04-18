@@ -7,6 +7,7 @@ import { TextField } from '@/components/admin/fields';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
 import type { NavMenuItem } from '@/lib/cms/types';
+import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
 type ColumnState = { heading: string; links: NavMenuItem[] };
 
@@ -93,7 +94,8 @@ export default function FooterEditorClient({ columns }: { columns: Record<string
       push('Footer saved', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Save failed', 'error');
+      logAdminClientError('FooterEditorClient.save', e);
+      push(e instanceof Error ? e.message : 'We could not save the footer.', 'error');
     } finally {
       setSaving(false);
     }

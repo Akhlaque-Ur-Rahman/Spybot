@@ -229,8 +229,33 @@ export const CMS_BLOCK_TYPES = [
 
 export type CmsBlockType = (typeof CMS_BLOCK_TYPES)[number];
 
+/** Human-readable names for admin pickers and editors. */
+export const CMS_BLOCK_TYPE_LABELS = {
+  hero: 'Hero',
+  pageHeader: 'Page header',
+  coverageCarousel: 'Coverage carousel',
+  directoryGrid: 'Directory grid',
+  sliderSection: 'Slider',
+  utilityCtaBand: 'Call-to-action band',
+  faqAccordion: 'FAQ',
+  supportPathways: 'Support pathways',
+  supportSlaStrip: 'Support SLA strip',
+  resourceGrid: 'Resource grid',
+  contactHighlights: 'Contact highlights',
+  benefits: 'Benefits',
+  challenges: 'Challenges',
+  lifecycle: 'Lifecycle',
+  decisionFlow: 'Decision flow',
+  demoSection: 'Demo section',
+} as const satisfies Record<CmsBlockType, string>;
+
 export function isCmsBlockType(value: string): value is CmsBlockType {
   return (CMS_BLOCK_TYPES as readonly string[]).includes(value);
+}
+
+export function cmsBlockTypeLabel(blockType: string): string {
+  if (isCmsBlockType(blockType)) return CMS_BLOCK_TYPE_LABELS[blockType];
+  return blockType;
 }
 
 export type CmsBlockValueMap = {

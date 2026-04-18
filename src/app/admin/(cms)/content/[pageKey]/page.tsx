@@ -44,8 +44,10 @@ export default async function AdminContentDetailPage({
       </nav>
       <h1 className={pageStyles.pageTitle}>Edit: {page.title}</h1>
       <p className={pageStyles.lead}>
-        Key <code className={pageStyles.mono}>{page.key}</code> · slug{' '}
-        <code className={pageStyles.mono}>/{page.slug}</code>
+        <span className={pageStyles.muted}>Public address </span>
+        <code className={pageStyles.mono}>
+          {page.slug === '/' ? '/' : `/${String(page.slug).replace(/^\//, '')}`}
+        </code>
       </p>
       <ContentPageEditor key={page.updatedAt.toISOString()} page={serialized} />
     </>

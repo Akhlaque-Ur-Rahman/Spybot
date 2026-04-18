@@ -6,6 +6,7 @@ import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { TextAreaField } from '@/components/admin/fields';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
+import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
 export type SettingRow = { id: string; key: string; valueJson: unknown };
 
@@ -27,8 +28,9 @@ export default function SettingsEditorClient({ settings }: { settings: SettingRo
     let valueJson: unknown;
     try {
       valueJson = JSON.parse(raw) as unknown;
-    } catch {
-      push('Invalid JSON', 'error');
+    } catch (err) {
+      logAdminClientError('SettingsEditorClient.save parse', err, { key });
+      push('This text could not be read as valid data.', 'error');
       return;
     }
     setSaving(key);
@@ -40,7 +42,8 @@ export default function SettingsEditorClient({ settings }: { settings: SettingRo
       push('Setting saved', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Save failed', 'error');
+      logAdminClientError('SettingsEditorClient.save', e, { key });
+      push(e instanceof Error ? e.message : 'We could not save this setting.', 'error');
     } finally {
       setSaving(null);
     }
@@ -51,7 +54,11 @@ export default function SettingsEditorClient({ settings }: { settings: SettingRo
       {settings.map((s) => (
         <article key={s.id} className={pageStyles.card}>
           <h3 className={pageStyles.cardTitle}>{s.key}</h3>
-          <TextAreaField label="valueJson" value={textByKey[s.key] ?? '{}'} onChange={(v) => setTextByKey((p) => ({ ...p, [s.key]: v }))} />
+          <TextAreaField
+            label="Technical format"
+            value={textByKey[s.key] ?? '{}'}
+            onChange={(v) => setTextByKey((p) => ({ ...p, [s.key]: v }))}
+          />
           <button type="button" className={pageStyles.btn} style={{ marginTop: 12 }} disabled={saving === s.key} onClick={() => save(s.key)}>
             {saving === s.key ? 'Saving…' : 'Save setting'}
           </button>

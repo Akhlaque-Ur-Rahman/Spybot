@@ -13,6 +13,12 @@ export type ContentPageListRow = {
   updatedAt: string;
 };
 
+function formatPageStatus(status: string): string {
+  if (status === 'published') return 'Published';
+  if (status === 'draft') return 'Draft';
+  return status;
+}
+
 function formatUpdated(iso: string) {
   try {
     return new Intl.DateTimeFormat(undefined, {
@@ -51,7 +57,7 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
             className={pageStyles.input}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Title, key, slug, or status…"
+            placeholder="Title, address, or status…"
             aria-label="Search pages"
           />
         </label>
@@ -81,8 +87,7 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
           <thead>
             <tr>
               <th>Page</th>
-              <th>Key</th>
-              <th>Slug</th>
+              <th>Address</th>
               <th>Status</th>
               <th>Updated</th>
             </tr>
@@ -96,14 +101,13 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
                   </Link>
                 </td>
                 <td>
-                  <code className={pageStyles.mono}>{p.key}</code>
-                </td>
-                <td>
-                  <code className={pageStyles.mono}>/{p.slug}</code>
+                  <code className={pageStyles.mono}>
+                    {p.slug === '/' ? '/' : `/${p.slug.replace(/^\//, '')}`}
+                  </code>
                 </td>
                 <td>
                   <span className={`${pageStyles.badge} ${p.status === 'draft' ? pageStyles.badgeDraft : ''}`} style={{ marginLeft: 0 }}>
-                    {p.status}
+                    {formatPageStatus(p.status)}
                   </span>
                 </td>
                 <td>{formatUpdated(p.updatedAt)}</td>
@@ -114,7 +118,7 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
       </div>
       {filtered.length === 0 ? (
         <p className={pageStyles.lead} style={{ marginTop: 'var(--space-3)', marginBottom: 0 }}>
-          No pages match. Clear search or use <strong>Sync website pages</strong> above to load default routes.
+          No pages match. Clear search or use <strong>Import default pages</strong> above.
         </p>
       ) : null}
     </div>

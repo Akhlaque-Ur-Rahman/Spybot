@@ -1,4 +1,5 @@
 import { UserRole } from '@prisma/client';
+import AddUserForm from '@/components/admin/pages/AddUserForm';
 import UsersRolesClient, { type UserRow } from '@/components/admin/pages/UsersRolesClient';
 import { requireAdminSession } from '@/lib/auth/session';
 import EmptyState from '@/components/admin/EmptyState';
@@ -18,7 +19,8 @@ export default async function AdminUsersPage() {
   return (
     <>
       <h1 className={pageStyles.pageTitle}>User Access</h1>
-      <p className={pageStyles.lead}>Change roles for CMS accounts. Owners can assign OWNER, EDITOR, or REVIEWER.</p>
+      <p className={pageStyles.lead}>Add CMS accounts and assign OWNER, EDITOR, or REVIEWER.</p>
+      <AddUserForm />
       {rows.length === 0 ? (
         <EmptyState title="No users" />
       ) : (

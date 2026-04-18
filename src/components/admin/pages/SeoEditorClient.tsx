@@ -6,6 +6,7 @@ import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { TextAreaField, TextField } from '@/components/admin/fields';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
+import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
 export type SeoRow = { key: string; title: string; seoTitle: string | null; seoDescription: string | null };
 
@@ -38,7 +39,8 @@ export default function SeoEditorClient({ pages }: { pages: SeoRow[] }) {
       push('SEO saved', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Save failed', 'error');
+      logAdminClientError('SeoEditorClient.save', e, { pageKey });
+      push(e instanceof Error ? e.message : 'We could not save SEO for this page.', 'error');
     } finally {
       setSaving(null);
     }
@@ -49,7 +51,9 @@ export default function SeoEditorClient({ pages }: { pages: SeoRow[] }) {
       {pages.map((p) => (
         <article key={p.key} className={pageStyles.card}>
           <h3 className={pageStyles.cardTitle}>{p.title}</h3>
-          <p className={pageStyles.lead}>Page key: {p.key}</p>
+          <p className={pageStyles.muted} style={{ marginTop: 0 }}>
+            {p.key}
+          </p>
           <TextField
             label="SEO title"
             value={rows[p.key]?.seoTitle ?? ''}

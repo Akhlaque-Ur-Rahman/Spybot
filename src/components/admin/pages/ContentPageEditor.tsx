@@ -8,8 +8,9 @@ import { CMS_TYPED_BLOCK_TYPES, CmsBlockDraftEditor } from '@/components/admin/c
 import { TextAreaField, ToggleField } from '@/components/admin/fields';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
+import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 import { stableStringify } from '@/lib/cms/json-stable';
-import { CMS_BLOCK_TYPES } from '@/lib/cms/page-registry';
+import { CMS_BLOCK_TYPES, cmsBlockTypeLabel } from '@/lib/cms/page-registry';
 
 type SerializedBlock = {
   id: string;
@@ -112,6 +113,7 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
   const [savingBlock, setSavingBlock] = useState<string | null>(null);
   const [savingAll, setSavingAll] = useState(false);
   const [jsonModeByBlock, setJsonModeByBlock] = useState<Record<string, boolean>>({});
+  const [untypedDevJsonByBlock, setUntypedDevJsonByBlock] = useState<Record<string, boolean>>({});
   const [sectionOpen, setSectionOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -165,7 +167,8 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
       push('Page details saved', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Save failed', 'error');
+      logAdminClientError('ContentPageEditor.saveMeta', e);
+      push(e instanceof Error ? e.message : 'We could not save the page details.', 'error');
     } finally {
       setSavingMeta(false);
     }
@@ -176,8 +179,9 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
     let parsed: unknown;
     try {
       parsed = JSON.parse(raw) as unknown;
-    } catch {
-      push('Block JSON is invalid', 'error');
+    } catch (err) {
+      logAdminClientError('ContentPageEditor.saveBlock parse', err, { blockId });
+      push('This block could not be saved because the content format is invalid.', 'error');
       return;
     }
     setSavingBlock(blockId);
@@ -186,10 +190,11 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
         method: 'PATCH',
         body: JSON.stringify({ draftJson: parsed }),
       });
-      push('Block draft saved', 'success');
+      push('Saved', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Block save failed', 'error');
+      logAdminClientError('ContentPageEditor.saveBlock', e, { blockId });
+      push(e instanceof Error ? e.message : 'We could not save this block.', 'error');
     } finally {
       setSavingBlock(null);
     }
@@ -198,7 +203,7 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
   async function saveAllBlockDrafts() {
     const targets = allBlockIds.filter((id) => (draftText[id] ?? '') !== (initialDrafts[id] ?? ''));
     if (targets.length === 0) {
-      push('No block changes to save', 'success');
+      push('Everything is already saved.', 'success');
       return;
     }
     setSavingAll(true);
@@ -208,8 +213,9 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
         const raw = draftText[blockId] ?? '{}';
         try {
           updates.push({ blockId, draftJson: JSON.parse(raw) as unknown });
-        } catch {
-          push(`Block ${blockId}: invalid JSON`, 'error');
+        } catch (err) {
+          logAdminClientError('ContentPageEditor.saveAllBlockDrafts parse', err, { blockId });
+          push('One of the blocks could not be saved because the content format is invalid.', 'error');
           return;
         }
       }
@@ -220,10 +226,11 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
           body: JSON.stringify({ updates }),
         },
       );
-      push(`Saved ${updates.length} block draft(s)`, 'success');
+      push(`Saved ${updates.length} block${updates.length === 1 ? '' : 's'}.`, 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Bulk save failed', 'error');
+      logAdminClientError('ContentPageEditor.saveAllBlockDrafts', e);
+      push(e instanceof Error ? e.message : 'We could not save all blocks.', 'error');
     } finally {
       setSavingAll(false);
     }
@@ -238,7 +245,8 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
       push('Published', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Publish failed', 'error');
+      logAdminClientError('ContentPageEditor.publishPage', e);
+      push(e instanceof Error ? e.message : 'We could not publish this page.', 'error');
     }
   }
 
@@ -249,10 +257,11 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
         method: 'PATCH',
         body: JSON.stringify({ status: 'draft' }),
       });
-      push('Page marked as draft. Live site now uses registry copy until you publish again.', 'success');
+      push('This page is a draft again. Visitors keep seeing the last published version until you publish.', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Unpublish failed', 'error');
+      logAdminClientError('ContentPageEditor.unpublishPage', e);
+      push(e instanceof Error ? e.message : 'We could not update the page status.', 'error');
     } finally {
       setUnpublishing(false);
     }
@@ -268,8 +277,15 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
       const target = res.redirectTo ?? (previewPath === '/' ? '/' : previewPath);
       window.location.assign(target);
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Preview failed', 'error');
+      logAdminClientError('ContentPageEditor.openPreview', e);
+      push(e instanceof Error ? e.message : 'We could not open preview.', 'error');
     }
+  }
+
+  function pageStatusLabel(status: string): string {
+    if (status === 'published') return 'Published';
+    if (status === 'draft') return 'Draft';
+    return status;
   }
 
   return (
@@ -279,7 +295,7 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
           className={`${pageStyles.badge} ${page.status === 'draft' ? pageStyles.badgeDraft : ''}`}
           style={{ marginLeft: 0 }}
         >
-          DB: {page.status}
+          {pageStatusLabel(page.status)}
         </span>
         {hasUnsaved ? (
           <span className={`${pageStyles.badge} ${pageStyles.badgeDraft}`} style={{ marginLeft: 0 }}>
@@ -298,7 +314,7 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
           disabled={savingAll || !blocksDirty}
           onClick={() => void saveAllBlockDrafts()}
         >
-          {savingAll ? 'Saving blocks…' : 'Save all block drafts'}
+          {savingAll ? 'Saving…' : 'Save all changes'}
         </button>
       </div>
 
@@ -309,15 +325,15 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
           <input className={pageStyles.input} value={title} onChange={(e) => setTitle(e.target.value)} />
         </label>
         <label className={pageStyles.lead} style={{ display: 'grid', gap: 6, marginBottom: 12 }}>
-          Slug
+          Page address (URL path)
           <input className={pageStyles.input} value={slug} onChange={(e) => setSlug(e.target.value)} />
         </label>
         <div className={pageStyles.lead} style={{ marginBottom: 12 }}>
-          <strong>Status</strong>
+          <strong>What visitors see</strong>
           <p style={{ margin: '6px 0 0' }}>
             {page.status === 'published' ? (
               <>
-                Published — live visitors see saved DB title/SEO and published block content.{' '}
+                Published — visitors see this page title, SEO settings, and the content you last published.{' '}
                 <button
                   type="button"
                   className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
@@ -325,13 +341,13 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
                   disabled={unpublishing}
                   onClick={() => void unpublishPage()}
                 >
-                  {unpublishing ? 'Updating…' : 'Mark as draft (unpublish)'}
+                  {unpublishing ? 'Updating…' : 'Return to draft'}
                 </button>
               </>
             ) : (
               <>
-                Draft — live visitors see registry title/SEO and last published block content (
-                <code className={pageStyles.mono}>liveJson</code>). Use <strong>Publish page</strong> to go live.
+                Draft — your edits are saved here; visitors still see the last published version until you use{' '}
+                <strong>Publish page</strong>.
               </>
             )}
           </p>
@@ -356,7 +372,12 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
         <ol style={{ paddingLeft: 18, marginBottom: 16 }}>
           {sectionKeys.map((key, idx) => (
             <li key={key} style={{ marginBottom: 8 }}>
-              <code className={pageStyles.mono}>{key}</code>
+              <span>
+                {page.sections.find((s) => s.key === key)?.label ?? key}
+              </span>
+              <span className={pageStyles.muted} style={{ marginLeft: 8, fontSize: '0.85em' }}>
+                ({key})
+              </span>
               <span style={{ marginLeft: 8 }}>
                 <button
                   type="button"
@@ -375,7 +396,8 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
                         push('Order saved', 'success');
                         router.refresh();
                       } catch (e) {
-                        push(e instanceof Error ? e.message : 'Reorder failed', 'error');
+                        logAdminClientError('ContentPageEditor.reorderSection', e);
+                        push(e instanceof Error ? e.message : 'We could not save the new order.', 'error');
                         setSectionKeys([...page.sections].sort((a, b) => a.position - b.position).map((s) => s.key));
                       }
                     })();
@@ -401,7 +423,8 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
                         push('Order saved', 'success');
                         router.refresh();
                       } catch (e) {
-                        push(e instanceof Error ? e.message : 'Reorder failed', 'error');
+                        logAdminClientError('ContentPageEditor.reorderSection', e);
+                        push(e instanceof Error ? e.message : 'We could not save the new order.', 'error');
                         setSectionKeys([...page.sections].sort((a, b) => a.position - b.position).map((s) => s.key));
                       }
                     })();
@@ -419,15 +442,15 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
         {addOpen ? (
           <div style={{ marginTop: 16, display: 'grid', gap: 10 }}>
             <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
-              Section key
+              Section code (short id)
               <input className={pageStyles.input} value={newSectionKey} onChange={(e) => setNewSectionKey(e.target.value)} />
             </label>
             <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
-              Section label
+              Section name (shown in the editor)
               <input className={pageStyles.input} value={newSectionLabel} onChange={(e) => setNewSectionLabel(e.target.value)} />
             </label>
             <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
-              Block type
+              First block type
               <select
                 className={pageStyles.input}
                 value={newSectionBlockType}
@@ -435,7 +458,7 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
               >
                 {CMS_BLOCK_TYPES.map((t) => (
                   <option key={t} value={t}>
-                    {t}
+                    {cmsBlockTypeLabel(t)}
                   </option>
                 ))}
               </select>
@@ -460,7 +483,8 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
                     setAddOpen(false);
                     router.refresh();
                   } catch (e) {
-                    push(e instanceof Error ? e.message : 'Add section failed', 'error');
+                    logAdminClientError('ContentPageEditor.addSection', e);
+                    push(e instanceof Error ? e.message : 'We could not add that section.', 'error');
                   }
                 })()
               }
@@ -486,9 +510,9 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
           }}
         >
           <summary style={{ cursor: 'pointer', fontWeight: 700, fontSize: 'var(--text-h4)' }}>
-            {section.label}{' '}
-            <span className={pageStyles.badge} style={{ marginLeft: 8 }}>
-              {section.key}
+            {section.label}
+            <span className={pageStyles.muted} style={{ marginLeft: 8, fontWeight: 500, fontSize: '0.85em' }}>
+              ({section.key})
             </span>
           </summary>
           <div style={{ marginTop: 'var(--space-3)' }}>
@@ -512,15 +536,18 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
                     }}
                   >
                     <p className={pageStyles.lead}>
-                      Block <strong>{block.key}</strong> <code className={pageStyles.mono}>({block.type})</code>
+                      <strong>{cmsBlockTypeLabel(block.type)}</strong>
+                      <span className={pageStyles.muted} style={{ marginLeft: 8 }}>
+                        · {block.key}
+                      </span>
                       {blockDirty ? (
                         <span className={`${pageStyles.badge} ${pageStyles.badgeDraft}`} style={{ marginLeft: 8 }}>
-                          Edited (unsaved)
+                          Unsaved changes
                         </span>
                       ) : null}
                       {!blockDirty && pendingLive ? (
                         <span className={`${pageStyles.badge} ${pageStyles.badgeDraft}`} style={{ marginLeft: 8 }}>
-                          Not on live yet
+                          Not published yet
                         </span>
                       ) : null}
                     </p>
@@ -532,21 +559,43 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
                           onChange={(checked) => setJsonModeByBlock((prev) => ({ ...prev, [block.id]: checked }))}
                         />
                       </div>
-                    ) : null}
-                    {!jsonMode && typed ? (
+                    ) : (
+                      <div style={{ marginBottom: 12 }}>
+                        <p className={pageStyles.lead} style={{ marginTop: 0 }}>
+                          No visual editor for this block.
+                        </p>
+                        <ToggleField
+                          label="Show developer editor (technical format)"
+                          checked={untypedDevJsonByBlock[block.id] ?? false}
+                          onChange={(checked) =>
+                            setUntypedDevJsonByBlock((prev) => ({ ...prev, [block.id]: checked }))
+                          }
+                        />
+                      </div>
+                    )}
+                    {typed && !jsonMode ? (
                       <CmsBlockDraftEditor
                         blockType={block.type}
                         value={parsed}
                         onChange={(next) => setParsedDraft(block.id, next)}
                       />
-                    ) : (
+                    ) : null}
+                    {typed && jsonMode ? (
                       <TextAreaField
-                        label={typed ? 'Raw JSON' : 'Draft JSON'}
+                        label="Technical format"
                         value={draftText[block.id] ?? '{}'}
                         onChange={(v) => setDraftText((prev) => ({ ...prev, [block.id]: v }))}
                         rows={14}
                       />
-                    )}
+                    ) : null}
+                    {!typed && (untypedDevJsonByBlock[block.id] ?? false) ? (
+                      <TextAreaField
+                        label="Technical format"
+                        value={draftText[block.id] ?? '{}'}
+                        onChange={(v) => setDraftText((prev) => ({ ...prev, [block.id]: v }))}
+                        rows={14}
+                      />
+                    ) : null}
                     <button
                       type="button"
                       className={pageStyles.btn}
@@ -554,7 +603,7 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
                       disabled={savingBlock === block.id || savingAll}
                       onClick={() => void saveBlock(block.id)}
                     >
-                      {savingBlock === block.id ? 'Saving…' : 'Save block draft'}
+                      {savingBlock === block.id ? 'Saving…' : 'Save this block'}
                     </button>
                   </div>
                 );

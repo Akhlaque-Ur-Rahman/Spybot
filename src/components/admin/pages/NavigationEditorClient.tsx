@@ -6,6 +6,7 @@ import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { TextField } from '@/components/admin/fields';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
+import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
 export type NavItemRow = { id: string; label: string; href: string; description: string | null };
 export type MenuRow = { id: string; key: string; items: NavItemRow[] };
@@ -87,7 +88,8 @@ export default function NavigationEditorClient({ menus }: { menus: MenuRow[] }) 
       push('Navigation saved', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Save failed', 'error');
+      logAdminClientError('NavigationEditorClient.saveMenu', e, { menuKey: menu.key });
+      push(e instanceof Error ? e.message : 'We could not save navigation.', 'error');
     } finally {
       setSavingMenu(null);
     }

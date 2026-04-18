@@ -12,6 +12,19 @@ function submissionCounts(rows: { status: SubmissionStatus; _count: { _all: numb
   return map;
 }
 
+function submissionStatusLabel(status: SubmissionStatus): string {
+  if (status === 'NEW') return 'New';
+  if (status === 'IN_REVIEW') return 'In review';
+  if (status === 'RESOLVED') return 'Resolved';
+  return status;
+}
+
+function pageStatusLabel(status: string): string {
+  if (status === 'published') return 'Published';
+  if (status === 'draft') return 'Draft';
+  return status;
+}
+
 export default async function AdminDashboardPage() {
   const [
     pagesTotal,
@@ -62,12 +75,12 @@ export default async function AdminDashboardPage() {
     <>
       <h1 className={pageStyles.pageTitle}>Dashboard Overview</h1>
       <p className={pageStyles.lead}>
-        Workspace snapshot: content health, inbox, and recent activity. Use the shortcuts below to jump into each area.
+        Snapshot of pages, forms, media, and recent changes. Shortcuts below open each area.
       </p>
 
       <div className={pageStyles.kpiGrid} role="region" aria-label="Key metrics">
         <div className={pageStyles.kpiCard}>
-          <span className={pageStyles.kpiLabel}>CMS pages</span>
+          <span className={pageStyles.kpiLabel}>Pages</span>
           <span className={pageStyles.kpiValue}>{pagesTotal}</span>
           <span className={pageStyles.kpiMeta}>
             {publishedCount} published · {draftsCount} drafts
@@ -83,7 +96,7 @@ export default async function AdminDashboardPage() {
         <div className={pageStyles.kpiCard}>
           <span className={pageStyles.kpiLabel}>Media assets</span>
           <span className={pageStyles.kpiValue}>{mediaCount}</span>
-          <span className={pageStyles.kpiMeta}>Registered in library</span>
+          <span className={pageStyles.kpiMeta}>In media library</span>
         </div>
         <div className={pageStyles.kpiCard}>
           <span className={pageStyles.kpiLabel}>Team &amp; nav</span>
@@ -156,7 +169,7 @@ export default async function AdminDashboardPage() {
                     {page.title}
                   </Link>
                   <span className={`${pageStyles.badge} ${page.status === 'draft' ? pageStyles.badgeDraft : ''}`}>
-                    {page.status}
+                    {pageStatusLabel(page.status)}
                   </span>
                   <span className={pageStyles.muted}>{page.updatedAt.toLocaleString()}</span>
                 </li>
@@ -181,7 +194,7 @@ export default async function AdminDashboardPage() {
               {recentSubmissions.map((s) => (
                 <li key={s.id} className={pageStyles.compactListItem}>
                   <strong>{s.formType}</strong>
-                  <span className={pageStyles.badge}>{s.status}</span>
+                  <span className={pageStyles.badge}>{submissionStatusLabel(s.status)}</span>
                   <span className={pageStyles.muted}>{s.createdAt.toLocaleString()}</span>
                 </li>
               ))}

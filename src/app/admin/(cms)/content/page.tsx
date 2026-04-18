@@ -29,14 +29,12 @@ export default async function AdminContentPage() {
   return (
     <>
       <h1 className={pageStyles.pageTitle}>Content Manager</h1>
-      <p className={pageStyles.lead}>
-        Pick a page to edit sections and blocks. Use search and filters to find routes quickly.
-      </p>
+      <p className={pageStyles.lead}>Open a page to change text, images, and layout. Search and status filters help you find it.</p>
       <ContentListToolbar />
       {pages.length === 0 ? (
         <EmptyState
           title="No pages yet"
-          description="Click Sync website pages above to create routes from the site registry, or create a custom page."
+          description="Use Import default pages above to add the standard pages, or create a new page with New page."
         />
       ) : (
         <ContentPageListClient pages={rows} />

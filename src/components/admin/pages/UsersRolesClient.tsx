@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
+import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
 export type UserRow = { id: string; email: string; name: string | null; role: UserRole };
 
@@ -28,7 +29,8 @@ export default function UsersRolesClient({ users }: { users: UserRow[] }) {
       push('Role updated', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Update failed', 'error');
+      logAdminClientError('UsersRolesClient.updateRole', e, { id });
+      push(e instanceof Error ? e.message : 'We could not update this role.', 'error');
     } finally {
       setSaving(null);
     }

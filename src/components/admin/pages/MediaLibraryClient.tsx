@@ -7,6 +7,7 @@ import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { TextField } from '@/components/admin/fields';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
+import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 import {
   MEDIA_MIME_FILTER_VALUES,
   MEDIA_PER_PAGE_VALUES,
@@ -122,7 +123,8 @@ export default function MediaLibraryClient({
       setTags('');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Add failed', 'error');
+      logAdminClientError('MediaLibraryClient.addAsset', e);
+      push(e instanceof Error ? e.message : 'We could not add this asset.', 'error');
     } finally {
       setLoading(false);
     }

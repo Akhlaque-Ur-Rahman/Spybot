@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { adminApiErrorToUserMessage } from '@/lib/admin/user-facing-errors';
 
 type AdminApiContextValue = {
   csrfToken: string;
@@ -42,9 +43,12 @@ export function AdminApiProvider({
         if (!res.ok) {
           const payload = data as { error?: string } | null;
           const method = (init?.method ?? 'GET').toUpperCase();
-          console.error('[admin-api]', method, url, res.status, payload ?? text);
-          const err = payload?.error ?? 'Something went wrong. Please try again.';
-          throw new Error(err);
+          const technical =
+            typeof payload?.error === 'string'
+              ? payload.error
+              : text?.trim() || 'Request failed without a message';
+          console.error('[admin-api]', method, url, res.status, { responseBody: payload ?? text, technicalError: technical });
+          throw new Error(adminApiErrorToUserMessage(technical));
         }
         return data as T;
       },

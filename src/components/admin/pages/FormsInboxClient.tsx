@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
+import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
 export type FormRow = {
   id: string;
@@ -34,7 +35,8 @@ export default function FormsInboxClient({ items }: { items: FormRow[] }) {
       push('Status updated', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Update failed', 'error');
+      logAdminClientError('FormsInboxClient.setStatus', e, { id });
+      push(e instanceof Error ? e.message : 'We could not update this submission.', 'error');
     } finally {
       setSaving(null);
     }

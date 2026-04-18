@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
+import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
 type DraftPage = { id: string; key: string; title: string; status: string };
 type PubPage = { id: string; key: string; title: string; status: string };
@@ -42,7 +43,8 @@ export default function PublishQueueClient({
       push('Published', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Publish failed', 'error');
+      logAdminClientError('PublishQueueClient.publish', e);
+      push(e instanceof Error ? e.message : 'We could not publish this page.', 'error');
     } finally {
       setBusy(null);
     }
@@ -56,13 +58,14 @@ export default function PublishQueueClient({
         body: JSON.stringify({ pageId, version }),
       });
       if (res.scope === 'content_and_metadata') {
-        push('Rollback applied (blocks + page metadata)', 'success');
+        push('Previous version restored.', 'success');
       } else {
-        push('Rollback applied (page metadata only — legacy snapshot)', 'success');
+        push('Previous version restored (page details only).', 'success');
       }
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Rollback failed', 'error');
+      logAdminClientError('PublishQueueClient.rollback', e);
+      push(e instanceof Error ? e.message : 'We could not restore that version.', 'error');
     } finally {
       setBusy(null);
     }
@@ -77,7 +80,7 @@ export default function PublishQueueClient({
         <ul className={pageStyles.list}>
           {drafts.map((p) => (
             <li key={p.id} className={pageStyles.listItem}>
-              <strong>{p.title}</strong> <span className={pageStyles.badge}>{p.key}</span>
+              <strong>{p.title}</strong>
               <div className={pageStyles.row} style={{ marginTop: 8 }}>
                 <Link href={`/admin/content/${encodeURIComponent(p.key)}`} className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}>
                   Edit in Content
@@ -97,7 +100,7 @@ export default function PublishQueueClient({
       )}
 
       <h3 className={pageStyles.cardTitle} style={{ marginTop: 32 }}>
-        Published pages (owner rollback)
+        Published pages
       </h3>
       {published.length === 0 ? (
         <p className={pageStyles.lead}>No published pages.</p>
@@ -105,7 +108,7 @@ export default function PublishQueueClient({
         <ul className={pageStyles.list}>
           {published.map((p) => (
             <li key={p.id} className={pageStyles.listItem}>
-              <strong>{p.title}</strong> <span className={pageStyles.badge}>{p.key}</span>
+              <strong>{p.title}</strong>
             </li>
           ))}
         </ul>
@@ -130,9 +133,7 @@ export default function PublishQueueClient({
           <tbody>
             {versions.map((v) => (
               <tr key={v.id}>
-                <td>
-                  {v.page.title} <span className={pageStyles.badge}>{v.page.key}</span>
-                </td>
+                <td>{v.page.title}</td>
                 <td>{v.version}</td>
                 <td>{new Date(v.publishedAt).toLocaleString()}</td>
                 <td>{v.note ?? '—'}</td>
