@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect, useCallback, type ReactNode } from 'react';
+import { Fragment, useState, useEffect, useCallback, type ReactNode } from 'react';
 import styles from './Navbar.module.css';
 import ThemeToggle from './ThemeToggle';
 import BrandLogoMark from '@/components/BrandLogoMark';
@@ -71,10 +71,12 @@ function slugify(label: string) {
 
 export default function Navbar({
   menuItems,
+  utilityMenuItems,
   primaryCtaHref = CTA_LINKS.demo,
   primaryCtaText = 'Book a Demo',
 }: {
   menuItems?: NavMenuItem[];
+  utilityMenuItems?: NavMenuItem[];
   primaryCtaHref?: string;
   primaryCtaText?: string;
 }) {
@@ -139,9 +141,24 @@ export default function Navbar({
             Bank-grade security, trusted by leading enterprises
           </span>
           <div className={styles.topLinks}>
-            <Link href={ROUTES.support} aria-label="Go to Support">Support</Link>
-            <span>|</span>
-            <Link href={ROUTES.contact} aria-label="Contact Sales Team">Contact Sales</Link>
+            {utilityMenuItems?.length ? (
+              utilityMenuItems.map((item, i) => (
+                <Fragment key={`${item.href}-${item.label}`}>
+                  {i > 0 ? <span>|</span> : null}
+                  <Link href={item.href}>{item.label}</Link>
+                </Fragment>
+              ))
+            ) : (
+              <>
+                <Link href={ROUTES.support} aria-label="Go to Support">
+                  Support
+                </Link>
+                <span>|</span>
+                <Link href={ROUTES.contact} aria-label="Contact Sales Team">
+                  Contact Sales
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -151,7 +168,7 @@ export default function Navbar({
         <div className={`container ${styles.navInner}`}>
           {/* Logo */}
           <Link href={ROUTES.home} className={styles.logo} aria-label="SpyBot homepage">
-            <BrandLogoMark width={160} height={40} plain decorative />
+            <BrandLogoMark width={160} height={40} plain decorative sizes="160px" priority />
           </Link>
 
           {/* Desktop links */}

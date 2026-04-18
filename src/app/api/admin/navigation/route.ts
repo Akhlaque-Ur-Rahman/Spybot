@@ -1,4 +1,5 @@
 import { UserRole } from '@prisma/client';
+import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/api/admin';
 import { prisma } from '@/lib/db/prisma';
@@ -52,5 +53,7 @@ export async function PATCH(request: NextRequest) {
     },
     include: { items: true },
   });
+  if (body.key === 'header-main') revalidateTag('cms-header-menu', 'max');
+  if (body.key === 'header-utility') revalidateTag('cms-header-utility-menu', 'max');
   return NextResponse.json({ menu });
 }

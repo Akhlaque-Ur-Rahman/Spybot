@@ -1,14 +1,19 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, type Prisma } from '@prisma/client';
 
 declare global {
-  // eslint-disable-next-line no-var
   var prismaGlobal: PrismaClient | undefined;
+}
+
+function prismaLog(): Prisma.LogLevel[] {
+  if (process.env.NODE_ENV === 'production') return ['error'];
+  if (process.env.PRISMA_LOG_QUERIES === '1') return ['query', 'warn', 'error'];
+  return ['warn', 'error'];
 }
 
 export const prisma =
   globalThis.prismaGlobal ??
   new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'warn', 'error'] : ['error'],
+    log: prismaLog(),
   });
 
 if (process.env.NODE_ENV !== 'production') {

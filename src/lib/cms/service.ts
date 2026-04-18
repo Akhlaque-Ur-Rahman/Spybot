@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/db/prisma';
 import { unstable_cache } from 'next/cache';
 import { getFooterColumnsSetting } from '@/lib/cms/page-registry';
+import { mergeSiteRuntimeConfig } from '@/lib/cms/site-runtime-config';
+import type { SiteRuntimeConfig } from '@/lib/cms/site-runtime-config';
 import type { CmsPage, NavMenuItem } from '@/lib/cms/types';
 
 const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
@@ -9,27 +11,47 @@ async function withCmsFallback<T>(fallback: T, loader: () => Promise<T>): Promis
   if (!hasDatabaseUrl) return fallback;
   try {
     return await loader();
-  } catch {
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[cms] Database operation failed; using in-memory fallback.', err);
+    }
     return fallback;
   }
 }
 
-/** Loads the CMS page row for a slug (any status). Public merge rules live in `getManagedPageBySlug`. */
-export async function getCmsPageBySlug(slug: string): Promise<CmsPage | null> {
-  const page = await withCmsFallback(null, async () =>
-    prisma.page.findUnique({
-      where: { slug },
-      include: {
-        sections: {
-          orderBy: { position: 'asc' },
-          include: { blocks: { orderBy: { position: 'asc' } } },
-        },
-      },
-    })
-  );
+/** Normalizes slug for DB lookup (home is stored as `/`). */
+export function normalizeCmsPageSlug(slug: string): string {
+  let t = slug.trim();
+  if (t === '' || t === '/') return '/';
+  if (!t.startsWith('/')) t = `/${t}`;
+  t = t.replace(/\/{2,}/g, '/');
+  if (t.length > 1 && t.endsWith('/')) t = t.slice(0, -1);
+  return t === '' ? '/' : t;
+}
 
-  if (!page) return null;
-
+function mapPrismaPageToCmsPage(page: {
+  id: string;
+  key: string;
+  title: string;
+  slug: string;
+  status: string;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  sections: Array<{
+    id: string;
+    key: string;
+    label: string;
+    position: number;
+    blocks: Array<{
+      id: string;
+      key: string;
+      type: string;
+      draftJson: unknown;
+      liveJson: unknown;
+      position: number;
+    }>;
+  }>;
+}): CmsPage {
   return {
     id: page.id,
     key: page.key,
@@ -42,6 +64,7 @@ export async function getCmsPageBySlug(slug: string): Promise<CmsPage | null> {
       id: section.id,
       key: section.key,
       label: section.label,
+      position: section.position,
       blocks: section.blocks.map((block) => ({
         id: block.id,
         key: block.key,
@@ -52,6 +75,43 @@ export async function getCmsPageBySlug(slug: string): Promise<CmsPage | null> {
       })),
     })),
   };
+}
+
+const pageInclude = {
+  sections: {
+    orderBy: { position: 'asc' as const },
+    include: { blocks: { orderBy: { position: 'asc' as const } } },
+  },
+} as const;
+
+/** Loads the CMS page row for a slug (any status). Public merge rules live in `getManagedPageBySlug`. */
+export async function getCmsPageBySlug(slug: string): Promise<CmsPage | null> {
+  const normalized = normalizeCmsPageSlug(slug);
+  const load = async (s: string) =>
+    withCmsFallback(null, async () => {
+      const row = await prisma.page.findUnique({
+        where: { slug: s },
+        include: pageInclude,
+      });
+      return row ? mapPrismaPageToCmsPage(row) : null;
+    });
+
+  let result = await load(normalized);
+  if (!result && normalized !== slug.trim()) {
+    result = await load(slug.trim());
+  }
+  return result;
+}
+
+/** Loads the CMS page row by stable page key. */
+export async function getCmsPageByKey(key: string): Promise<CmsPage | null> {
+  return withCmsFallback(null, async () => {
+    const row = await prisma.page.findUnique({
+      where: { key },
+      include: pageInclude,
+    });
+    return row ? mapPrismaPageToCmsPage(row) : null;
+  });
 }
 
 export async function getHeaderMenu(): Promise<NavMenuItem[]> {
@@ -66,7 +126,23 @@ export async function getHeaderMenu(): Promise<NavMenuItem[]> {
       return menu.items;
     }),
     ['cms-header-menu'],
-    { revalidate: 60 }
+    { revalidate: 60, tags: ['cms-header-menu'] }
+  )();
+}
+
+export async function getHeaderUtilityMenu(): Promise<NavMenuItem[]> {
+  return unstable_cache(
+    () =>
+      withCmsFallback([], async () => {
+        const menu = await prisma.navigationMenu.findUnique({
+          where: { key: 'header-utility' },
+          include: { items: { orderBy: { position: 'asc' } } },
+        });
+        if (!menu) return [];
+        return menu.items;
+      }),
+    ['cms-header-utility-menu'],
+    { revalidate: 60, tags: ['cms-header-utility-menu'] }
   )();
 }
 
@@ -79,7 +155,7 @@ export async function getFooterMenu(): Promise<Record<string, NavMenuItem[]>> {
       return parsed ?? getFooterColumnsSetting();
     }),
     ['cms-footer-menu'],
-    { revalidate: 120 }
+    { revalidate: 120, tags: ['cms-footer-menu'] }
   )();
 }
 
@@ -91,7 +167,19 @@ export async function getGlobalSettings<T extends Record<string, unknown>>() {
       return (setting?.valueJson ?? {}) as T;
     }),
     ['cms-global-settings'],
-    { revalidate: 120 }
+    { revalidate: 120, tags: ['cms-global-settings'] }
   );
   return loader();
+}
+
+export async function getSiteRuntimeConfig(): Promise<SiteRuntimeConfig> {
+  return unstable_cache(
+    () =>
+      withCmsFallback(mergeSiteRuntimeConfig(null), async () => {
+        const setting = await prisma.siteSetting.findUnique({ where: { key: 'site' } });
+        return mergeSiteRuntimeConfig(setting?.valueJson ?? {});
+      }),
+    ['cms-site-runtime-config'],
+    { revalidate: 120, tags: ['cms-site-runtime-config'] }
+  )();
 }

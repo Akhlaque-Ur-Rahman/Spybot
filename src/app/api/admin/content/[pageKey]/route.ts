@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { prisma } from '@/lib/db/prisma';
+import { getCmsRegistryPageByKey } from '@/lib/cms/page-registry';
+import { normalizeCmsPageSlug } from '@/lib/cms/service';
+import { validatePublicCmsSlugInput } from '@/lib/cms/slug-validation';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 
 export async function GET(
@@ -40,11 +43,29 @@ export async function PATCH(
 
   const data: {
     title?: string;
+    slug?: string;
     seoTitle?: string | null;
     seoDescription?: string | null;
     status?: string;
   } = {};
   if (typeof body.title === 'string') data.title = body.title;
+  if (typeof body.slug === 'string' && body.slug.trim()) {
+    const slug = normalizeCmsPageSlug(
+      body.slug.trim().startsWith('/') ? body.slug.trim() : `/${body.slug.trim()}`
+    );
+    const registryPage = getCmsRegistryPageByKey(pageKey);
+    const err = validatePublicCmsSlugInput(slug, registryPage?.slug);
+    if (err) return NextResponse.json({ error: err }, { status: 400 });
+    if (registryPage && normalizeCmsPageSlug(slug) !== normalizeCmsPageSlug(registryPage.slug)) {
+      return NextResponse.json(
+        { error: 'Built-in pages cannot change their public path.' },
+        { status: 400 }
+      );
+    }
+    const other = await prisma.page.findFirst({ where: { slug, NOT: { key: pageKey } } });
+    if (other) return NextResponse.json({ error: 'Slug already in use' }, { status: 409 });
+    data.slug = slug;
+  }
   if ('seoTitle' in body) data.seoTitle = (body.seoTitle as string | null) ?? null;
   if ('seoDescription' in body) data.seoDescription = (body.seoDescription as string | null) ?? null;
   if (typeof body.status === 'string') {

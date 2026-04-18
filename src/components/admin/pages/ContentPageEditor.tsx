@@ -9,6 +9,7 @@ import { TextAreaField, ToggleField } from '@/components/admin/fields';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
 import { stableStringify } from '@/lib/cms/json-stable';
+import { CMS_BLOCK_TYPES } from '@/lib/cms/page-registry';
 
 type SerializedBlock = {
   id: string;
@@ -86,6 +87,14 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
   const { push } = useToast();
 
   const [title, setTitle] = useState(page.title);
+  const [slug, setSlug] = useState(page.slug);
+  const [sectionKeys, setSectionKeys] = useState(() =>
+    [...page.sections].sort((a, b) => a.position - b.position).map((s) => s.key)
+  );
+  const [addOpen, setAddOpen] = useState(false);
+  const [newSectionKey, setNewSectionKey] = useState('');
+  const [newSectionLabel, setNewSectionLabel] = useState('');
+  const [newSectionBlockType, setNewSectionBlockType] = useState<string>(CMS_BLOCK_TYPES[0] ?? 'utilityCtaBand');
   const [savingMeta, setSavingMeta] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
 
@@ -111,11 +120,18 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
 
   const allBlockIds = useMemo(() => page.sections.flatMap((s) => s.blocks.map((b) => b.id)), [page.sections]);
 
-  const metaDirty = title !== page.title;
+  const metaDirty = title !== page.title || slug !== page.slug;
+
+  const sectionSig = useMemo(
+    () => page.sections.map((s) => `${s.id}:${s.position}:${s.key}`).join('|'),
+    [page.sections]
+  );
 
   useEffect(() => {
     setTitle(page.title);
-  }, [page.title]);
+    setSlug(page.slug);
+    setSectionKeys([...page.sections].sort((a, b) => a.position - b.position).map((s) => s.key));
+  }, [page.key, page.title, page.slug, sectionSig, page.sections]);
   const blocksDirty = useMemo(
     () => allBlockIds.some((id) => (draftText[id] ?? '') !== (initialDrafts[id] ?? '')),
     [allBlockIds, draftText, initialDrafts],
@@ -143,6 +159,7 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
         method: 'PATCH',
         body: JSON.stringify({
           title,
+          slug,
         }),
       });
       push('Page details saved', 'success');
@@ -243,11 +260,12 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
 
   async function openPreview() {
     try {
+      const previewPath = slug.startsWith('/') ? slug : `/${slug}`;
       const res = await fetchJson<{ redirectTo?: string }>('/api/admin/publish/preview', {
         method: 'POST',
-        body: JSON.stringify({ redirectTo: `/${page.slug}` }),
+        body: JSON.stringify({ redirectTo: previewPath === '/' ? '/' : previewPath }),
       });
-      const target = res.redirectTo ?? `/${page.slug}`;
+      const target = res.redirectTo ?? (previewPath === '/' ? '/' : previewPath);
       window.location.assign(target);
     } catch (e) {
       push(e instanceof Error ? e.message : 'Preview failed', 'error');
@@ -290,6 +308,10 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
           Title
           <input className={pageStyles.input} value={title} onChange={(e) => setTitle(e.target.value)} />
         </label>
+        <label className={pageStyles.lead} style={{ display: 'grid', gap: 6, marginBottom: 12 }}>
+          Slug
+          <input className={pageStyles.input} value={slug} onChange={(e) => setSlug(e.target.value)} />
+        </label>
         <div className={pageStyles.lead} style={{ marginBottom: 12 }}>
           <strong>Status</strong>
           <p style={{ margin: '6px 0 0' }}>
@@ -320,14 +342,133 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
       </div>
 
       <div className={pageStyles.card}>
-        <h3 className={pageStyles.cardTitle}>SEO &amp; search snippets</h3>
+        <h3 className={pageStyles.cardTitle}>SEO</h3>
         <p className={pageStyles.lead} style={{ marginTop: 0 }}>
-          Meta title and description for this route are edited in the SEO manager so there is a single source of truth.
-          Current values stay on the page record until you change them there.
+          Meta title and description: <Link href="/admin/seo">SEO manager</Link>
         </p>
-        <Link href="/admin/seo" className={pageStyles.btn}>
-          Open SEO manager
-        </Link>
+      </div>
+
+      <div className={pageStyles.card}>
+        <h3 className={pageStyles.cardTitle}>Sections</h3>
+        <p className={pageStyles.lead} style={{ marginTop: 0 }}>
+          Reorder sections or add a new section with one block.
+        </p>
+        <ol style={{ paddingLeft: 18, marginBottom: 16 }}>
+          {sectionKeys.map((key, idx) => (
+            <li key={key} style={{ marginBottom: 8 }}>
+              <code className={pageStyles.mono}>{key}</code>
+              <span style={{ marginLeft: 8 }}>
+                <button
+                  type="button"
+                  className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+                  disabled={idx === 0}
+                  onClick={() => {
+                    const next = [...sectionKeys];
+                    [next[idx - 1], next[idx]] = [next[idx]!, next[idx - 1]!];
+                    setSectionKeys(next);
+                    void (async () => {
+                      try {
+                        await fetchJson(`/api/admin/content/${encodeURIComponent(page.key)}/sections/reorder`, {
+                          method: 'POST',
+                          body: JSON.stringify({ sectionKeys: next }),
+                        });
+                        push('Order saved', 'success');
+                        router.refresh();
+                      } catch (e) {
+                        push(e instanceof Error ? e.message : 'Reorder failed', 'error');
+                        setSectionKeys([...page.sections].sort((a, b) => a.position - b.position).map((s) => s.key));
+                      }
+                    })();
+                  }}
+                >
+                  Up
+                </button>
+                <button
+                  type="button"
+                  className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+                  style={{ marginLeft: 4 }}
+                  disabled={idx >= sectionKeys.length - 1}
+                  onClick={() => {
+                    const next = [...sectionKeys];
+                    [next[idx + 1], next[idx]] = [next[idx]!, next[idx + 1]!];
+                    setSectionKeys(next);
+                    void (async () => {
+                      try {
+                        await fetchJson(`/api/admin/content/${encodeURIComponent(page.key)}/sections/reorder`, {
+                          method: 'POST',
+                          body: JSON.stringify({ sectionKeys: next }),
+                        });
+                        push('Order saved', 'success');
+                        router.refresh();
+                      } catch (e) {
+                        push(e instanceof Error ? e.message : 'Reorder failed', 'error');
+                        setSectionKeys([...page.sections].sort((a, b) => a.position - b.position).map((s) => s.key));
+                      }
+                    })();
+                  }}
+                >
+                  Down
+                </button>
+              </span>
+            </li>
+          ))}
+        </ol>
+        <button type="button" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`} onClick={() => setAddOpen((o) => !o)}>
+          {addOpen ? 'Close' : 'Add section'}
+        </button>
+        {addOpen ? (
+          <div style={{ marginTop: 16, display: 'grid', gap: 10 }}>
+            <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
+              Section key
+              <input className={pageStyles.input} value={newSectionKey} onChange={(e) => setNewSectionKey(e.target.value)} />
+            </label>
+            <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
+              Section label
+              <input className={pageStyles.input} value={newSectionLabel} onChange={(e) => setNewSectionLabel(e.target.value)} />
+            </label>
+            <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
+              Block type
+              <select
+                className={pageStyles.input}
+                value={newSectionBlockType}
+                onChange={(e) => setNewSectionBlockType(e.target.value)}
+              >
+                {CMS_BLOCK_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              className={pageStyles.btn}
+              onClick={() =>
+                void (async () => {
+                  try {
+                    await fetchJson(`/api/admin/content/${encodeURIComponent(page.key)}/sections`, {
+                      method: 'POST',
+                      body: JSON.stringify({
+                        key: newSectionKey.trim(),
+                        label: newSectionLabel.trim(),
+                        blockType: newSectionBlockType,
+                      }),
+                    });
+                    push('Section added', 'success');
+                    setNewSectionKey('');
+                    setNewSectionLabel('');
+                    setAddOpen(false);
+                    router.refresh();
+                  } catch (e) {
+                    push(e instanceof Error ? e.message : 'Add section failed', 'error');
+                  }
+                })()
+              }
+            >
+              Create section
+            </button>
+          </div>
+        ) : null}
       </div>
 
       {page.sections.map((section) => (

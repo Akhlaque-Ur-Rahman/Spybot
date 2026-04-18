@@ -2,6 +2,7 @@ export type CmsPageSection = {
   id: string;
   key: string;
   label: string;
+  position: number;
   blocks: Array<{
     id: string;
     key: string;

@@ -1,0 +1,25 @@
+.pageStage {
+  flex: 1;
+  min-height: 0;
+}
+
+.pageStageRouteIn {
+  animation: routeStageIn 0.38s ease-out both;
+}
+
+@keyframes routeStageIn {
+  from {
+    opacity: 0.55;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pageStageRouteIn {
+    animation: none;
+  }
+}

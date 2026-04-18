@@ -34,6 +34,7 @@ To show the site and CMS to someone **without deploying** (local DB stays local)
 - `/admin/forms` inquiries inbox
 - `/admin/users` role management
 - `/admin/settings` global settings
+- `/admin/footer` footer columns
 - `/admin/publish` publish queue
 - `/admin/audit` audit history
 

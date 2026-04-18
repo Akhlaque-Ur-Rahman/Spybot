@@ -1,8 +1,10 @@
 import { draftMode } from 'next/headers';
-import { getCmsPageBySlug } from '@/lib/cms/service';
+import { getCmsPageByKey, getCmsPageBySlug, normalizeCmsPageSlug } from '@/lib/cms/service';
+import type { CmsPage } from '@/lib/cms/types';
 import {
   cmsRegistryPages,
   getCmsRegistryPageBySlug,
+  isCmsBlockType,
   type CmsBlockType,
   type CmsBlockValueMap,
   type CmsRegistryBlock,
@@ -38,7 +40,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function toManagedBlock(blockDef: CmsRegistryBlock, valueOverride?: unknown): ManagedBlock {
-  const value = isRecord(valueOverride) ? (valueOverride as CmsBlockValueMap[typeof blockDef.type]) : blockDef.value;
+  const value = isRecord(valueOverride)
+    ? (valueOverride as CmsBlockValueMap[typeof blockDef.type])
+    : blockDef.value;
   return {
     key: blockDef.key,
     type: blockDef.type,
@@ -64,35 +68,101 @@ function fromRegistryPage(page: CmsRegistryPage): ManagedCmsPage {
   };
 }
 
-export async function getManagedPageBySlug(slug: string): Promise<ManagedCmsPage | null> {
-  const registryPage = getCmsRegistryPageBySlug(slug);
-  const dbPage = await getCmsPageBySlug(slug);
+function managedBlockFromDbRow(
+  block: CmsPage['sections'][number]['blocks'][number],
+  useDraft: boolean
+): ManagedBlock | null {
+  if (!isCmsBlockType(block.type)) return null;
+  const t = block.type;
+  const raw = useDraft ? block.draftJson : block.liveJson;
+  const value = isRecord(raw)
+    ? (raw as CmsBlockValueMap[typeof t])
+    : ({} as CmsBlockValueMap[typeof t]);
+  return {
+    key: block.key,
+    type: t,
+    position: block.position,
+    value,
+  };
+}
 
-  if (!registryPage && !dbPage) return null;
+function managedSectionFromDbRow(
+  sec: CmsPage['sections'][number],
+  useDraft: boolean
+): ManagedSection {
+  return {
+    key: sec.key,
+    label: sec.label,
+    position: sec.position,
+    blocks: sec.blocks
+      .map((b) => managedBlockFromDbRow(b, useDraft))
+      .filter((b): b is ManagedBlock => b !== null),
+  };
+}
 
-  const mode = await draftMode();
-  const useDraft = mode.isEnabled;
+/** Full page from DB only (no registry template). */
+function fromDbOnlyManagedPage(dbPage: CmsPage, useDraft: boolean): ManagedCmsPage {
+  const seoTitle =
+    dbPage.seoTitle && String(dbPage.seoTitle).trim() !== '' ? dbPage.seoTitle : dbPage.title;
+  return {
+    key: dbPage.key,
+    title: dbPage.title,
+    slug: dbPage.slug,
+    status: dbPage.status,
+    seoTitle: seoTitle ?? dbPage.title,
+    seoDescription: dbPage.seoDescription ?? '',
+    sections: [...dbPage.sections]
+      .sort((a, b) => a.position - b.position)
+      .map((s) => managedSectionFromDbRow(s, useDraft)),
+  };
+}
 
-  if (!registryPage) {
-    if (dbPage && !useDraft && dbPage.status === 'draft') {
-      return null;
-    }
-    return {
-      key: dbPage!.key,
-      title: dbPage!.title,
-      slug: dbPage!.slug,
-      status: dbPage!.status,
-      seoTitle: dbPage!.title,
-      seoDescription: '',
-      sections: [],
-    };
-  }
-
+function mergeRegistryWithDb(
+  registryPage: CmsRegistryPage,
+  dbPage: CmsPage,
+  useDraft: boolean
+): ManagedCmsPage {
   const base = fromRegistryPage(registryPage);
-
-  if (!dbPage) return base;
-
   const applyDbMetadata = useDraft || dbPage.status === 'published';
+
+  const mergedBaseSections = base.sections.map((section) => {
+    const dbSection = dbPage.sections.find((item) => item.key === section.key);
+    if (!dbSection) return section;
+
+    if (!applyDbMetadata) {
+      return {
+        key: section.key,
+        label: section.label,
+        position: section.position,
+        blocks: section.blocks,
+      };
+    }
+
+    return {
+      key: section.key,
+      label: dbSection.label || section.label,
+      position: section.position,
+      blocks: section.blocks.map((block) => {
+        const dbBlock = dbSection.blocks.find((item) => item.key === block.key);
+        if (!dbBlock || dbBlock.type !== block.type || !isCmsBlockType(dbBlock.type)) return block;
+        return {
+          ...block,
+          type: dbBlock.type as CmsBlockType,
+          value: isRecord(useDraft ? dbBlock.draftJson : dbBlock.liveJson)
+            ? ((useDraft ? dbBlock.draftJson : dbBlock.liveJson) as CmsBlockValueMap[typeof block.type])
+            : block.value,
+        };
+      }),
+    };
+  });
+
+  const baseKeys = new Set(base.sections.map((s) => s.key));
+  const extraDbSections = applyDbMetadata
+    ? dbPage.sections
+        .filter((s) => !baseKeys.has(s.key))
+        .sort((a, b) => a.position - b.position)
+        .map((s) => managedSectionFromDbRow(s, useDraft))
+    : [];
 
   return {
     key: dbPage.key,
@@ -103,34 +173,57 @@ export async function getManagedPageBySlug(slug: string): Promise<ManagedCmsPage
     seoDescription: applyDbMetadata
       ? (dbPage.seoDescription ?? registryPage.seoDescription)
       : registryPage.seoDescription,
-    sections: base.sections.map((section) => {
-      const dbSection = dbPage.sections.find((item) => item.key === section.key);
-      if (!dbSection) return section;
-
-      return {
-        key: section.key,
-        label: applyDbMetadata ? dbSection.label || section.label : section.label,
-        position: section.position,
-        blocks: section.blocks.map((block) => {
-          const dbBlock = dbSection.blocks.find((item) => item.key === block.key || item.type === block.type);
-          if (!dbBlock) return block;
-          return {
-            ...block,
-            type: (dbBlock.type as CmsBlockType) || block.type,
-            value: isRecord(useDraft ? dbBlock.draftJson : dbBlock.liveJson)
-              ? ((useDraft ? dbBlock.draftJson : dbBlock.liveJson) as CmsBlockValueMap[typeof block.type])
-              : block.value,
-          };
-        }),
-      };
-    }),
+    sections: [...mergedBaseSections, ...extraDbSections],
   };
 }
 
+export async function getManagedPageBySlug(slug: string): Promise<ManagedCmsPage | null> {
+  const pathSlug = normalizeCmsPageSlug(slug);
+  const registryPage =
+    getCmsRegistryPageBySlug(pathSlug) ?? getCmsRegistryPageBySlug(slug.trim()) ?? null;
+
+  let dbPage: CmsPage | null = null;
+  if (registryPage) {
+    const byKey = await getCmsPageByKey(registryPage.key);
+    const bySlug = await getCmsPageBySlug(pathSlug);
+    if (byKey && bySlug && byKey.id !== bySlug.id) {
+      dbPage = byKey;
+    } else {
+      dbPage = byKey ?? bySlug;
+    }
+    if (dbPage && dbPage.key !== registryPage.key) {
+      dbPage = null;
+    }
+  } else {
+    dbPage = await getCmsPageBySlug(pathSlug);
+  }
+
+  if (!registryPage && !dbPage) return null;
+
+  const mode = await draftMode();
+  const useDraft = mode.isEnabled;
+
+  if (!registryPage) {
+    if (!dbPage) return null;
+    if (!useDraft && dbPage.status === 'draft') {
+      return null;
+    }
+    return fromDbOnlyManagedPage(dbPage, useDraft);
+  }
+
+  const base = fromRegistryPage(registryPage);
+
+  if (!dbPage) return base;
+
+  return mergeRegistryWithDb(registryPage, dbPage, useDraft);
+}
+
 export async function getManagedPageByKey(key: string): Promise<ManagedCmsPage | null> {
-  const page = cmsRegistryPages.find((item) => item.key === key);
-  if (!page) return null;
-  return getManagedPageBySlug(page.slug);
+  const registryHit = cmsRegistryPages.find((item) => item.key === key);
+  if (registryHit) return getManagedPageBySlug(registryHit.slug);
+  const db = await getCmsPageByKey(key);
+  if (!db) return null;
+  return getManagedPageBySlug(db.slug);
 }
 
 export async function getManagedPageSeoBySlug(slug: string) {
@@ -145,9 +238,13 @@ export async function getManagedPageSeoBySlug(slug: string) {
 export function getManagedBlock<T extends CmsBlockType>(
   page: ManagedCmsPage | null,
   sectionKey: string,
-  type: T
+  type: T,
+  blockKey?: string
 ): CmsBlockValueMap[T] | null {
   const section = page?.sections.find((item) => item.key === sectionKey);
-  const block = section?.blocks.find((item) => item.type === type);
+  if (!section) return null;
+  const block = blockKey
+    ? section.blocks.find((item) => item.key === blockKey && item.type === type)
+    : section.blocks.find((item) => item.type === type);
   return (block?.value as CmsBlockValueMap[T] | undefined) ?? null;
 }

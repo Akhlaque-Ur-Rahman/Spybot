@@ -3,6 +3,7 @@ import type { MediaClipMeta } from '@/lib/site-media';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 import { CTA_LINKS, ROUTES, footerColumns, industryNavItems, solutionNavItems } from '@/site';
 import type { CmsIconName } from '@/lib/cms/icon-map';
+import { buildMarketingDetailRegistryPages } from '@/lib/cms/marketing-detail-registry';
 
 export type CmsLink = {
   label: string;
@@ -274,15 +275,15 @@ export type CmsRegistryPage = {
   sections: CmsRegistrySection[];
 };
 
-function section(key: string, label: string, position: number, blockDef: CmsRegistryBlock): CmsRegistrySection {
+export function section(key: string, label: string, position: number, blockDef: CmsRegistryBlock): CmsRegistrySection {
   return { key, label, position, blocks: [{ ...blockDef, position: 1 }] };
 }
 
-function block<T extends CmsBlockType>(key: string, type: T, value: CmsBlockValueMap[T]): CmsRegistryBlock<T> {
+export function block<T extends CmsBlockType>(key: string, type: T, value: CmsBlockValueMap[T]): CmsRegistryBlock<T> {
   return { key, type, position: 1, value };
 }
 
-const defaultCoverageItems = [
+export const defaultCoverageItems = [
   'Aadhaar · PAN · Voter ID',
   'KYB · MCA · GST',
   'Penny drop · Bank statements',
@@ -558,7 +559,7 @@ export const homeHeroBlock: CmsHeroBlock = {
   media: MEDIA_CLIPS.homeHero,
 };
 
-function createSimplePage(args: {
+export function createSimplePage(args: {
   key: string;
   title: string;
   slug: string;
@@ -610,6 +611,14 @@ function createSimplePage(args: {
     sections,
   };
 }
+
+const marketingDetailRegistryPages = buildMarketingDetailRegistryPages({
+  section,
+  block,
+  createSimplePage,
+  defaultDemoSectionBlock,
+  defaultCoverageItems,
+});
 
 export const cmsRegistryPages: CmsRegistryPage[] = [
   {
@@ -956,6 +965,7 @@ export const cmsRegistryPages: CmsRegistryPage[] = [
     decisionFlow: defaultDecisionFlowBlock,
     demoSection: defaultDemoSectionBlock,
   }),
+  ...marketingDetailRegistryPages,
 ];
 
 export function getCmsRegistryPageBySlug(slug: string) {
