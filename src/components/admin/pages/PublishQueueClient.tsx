@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAdminApi } from '@/components/admin/AdminApiContext';
@@ -50,11 +51,15 @@ export default function PublishQueueClient({
   async function rollback(pageId: string, version: number) {
     setBusy(`rb-${pageId}-${version}`);
     try {
-      await fetchJson('/api/admin/publish/rollback', {
+      const res = await fetchJson<{ ok?: boolean; scope?: string }>('/api/admin/publish/rollback', {
         method: 'POST',
         body: JSON.stringify({ pageId, version }),
       });
-      push('Rollback applied (page metadata)', 'success');
+      if (res.scope === 'content_and_metadata') {
+        push('Rollback applied (blocks + page metadata)', 'success');
+      } else {
+        push('Rollback applied (page metadata only — legacy snapshot)', 'success');
+      }
       router.refresh();
     } catch (e) {
       push(e instanceof Error ? e.message : 'Rollback failed', 'error');
@@ -74,6 +79,9 @@ export default function PublishQueueClient({
             <li key={p.id} className={pageStyles.listItem}>
               <strong>{p.title}</strong> <span className={pageStyles.badge}>{p.key}</span>
               <div className={pageStyles.row} style={{ marginTop: 8 }}>
+                <Link href={`/admin/content/${encodeURIComponent(p.key)}`} className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}>
+                  Edit in Content
+                </Link>
                 <button
                   type="button"
                   className={pageStyles.btn}

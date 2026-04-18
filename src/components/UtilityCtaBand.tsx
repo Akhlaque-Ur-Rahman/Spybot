@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import styles from './UtilityCtaBand.module.css';
+import richTextStyles from '@/components/CmsRichText.module.css';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 type Cta = {
   label: string;
@@ -9,7 +12,7 @@ type Cta = {
 
 type Props = {
   title: string;
-  description?: string;
+  description?: CmsRichTextValue;
   primary: Cta;
   secondary?: Cta;
 };
@@ -22,7 +25,9 @@ export default function UtilityCtaBand({ title, description, primary, secondary 
           <h2 id="utility-cta-heading" className={styles.title}>
             {title}
           </h2>
-          {description ? <p className={styles.desc}>{description}</p> : null}
+          {description ? (
+            <div className={`${styles.desc} ${richTextStyles.prose}`}>{renderCmsRichText(description)}</div>
+          ) : null}
         </div>
         <div className={styles.actions}>
           <Link href={primary.href} className={primary.variant === 'ghost' ? styles.ghost : styles.primary}>

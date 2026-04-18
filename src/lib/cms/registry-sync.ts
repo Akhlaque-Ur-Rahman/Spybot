@@ -85,6 +85,27 @@ export async function syncCmsRegistry() {
         });
       }
     }
+
+    const syncedPage = await prisma.page.findUnique({
+      where: { key: page.key },
+      include: { sections: { include: { blocks: true } } },
+    });
+    if (syncedPage) {
+      const registrySectionByKey = new Map(page.sections.map((s) => [s.key, s]));
+      for (const dbSec of syncedPage.sections) {
+        const regSec = registrySectionByKey.get(dbSec.key);
+        if (!regSec) {
+          await prisma.section.delete({ where: { id: dbSec.id } });
+          continue;
+        }
+        const regBlockKeys = new Set(regSec.blocks.map((b) => b.key));
+        for (const dbBlock of dbSec.blocks) {
+          if (!regBlockKeys.has(dbBlock.key)) {
+            await prisma.block.delete({ where: { id: dbBlock.id } });
+          }
+        }
+      }
+    }
   }
 
   return {

@@ -1,8 +1,11 @@
 import styles from './SupportPathways.module.css';
+import richTextStyles from '@/components/CmsRichText.module.css';
 import { Headphones, Mail, Clock, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import { ROUTES } from '@/site';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 const pathways = [
   {
@@ -34,7 +37,7 @@ const pathways = [
 type SupportPathwayItem = {
   icon: CmsIconName;
   title: string;
-  desc: string;
+  desc: CmsRichTextValue;
   action: { label: string; href: string };
 };
 
@@ -46,7 +49,7 @@ export default function SupportPathways({
 }: {
   heading?: string;
   gradientText?: string;
-  subheading?: string;
+  subheading?: CmsRichTextValue;
   items?: SupportPathwayItem[];
 }) {
   const resolvedItems = items
@@ -62,9 +65,7 @@ export default function SupportPathways({
         <h2 id="support-pathways-heading" className={styles.heading}>
           {heading} <span className="text-gradient">{gradientText}</span>
         </h2>
-        <p className={styles.sub}>
-          {subheading}
-        </p>
+        <div className={`${styles.sub} ${richTextStyles.prose}`}>{renderCmsRichText(subheading)}</div>
         <div className={styles.grid}>
           {resolvedItems.map((p) => (
             <article key={p.title} className={styles.card}>
@@ -72,7 +73,7 @@ export default function SupportPathways({
                 {p.icon}
               </div>
               <h3 className={styles.title}>{p.title}</h3>
-              <p className={styles.desc}>{p.desc}</p>
+              <div className={`${styles.desc} ${richTextStyles.prose}`}>{renderCmsRichText(p.desc)}</div>
               <Link href={p.action.href} className={styles.link}>
                 {p.action.label} →
               </Link>

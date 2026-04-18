@@ -1,10 +1,12 @@
 import { Prisma, UserRole } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { prisma } from '@/lib/db/prisma';
 import { notifyOps } from '@/lib/ops/notifications';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
+import type { PublishSnapshot } from '@/app/api/admin/publish/snapshot-types';
 
 export async function GET() {
   const auth = await requireApiRole();
@@ -31,30 +33,38 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Page not found' }, { status: 404 });
   }
 
-  for (const section of current.sections) {
-    for (const block of section.blocks) {
-      await prisma.block.update({
-        where: { id: block.id },
-        data: {
-          liveJson:
-            block.draftJson === null ? Prisma.JsonNull : (block.draftJson as Prisma.InputJsonValue),
-        },
-      });
+  await prisma.$transaction(async (tx) => {
+    for (const section of current.sections) {
+      for (const block of section.blocks) {
+        await tx.block.update({
+          where: { id: block.id },
+          data: {
+            liveJson:
+              block.draftJson === null ? Prisma.JsonNull : (block.draftJson as Prisma.InputJsonValue),
+          },
+        });
+      }
     }
-  }
+    await tx.page.update({
+      where: { key: body.pageKey },
+      data: { status: 'published' },
+    });
+  });
 
-  const page = await prisma.page.update({
+  const page = await prisma.page.findUnique({
     where: { key: body.pageKey },
-    data: { status: 'published' },
     include: { sections: { include: { blocks: true } } },
   });
+  if (!page) {
+    return NextResponse.json({ error: 'Page not found after publish' }, { status: 500 });
+  }
 
   const latestVersion = await prisma.pageVersion.findFirst({
     where: { pageId: page.id },
     orderBy: { version: 'desc' },
   });
 
-  const snapshot = {
+  const snapshot: PublishSnapshot = {
     page: {
       id: page.id,
       title: page.title,
@@ -64,7 +74,13 @@ export async function POST(request: NextRequest) {
         id: section.id,
         key: section.key,
         label: section.label,
-        blocks: section.blocks.map((block) => block.liveJson),
+        blocks: section.blocks.map((block) => ({
+          id: block.id,
+          key: block.key,
+          type: block.type,
+          position: block.position,
+          liveJson: block.liveJson,
+        })),
       })),
     },
   };
@@ -73,7 +89,7 @@ export async function POST(request: NextRequest) {
     data: {
       pageId: page.id,
       version: (latestVersion?.version ?? 0) + 1,
-      snapshotJson: snapshot,
+      snapshotJson: snapshot as unknown as Prisma.InputJsonValue,
       note: body.note,
     },
   });
@@ -86,6 +102,14 @@ export async function POST(request: NextRequest) {
     afterJson: snapshot,
   });
   await notifyOps('publish.completed', { pageKey: body.pageKey, actorId: auth.session.user.id });
+
+  try {
+    revalidatePath('/', 'layout');
+    const path = page.slug.startsWith('/') ? page.slug : `/${page.slug}`;
+    revalidatePath(path);
+  } catch {
+    /* revalidate is best-effort */
+  }
 
   return NextResponse.json({ ok: true });
 }

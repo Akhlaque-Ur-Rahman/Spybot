@@ -1,6 +1,9 @@
 import styles from './DecisionFlow.module.css';
+import richTextStyles from '@/components/CmsRichText.module.css';
 import { Settings, Component, MousePointerClick, Shuffle, Zap, Lightbulb } from 'lucide-react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 const decisions = [
   {
@@ -36,7 +39,7 @@ type DecisionFlowItem = {
 type DecisionFlowCapability = {
   icon: CmsIconName;
   title: string;
-  desc: string;
+  desc: CmsRichTextValue;
 };
 
 export default function DecisionFlow({
@@ -55,14 +58,14 @@ export default function DecisionFlow({
   label?: string;
   title?: string;
   gradientText?: string;
-  subtitle?: string;
+  subtitle?: CmsRichTextValue;
   panelTitle?: string;
   panelBadge?: string;
   items?: DecisionFlowItem[];
   capabilitiesHeading?: string;
   capabilities?: DecisionFlowCapability[];
   noteTitle?: string;
-  noteText?: string;
+  noteText?: CmsRichTextValue;
 }) {
   const resolvedCapabilities = capabilities
     ? capabilities.map((item) => ({
@@ -81,9 +84,9 @@ export default function DecisionFlow({
             {title}{' '}
             <span className="text-gradient">{gradientText}</span>
           </h2>
-          <p className="section-subtitle" style={{ marginTop: 16 }}>
-            {subtitle}
-          </p>
+          <div className={`section-subtitle ${richTextStyles.prose}`} style={{ marginTop: 16 }}>
+            {renderCmsRichText(subtitle)}
+          </div>
         </div>
 
         <div className={styles.layout}>
@@ -111,7 +114,7 @@ export default function DecisionFlow({
                     <div className={styles.branchAction} data-type="no">{d.no}</div>
                   </div>
                 </div>
-                {i < decisions.length - 1 && <div className={styles.nodeConnector} aria-hidden="true" />}
+                {i < items.length - 1 && <div className={styles.nodeConnector} aria-hidden="true" />}
               </div>
             ))}
           </div>
@@ -124,7 +127,7 @@ export default function DecisionFlow({
                 <span className={styles.contextIcon} aria-hidden="true">{item.icon}</span>
                 <div>
                   <div className={styles.contextTitle}>{item.title}</div>
-                  <div className={styles.contextDesc}>{item.desc}</div>
+                  <div className={`${styles.contextDesc} ${richTextStyles.prose}`}>{renderCmsRichText(item.desc)}</div>
                 </div>
               </div>
             ))}
@@ -135,9 +138,7 @@ export default function DecisionFlow({
               </div>
               <div>
                 <div className={styles.aiNoteTitle}>{noteTitle}</div>
-                <div className={styles.aiNoteText}>
-                  {noteText}
-                </div>
+                <div className={`${styles.aiNoteText} ${richTextStyles.prose}`}>{renderCmsRichText(noteText)}</div>
               </div>
             </div>
           </div>

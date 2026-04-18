@@ -14,7 +14,8 @@ async function withCmsFallback<T>(fallback: T, loader: () => Promise<T>): Promis
   }
 }
 
-export async function getPublishedPageBySlug(slug: string): Promise<CmsPage | null> {
+/** Loads the CMS page row for a slug (any status). Public merge rules live in `getManagedPageBySlug`. */
+export async function getCmsPageBySlug(slug: string): Promise<CmsPage | null> {
   const page = await withCmsFallback(null, async () =>
     prisma.page.findUnique({
       where: { slug },

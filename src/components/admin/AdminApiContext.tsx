@@ -40,7 +40,10 @@ export function AdminApiProvider({
           }
         }
         if (!res.ok) {
-          const err = (data as { error?: string })?.error ?? res.statusText;
+          const payload = data as { error?: string } | null;
+          const method = (init?.method ?? 'GET').toUpperCase();
+          console.error('[admin-api]', method, url, res.status, payload ?? text);
+          const err = payload?.error ?? 'Something went wrong. Please try again.';
           throw new Error(err);
         }
         return data as T;

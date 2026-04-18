@@ -1,3 +1,7 @@
+/**
+ * Enables Next.js draft mode for editors, then returns a client-visible redirect target.
+ * Intended for authenticated admin users only (see requireApiRole below).
+ */
 import { UserRole } from '@prisma/client';
 import { draftMode } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';

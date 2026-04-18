@@ -35,17 +35,38 @@ export async function PATCH(
   if (auth.error) return auth.error;
 
   const { pageKey } = await context.params;
-  const body = await request.json();
+  const body = (await request.json()) as Record<string, unknown>;
   const before = await prisma.page.findUnique({ where: { key: pageKey } });
+
+  const data: {
+    title?: string;
+    seoTitle?: string | null;
+    seoDescription?: string | null;
+    status?: string;
+  } = {};
+  if (typeof body.title === 'string') data.title = body.title;
+  if ('seoTitle' in body) data.seoTitle = (body.seoTitle as string | null) ?? null;
+  if ('seoDescription' in body) data.seoDescription = (body.seoDescription as string | null) ?? null;
+  if (typeof body.status === 'string') {
+    if (body.status === 'published') {
+      return NextResponse.json(
+        { error: 'Use POST /api/admin/publish to publish; status cannot be set to published here.' },
+        { status: 400 },
+      );
+    }
+    if (body.status !== 'draft') {
+      return NextResponse.json({ error: 'Invalid status; only "draft" is allowed.' }, { status: 400 });
+    }
+    data.status = body.status;
+  }
+
+  if (Object.keys(data).length === 0) {
+    return NextResponse.json({ error: 'No updatable fields' }, { status: 400 });
+  }
 
   const page = await prisma.page.update({
     where: { key: pageKey },
-    data: {
-      title: body.title,
-      seoTitle: body.seoTitle,
-      seoDescription: body.seoDescription,
-      status: body.status,
-    },
+    data,
   });
 
   await createAuditLog({

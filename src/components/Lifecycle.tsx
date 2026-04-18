@@ -1,7 +1,10 @@
 import styles from './Lifecycle.module.css';
+import richTextStyles from '@/components/CmsRichText.module.css';
 import { Camera, Search, CreditCard, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import React from 'react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 export interface StepItem {
   num: string;
@@ -13,7 +16,7 @@ export interface StepItem {
 export type StepDataItem = {
   num: string;
   title: string;
-  desc: string;
+  desc: CmsRichTextValue;
   icon: CmsIconName;
 };
 
@@ -60,7 +63,7 @@ interface LifecycleProps {
     label?: string;
     title?: string;
     gradientText?: string;
-    subtitle?: string;
+    subtitle?: CmsRichTextValue;
     steps: StepDataItem[];
   };
 }
@@ -94,9 +97,9 @@ export default function Lifecycle({
             {resolvedTitle}{' '}
             {resolvedGradientText && <span className="text-gradient">{resolvedGradientText}</span>}
           </h2>
-          <p className="section-subtitle" style={{ marginTop: 16, marginInline: 'auto' }}>
-            {resolvedSubtitle}
-          </p>
+          <div className={`section-subtitle ${richTextStyles.prose}`} style={{ marginTop: 16, marginInline: 'auto' }}>
+            {renderCmsRichText(resolvedSubtitle)}
+          </div>
         </div>
 
         <div className={styles.timeline}>
@@ -108,7 +111,7 @@ export default function Lifecycle({
                 </div>
                 <div className={styles.stepNum}>{step.num}</div>
                 <h3 className={styles.stepTitle}>{step.title}</h3>
-                <p className={styles.stepDesc}>{step.desc}</p>
+                <div className={`${styles.stepDesc} ${richTextStyles.prose}`}>{renderCmsRichText(step.desc)}</div>
               </div>
               <div className={styles.connector} aria-hidden="true">
                 {i < data.length - 1 && <div className={styles.line} />}
@@ -127,7 +130,7 @@ export default function Lifecycle({
               {i < data.length - 1 && <div className={styles.arrowLine} aria-hidden="true"><div className={styles.arrow} /></div>}
               <div className={styles.stepBlockNum}>{step.num}</div>
               <h3 className={styles.stepBlockTitle}>{step.title}</h3>
-              <p className={styles.stepBlockDesc}>{step.desc}</p>
+              <div className={`${styles.stepBlockDesc} ${richTextStyles.prose}`}>{renderCmsRichText(step.desc)}</div>
             </div>
           ))}
         </div>

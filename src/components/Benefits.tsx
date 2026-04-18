@@ -1,8 +1,11 @@
 import styles from './Benefits.module.css';
+import richTextStyles from '@/components/CmsRichText.module.css';
 import { LibraryBig, Hammer, Globe, Lock, FileText, Building2 } from 'lucide-react';
 import React from 'react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import { CTA_LINKS } from '@/site';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 export interface BenefitItem {
   icon: React.ReactNode;
@@ -14,7 +17,7 @@ export interface BenefitItem {
 export type BenefitDataItem = {
   icon: CmsIconName;
   title: string;
-  desc: string;
+  desc: CmsRichTextValue;
   highlight: 'primary' | 'teal';
 };
 
@@ -67,7 +70,7 @@ interface BenefitsProps {
     label?: string;
     title?: string;
     gradientText?: string;
-    subtitle?: string;
+    subtitle?: CmsRichTextValue;
     items: BenefitDataItem[];
   };
 }
@@ -102,9 +105,9 @@ export default function Benefits({
             {resolvedTitle}{' '}
             {resolvedGradientText && <span className="text-gradient">{resolvedGradientText}</span>}
           </h2>
-          <p className="section-subtitle" style={{ marginTop: 16, marginInline: 'auto' }}>
-            {resolvedSubtitle}
-          </p>
+          <div className={`section-subtitle ${richTextStyles.prose}`} style={{ marginTop: 16, marginInline: 'auto' }}>
+            {renderCmsRichText(resolvedSubtitle)}
+          </div>
         </div>
 
         <div className={`grid-3 ${styles.grid}`}>
@@ -114,7 +117,7 @@ export default function Benefits({
                 <span className={styles.cardIcon} aria-hidden="true">{b.icon}</span>
               </div>
               <h3 className={styles.cardTitle}>{b.title}</h3>
-              <p className={styles.cardDesc}>{b.desc}</p>
+              <div className={`${styles.cardDesc} ${richTextStyles.prose}`}>{renderCmsRichText(b.desc)}</div>
               <a href={CTA_LINKS.solutionsCatalog} className={styles.cardLink} aria-label={`Learn more about ${b.title}`}>
                 Learn more →
               </a>

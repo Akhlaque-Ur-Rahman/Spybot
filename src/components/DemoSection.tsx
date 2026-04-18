@@ -1,10 +1,13 @@
 'use client';
 import { useRef, useState } from 'react';
 import styles from './DemoSection.module.css';
+import richTextStyles from '@/components/CmsRichText.module.css';
 import { Rocket, Target, BarChart3, ShieldCheck, CheckCircle2, Star } from 'lucide-react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import { CTA_LINKS } from '@/site';
 import { MEDIA_CLIPS, mediaEncodingFormat, type MediaClipMeta } from '@/lib/site-media';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 const demoClip = MEDIA_CLIPS.demoSpotlight;
 
@@ -27,6 +30,7 @@ const defaultValuePoints = [
 type DemoValuePoint = {
   icon: CmsIconName;
   title: string;
+  desc: CmsRichTextValue;
 };
 
 type DemoSectionProps = {
@@ -37,17 +41,18 @@ type DemoSectionProps = {
     sectionLabel?: string;
     title?: string;
     gradientText?: string;
-    subtitle?: string;
+    subtitle?: CmsRichTextValue;
     valuePoints?: DemoValuePoint[];
     socialProofRating?: string;
-    socialProofText?: string;
+    socialProofText?: CmsRichTextValue;
+    socialProofSubtext?: CmsRichTextValue;
     formTitle?: string;
     formFields?: Array<{ id: string; label: string; type: string; placeholder: string }>;
     submitLabel?: string;
-    formNote?: string;
+    formNote?: CmsRichTextValue;
     loadingTitle?: string;
     successTitle?: string;
-    successText?: string;
+    successText?: CmsRichTextValue;
     successJson?: string;
     successAction?: { label: string; href: string };
     media?: MediaClipMeta;
@@ -60,12 +65,8 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
   const formRef = useRef<HTMLFormElement>(null);
   const resolvedClip = content?.media ?? demoClip;
   const resolvedClipType = mediaEncodingFormat(resolvedClip.src);
-  const resolvedValuePoints = content?.valuePoints
-    ? content.valuePoints.map((point) => ({
-        icon: renderCmsIcon(point.icon, 'small'),
-        text: point.title,
-      }))
-    : defaultValuePoints;
+  const defaultSocialProofText = 'from 500+ onboarding and product teams';
+  const defaultSocialProofSubtext = 'Trusted by teams running high-volume verification programs.';
   const resolvedFields = content?.formFields ?? formFields;
   const resolvedSuccessAction = content?.successAction ?? { label: 'Explore resources while you wait', href: CTA_LINKS.resources };
 
@@ -96,18 +97,38 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
               {content?.title ?? 'Validate your onboarding flow'}{' '}
               <span className="text-gradient">{content?.gradientText ?? 'before going live'}</span>
             </h2>
-            <p className={styles.subtitle}>
-              {content?.subtitle ??
-                'Request a guided sandbox, map your current KYC or KYB bottlenecks, and see which verification sequence improves approval rates without increasing compliance risk.'}
-            </p>
+            <div className={`${styles.subtitle} ${richTextStyles.prose}`}>
+              {renderCmsRichText(
+                content?.subtitle ??
+                  'Request a guided sandbox, map your current KYC or KYB bottlenecks, and see which verification sequence improves approval rates without increasing compliance risk.',
+              )}
+            </div>
 
             <div className={styles.valuePoints}>
-                {resolvedValuePoints.map((p) => (
-                <div key={p.text} className={styles.valuePoint}>
-                  <span aria-hidden="true" style={{ display: 'flex', alignItems: 'center' }}>{p.icon}</span>
-                  <span>{p.text}</span>
-                </div>
-              ))}
+              {content?.valuePoints
+                ? content.valuePoints.map((point) => (
+                    <div key={point.title} className={styles.valuePoint}>
+                      <span aria-hidden="true" style={{ display: 'flex', alignItems: 'center' }}>
+                        {renderCmsIcon(point.icon, 'small')}
+                      </span>
+                      <div className={styles.valuePointBody}>
+                        <span className={styles.valuePointTitle}>{point.title}</span>
+                        {(typeof point.desc !== 'string' || point.desc.trim()) ? (
+                          <div className={`${styles.valuePointDesc} ${richTextStyles.prose}`}>
+                            {renderCmsRichText(point.desc)}
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  ))
+                : defaultValuePoints.map((p) => (
+                    <div key={p.text} className={styles.valuePoint}>
+                      <span aria-hidden="true" style={{ display: 'flex', alignItems: 'center' }}>
+                        {p.icon}
+                      </span>
+                      <span>{p.text}</span>
+                    </div>
+                  ))}
             </div>
 
             <div className={styles.socialProof}>
@@ -123,7 +144,12 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
                   </span> 
                   <span className="sr-only">5 out of 5 stars</span> {content?.socialProofRating ?? '4.9/5'}
                 </div>
-                <div className={styles.proofSub}>{content?.socialProofText ?? 'from 500+ onboarding and product teams'}</div>
+                <div className={`${styles.proofSub} ${richTextStyles.prose}`}>
+                  {renderCmsRichText(content?.socialProofText ?? defaultSocialProofText)}
+                </div>
+                <div className={`${styles.proofSub} ${styles.proofSubSecondary} ${richTextStyles.prose}`}>
+                  {renderCmsRichText(content?.socialProofSubtext ?? defaultSocialProofSubtext)}
+                </div>
               </div>
             </div>
 
@@ -169,10 +195,12 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
                 <button type="submit" className={`btn btn-primary ${styles.submitBtn}`} aria-label="Submit Demo Request" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
                   <Rocket size={18} strokeWidth={2} /> {content?.submitLabel ?? 'Request Guided Sandbox Access'}
                 </button>
-                <p className={styles.formNote}>
-                  {content?.formNote ??
-                    'By submitting, you agree to our Privacy Policy. Need a faster response? Use the dedicated support and contact routes in the main navigation.'}
-                </p>
+                <div className={`${styles.formNote} ${richTextStyles.prose}`}>
+                  {renderCmsRichText(
+                    content?.formNote ??
+                      'By submitting, you agree to our Privacy Policy. Need a faster response? Use the dedicated support and contact routes in the main navigation.',
+                  )}
+                </div>
               </form>
             )}
 
@@ -192,10 +220,12 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
                   <CheckCircle2 size={48} strokeWidth={1.5} />
                 </div>
                 <h3 className={styles.successTitle}>{content?.successTitle ?? 'Environment Ready!'}</h3>
-                <p className={styles.successText}>
-                  {content?.successText ??
-                    'Your secure sandbox environment is configured. A solution consultant will follow up with workflow recommendations and access details.'}
-                </p>
+                <div className={`${styles.successText} ${richTextStyles.prose}`}>
+                  {renderCmsRichText(
+                    content?.successText ??
+                      'Your secure sandbox environment is configured. A solution consultant will follow up with workflow recommendations and access details.',
+                  )}
+                </div>
                 <div className={styles.mockTerminal} style={{ textAlign: 'left', marginTop: '16px' }}>
                   <code>
                     {content?.successJson ??

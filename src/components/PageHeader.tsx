@@ -1,12 +1,13 @@
-import React from 'react';
 import styles from './PageHeader.module.css';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 import { mediaEncodingFormat, type MediaClipMeta } from '@/lib/site-media';
 
 interface PageHeaderProps {
   label: string;
   title: string;
   gradientText: string;
-  description: string;
+  description: CmsRichTextValue;
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
   /** Optional clip with visible caption for SEO (indexable text + `VideoObject` context on the page). */
@@ -37,7 +38,9 @@ export default function PageHeader({
               {title} <br />
               <span className="text-gradient">{gradientText}</span>
             </h1>
-            <p className={`${styles.subtitle} fade-up`} style={{ animationDelay: '0.1s', opacity: 0 }}>{description}</p>
+            <div className={`${styles.subtitle} ${styles.richProse} fade-up`} style={{ animationDelay: '0.1s', opacity: 0 }}>
+              {renderCmsRichText(description)}
+            </div>
 
             <div className={`${styles.ctas} fade-up`} style={{ animationDelay: '0.2s', opacity: 0 }}>
               {primaryCta && (

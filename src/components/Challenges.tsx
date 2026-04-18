@@ -1,8 +1,11 @@
 import styles from './Challenges.module.css';
+import richTextStyles from '@/components/CmsRichText.module.css';
 import { TrendingDown, UserX, Timer, Blocks, Settings, Globe } from 'lucide-react';
 import React from 'react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import { ChallengeTone } from '@/site';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 export interface ChallengeItem {
   icon: React.ReactNode;
@@ -14,7 +17,7 @@ export interface ChallengeItem {
 export type ChallengeDataItem = {
   icon: CmsIconName;
   title: string;
-  desc: string;
+  desc: CmsRichTextValue;
   tone: ChallengeTone;
 };
 
@@ -107,7 +110,7 @@ interface ChallengesProps {
     label?: string;
     title?: string;
     gradientText?: string;
-    subtitle?: string;
+    subtitle?: CmsRichTextValue;
     items: ChallengeDataItem[];
   };
 }
@@ -141,9 +144,9 @@ export default function Challenges({
             {resolvedTitle}{' '}
             {resolvedGradientText && <span className="text-gradient">{resolvedGradientText}</span>}
           </h2>
-          <p className="section-subtitle" style={{ marginTop: 16 }}>
-            {resolvedSubtitle}
-          </p>
+          <div className={`section-subtitle ${richTextStyles.prose}`} style={{ marginTop: 16 }}>
+            {renderCmsRichText(resolvedSubtitle)}
+          </div>
         </div>
 
         <div className={`grid-3 ${styles.grid}`}>
@@ -157,7 +160,7 @@ export default function Challenges({
                 {c.icon}
               </div>
               <h3 className={styles.cardTitle}>{c.title}</h3>
-              <p className={styles.cardDesc}>{c.desc}</p>
+              <div className={`${styles.cardDesc} ${richTextStyles.prose}`}>{renderCmsRichText(c.desc)}</div>
               <div className={styles.cardAccent} style={{ background: toneStyles[c.tone].accent as string }} aria-hidden="true" />
             </div>
           ))}

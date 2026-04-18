@@ -1,3 +1,4 @@
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import type { MediaClipMeta } from '@/lib/site-media';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 import { CTA_LINKS, ROUTES, footerColumns, industryNavItems, solutionNavItems } from '@/site';
@@ -15,7 +16,8 @@ export type CmsCardLink = CmsLink & {
 export type CmsNamedItem = {
   icon: CmsIconName;
   title: string;
-  desc: string;
+  /** Plain string (legacy) or rich-text JSON document. */
+  desc: CmsRichTextValue;
 };
 
 export type CmsHeroThreat = {
@@ -33,7 +35,7 @@ export type CmsHeroBlock = {
   badge: string;
   headline: string;
   headlineGradient: string;
-  subheadline: string;
+  subheadline: CmsRichTextValue;
   primaryCta: CmsLink;
   secondaryCta: CmsLink;
   trustItems: string[];
@@ -42,7 +44,7 @@ export type CmsHeroBlock = {
   threats: CmsHeroThreat[];
   riskLabel: string;
   riskScore: string;
-  riskSummary: string;
+  riskSummary: CmsRichTextValue;
   riskPercent: number;
   stats: CmsHeroStat[];
   media: MediaClipMeta;
@@ -52,7 +54,8 @@ export type CmsPageHeaderBlock = {
   label: string;
   title: string;
   gradientText: string;
-  description: string;
+  /** Plain string (legacy) or TipTap-compatible rich-text JSON document. */
+  description: CmsRichTextValue;
   primaryCta?: CmsLink;
   secondaryCta?: CmsLink;
   media?: MediaClipMeta;
@@ -66,10 +69,10 @@ export type CmsCoverageCarouselBlock = {
 export type CmsDirectoryGridBlock = {
   id?: string;
   heading: string;
-  subheading?: string;
+  subheading?: CmsRichTextValue;
   items: Array<{
     title: string;
-    description: string;
+    description: CmsRichTextValue;
     href: string;
     badge?: string;
   }>;
@@ -81,14 +84,14 @@ export type CmsSliderSectionBlock = {
   ariaLabel?: string;
   items: Array<{
     title: string;
-    desc: string;
+    desc: CmsRichTextValue;
     tag?: string;
   }>;
 };
 
 export type CmsUtilityCtaBandBlock = {
   title: string;
-  description?: string;
+  description?: CmsRichTextValue;
   primary: CmsCardLink;
   secondary?: CmsCardLink;
 };
@@ -96,14 +99,14 @@ export type CmsUtilityCtaBandBlock = {
 export type CmsFaqAccordionBlock = {
   groups: Array<{
     title: string;
-    items: Array<{ q: string; a: string }>;
+    items: Array<{ q: string; a: CmsRichTextValue }>;
   }>;
 };
 
 export type CmsSupportPathwaysBlock = {
   heading: string;
   gradientText?: string;
-  subheading: string;
+  subheading: CmsRichTextValue;
   pathways: Array<CmsNamedItem & { action: CmsLink }>;
 };
 
@@ -121,7 +124,7 @@ export type CmsResourceGridBlock = {
   gradientText?: string;
   tiles: Array<{
     title: string;
-    desc: string;
+    desc: CmsRichTextValue;
     href: string;
     tag: string;
   }>;
@@ -137,7 +140,7 @@ export type CmsBenefitsBlock = {
   label?: string;
   title?: string;
   gradientText?: string;
-  subtitle?: string;
+  subtitle?: CmsRichTextValue;
   items: Array<CmsNamedItem & { highlight: 'primary' | 'teal' }>;
 };
 
@@ -145,7 +148,7 @@ export type CmsChallengesBlock = {
   label?: string;
   title?: string;
   gradientText?: string;
-  subtitle?: string;
+  subtitle?: CmsRichTextValue;
   items: Array<CmsNamedItem & { tone: 'danger' | 'warning' | 'info' | 'accent' | 'success' }>;
 };
 
@@ -153,7 +156,7 @@ export type CmsLifecycleBlock = {
   label?: string;
   title?: string;
   gradientText?: string;
-  subtitle?: string;
+  subtitle?: CmsRichTextValue;
   steps: Array<CmsNamedItem & { num: string }>;
 };
 
@@ -161,7 +164,7 @@ export type CmsDecisionFlowBlock = {
   label: string;
   title: string;
   gradientText: string;
-  subtitle: string;
+  subtitle: CmsRichTextValue;
   panelTitle: string;
   panelBadge: string;
   decisions: Array<{
@@ -172,7 +175,7 @@ export type CmsDecisionFlowBlock = {
   capabilitiesHeading: string;
   capabilities: CmsNamedItem[];
   noteTitle: string;
-  noteText: string;
+  noteText: CmsRichTextValue;
 };
 
 export type CmsDemoSectionField = {
@@ -186,40 +189,48 @@ export type CmsDemoSectionBlock = {
   sectionLabel: string;
   title: string;
   gradientText: string;
-  subtitle: string;
+  subtitle: CmsRichTextValue;
   valuePoints: CmsNamedItem[];
   socialProofRating: string;
-  socialProofText: string;
-  socialProofSubtext: string;
+  socialProofText: CmsRichTextValue;
+  socialProofSubtext: CmsRichTextValue;
   formTitle: string;
   formFields: CmsDemoSectionField[];
   submitLabel: string;
-  formNote: string;
+  formNote: CmsRichTextValue;
   loadingTitle: string;
   successTitle: string;
-  successText: string;
+  successText: CmsRichTextValue;
   successJson: string;
   successAction: CmsLink;
   media: MediaClipMeta;
 };
 
-export type CmsBlockType =
-  | 'hero'
-  | 'pageHeader'
-  | 'coverageCarousel'
-  | 'directoryGrid'
-  | 'sliderSection'
-  | 'utilityCtaBand'
-  | 'faqAccordion'
-  | 'supportPathways'
-  | 'supportSlaStrip'
-  | 'resourceGrid'
-  | 'contactHighlights'
-  | 'benefits'
-  | 'challenges'
-  | 'lifecycle'
-  | 'decisionFlow'
-  | 'demoSection';
+/** Single source of truth for known CMS block `type` strings (registry, validation, admin). */
+export const CMS_BLOCK_TYPES = [
+  'hero',
+  'pageHeader',
+  'coverageCarousel',
+  'directoryGrid',
+  'sliderSection',
+  'utilityCtaBand',
+  'faqAccordion',
+  'supportPathways',
+  'supportSlaStrip',
+  'resourceGrid',
+  'contactHighlights',
+  'benefits',
+  'challenges',
+  'lifecycle',
+  'decisionFlow',
+  'demoSection',
+] as const;
+
+export type CmsBlockType = (typeof CMS_BLOCK_TYPES)[number];
+
+export function isCmsBlockType(value: string): value is CmsBlockType {
+  return (CMS_BLOCK_TYPES as readonly string[]).includes(value);
+}
 
 export type CmsBlockValueMap = {
   hero: CmsHeroBlock;

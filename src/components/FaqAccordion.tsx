@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import styles from './FaqAccordion.module.css';
 import { ChevronDown } from 'lucide-react';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 export type FaqEntry = {
   q: string;
-  a: string;
+  a: CmsRichTextValue;
 };
 
 type Props = {
@@ -51,7 +53,7 @@ export default function FaqAccordion({ groups }: Props) {
                     className={isOpen ? styles.answerOpen : styles.answer}
                     hidden={!isOpen}
                   >
-                    <p>{item.a}</p>
+                    <div className={styles.answerRich}>{renderCmsRichText(item.a)}</div>
                   </div>
                 </li>
               );

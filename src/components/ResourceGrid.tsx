@@ -1,11 +1,14 @@
 import Link from 'next/link';
 import { FileText } from 'lucide-react';
 import styles from './ResourceGrid.module.css';
+import richTextStyles from '@/components/CmsRichText.module.css';
 import { ROUTES } from '@/site';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 export type ResourceTile = {
   title: string;
-  desc: string;
+  desc: CmsRichTextValue;
   href: string;
   tag: string;
 };
@@ -63,7 +66,7 @@ export default function ResourceGrid({
                   <FileText size={20} strokeWidth={1.5} />
                 </span>
                 <h3 className={styles.title}>{t.title}</h3>
-                <p className={styles.desc}>{t.desc}</p>
+                <div className={`${styles.desc} ${richTextStyles.prose}`}>{renderCmsRichText(t.desc)}</div>
                 <span className={styles.cta}>Read more →</span>
               </Link>
             </li>

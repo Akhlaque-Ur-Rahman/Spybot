@@ -201,9 +201,17 @@
 .riskMeta {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
   font-size: 0.75rem;
   color: var(--color-text-secondary);
   font-family: var(--font-mono);
+}
+.riskSummaryRich {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  font-family: var(--font-body);
 }
 
 /* Scanner ring */

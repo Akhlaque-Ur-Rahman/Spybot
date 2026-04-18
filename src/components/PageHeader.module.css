@@ -106,6 +106,34 @@
   max-width: 640px;
 }
 
+.richProse :global(p) {
+  margin: 0 0 0.65em;
+  font-size: inherit;
+  color: inherit;
+}
+
+.richProse :global(p:last-child) {
+  margin-bottom: 0;
+}
+
+.richProse :global(h2),
+.richProse :global(h3) {
+  font-family: var(--font-display);
+  color: var(--color-text-primary);
+  line-height: 1.25;
+  margin: 0.75em 0 0.45em;
+}
+
+.richProse :global(h2:first-child),
+.richProse :global(h3:first-child) {
+  margin-top: 0;
+}
+
+.richProse :global(a) {
+  color: var(--color-primary-300);
+  text-decoration: underline;
+}
+
 .ctas {
   display: flex;
   gap: var(--space-4);

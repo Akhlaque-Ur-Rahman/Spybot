@@ -6,7 +6,9 @@
 }
 
 .input,
-.textarea {
+.textarea,
+.select,
+.number {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md, 8px);
   border: 1px solid var(--color-border);
@@ -14,6 +16,14 @@
   color: var(--color-text-primary);
   font-family: var(--font-body);
   font-size: var(--text-body-sm);
+}
+
+.select {
+  cursor: pointer;
+}
+
+.number {
+  max-width: 160px;
 }
 
 .textarea {
@@ -28,4 +38,52 @@
   align-items: center;
   font-size: var(--text-body-sm);
   color: var(--color-text-secondary);
+}
+
+.fieldGrid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+@media (max-width: 720px) {
+  .fieldGrid2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.repeatItem {
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-surface);
+}
+
+.repeatToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.btnSmall {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+  color: var(--color-text-primary);
+  font-size: var(--text-body-sm);
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.btnSmallDanger {
+  border-color: rgba(var(--color-danger-rgb, 220 38 38), 0.45);
+  color: var(--color-danger);
+  background: transparent;
 }

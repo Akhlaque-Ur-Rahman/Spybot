@@ -33,12 +33,25 @@
 }
 .valuePoint {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   font-size: 0.9375rem;
   color: var(--color-text-secondary);
 }
 .valuePoint span:first-child { font-size: 1.1rem; }
+.valuePointBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.valuePointTitle {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.valuePointDesc {
+  font-size: 0.875rem;
+}
 .socialProof {
   display: flex;
   align-items: center;
@@ -63,6 +76,7 @@
 .avatar:last-child { margin-right: 0; }
 .proofText { font-size: 0.875rem; font-weight: 600; color: var(--color-text-primary); }
 .proofSub { font-size: 0.75rem; color: var(--color-text-secondary); }
+.proofSubSecondary { margin-top: 4px; }
 
 .clipFigure {
   margin: var(--space-4) 0 0;

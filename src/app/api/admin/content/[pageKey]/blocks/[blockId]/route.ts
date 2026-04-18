@@ -1,6 +1,7 @@
 import { Prisma, UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/api/admin';
+import { validateBlockDraftJson } from '@/lib/cms/block-draft-validation';
 import { createAuditLog } from '@/lib/cms/audit';
 import { prisma } from '@/lib/db/prisma';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
@@ -32,6 +33,11 @@ export async function PATCH(
   const body = (await request.json()) as { draftJson?: unknown };
   if (body.draftJson === undefined) {
     return NextResponse.json({ error: 'draftJson required' }, { status: 400 });
+  }
+
+  const valid = validateBlockDraftJson(block.type, body.draftJson);
+  if (!valid.ok) {
+    return NextResponse.json({ error: valid.error }, { status: 400 });
   }
 
   const before = { ...block };

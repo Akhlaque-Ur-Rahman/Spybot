@@ -1,6 +1,9 @@
 import styles from './ContactHighlights.module.css';
+import richTextStyles from '@/components/CmsRichText.module.css';
 import { MessageSquare, Timer, Shield } from 'lucide-react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 const items = [
   {
@@ -23,7 +26,7 @@ const items = [
 type ContactHighlightItem = {
   icon: CmsIconName;
   title: string;
-  desc: string;
+  desc: CmsRichTextValue;
 };
 
 export default function ContactHighlights({
@@ -55,7 +58,7 @@ export default function ContactHighlights({
                 {it.icon}
               </span>
               <h3 className={styles.title}>{it.title}</h3>
-              <p className={styles.desc}>{it.desc}</p>
+              <div className={`${styles.desc} ${richTextStyles.prose}`}>{renderCmsRichText(it.desc)}</div>
             </li>
           ))}
         </ul>

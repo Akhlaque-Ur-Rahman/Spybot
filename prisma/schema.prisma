@@ -76,10 +76,16 @@ model Page {
   status        String         @default("draft")
   seoTitle      String?
   seoDescription String?
+  /** Optional parent for hierarchical CMS pages (e.g. solution detail under hub). */
+  parentId      String?
+  parent        Page?          @relation("PageTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children      Page[]         @relation("PageTree")
   sections      Section[]
   versions      PageVersion[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+
+  @@index([parentId])
 }
 
 model Section {

@@ -1,0 +1,12 @@
+---
+description: Avoid instructional or guiding copy in the product UI and in code meant for end users.
+alwaysApply: true
+---
+
+# No instructional or guiding copy
+
+When changing or adding UI, source strings, or user-visible text in code:
+
+- Do not add “how to” panels, onboarding hints, tutorial paragraphs, or step-by-step guidance unless the user explicitly requests it.
+- Prefer short labels, button text, and field names without explanatory prose.
+- Do not add comment blocks or strings whose only purpose is to teach the user how to use the app; use code structure and minimal labels instead.

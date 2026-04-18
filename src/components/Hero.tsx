@@ -1,10 +1,13 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import styles from './Hero.module.css';
+import richTextStyles from '@/components/CmsRichText.module.css';
 import { Rocket } from 'lucide-react';
 import { CTA_LINKS } from '@/site';
 import { MEDIA_CLIPS, mediaEncodingFormat } from '@/lib/site-media';
 import type { MediaClipMeta } from '@/lib/site-media';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 const heroClip = MEDIA_CLIPS.homeHero;
 
@@ -37,7 +40,7 @@ type HeroContent = {
   badge?: string;
   headline?: string;
   headlineGradient?: string;
-  subheadline?: string;
+  subheadline?: CmsRichTextValue;
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
   trustItems?: string[];
@@ -46,7 +49,7 @@ type HeroContent = {
   threats?: Array<{ label: string; severity: string; time: string }>;
   riskLabel?: string;
   riskScore?: string;
-  riskSummary?: string;
+  riskSummary?: CmsRichTextValue;
   riskPercent?: number;
   stats?: Array<{ value: string; label: string }>;
   media?: MediaClipMeta;
@@ -169,10 +172,12 @@ export function HeroSection({ content }: { content?: HeroContent }) {
             <span className={`font-display text-gradient`}>{content?.headlineGradient ?? 'before they cost conversion.'}</span>
           </h1>
 
-          <p className={styles.subheadline}>
-            {content?.subheadline ??
-              'SpyBot helps fintech, telecom, gaming, and marketplace teams verify users and businesses faster, reduce fraud exposure, and launch compliant identity flows without rebuilding their stack.'}
-          </p>
+          <div className={`${styles.subheadline} ${richTextStyles.prose}`}>
+            {renderCmsRichText(
+              content?.subheadline ??
+                'SpyBot helps fintech, telecom, gaming, and marketplace teams verify users and businesses faster, reduce fraud exposure, and launch compliant identity flows without rebuilding their stack.',
+            )}
+          </div>
 
           <div className={styles.heroCtas}>
             <a
@@ -242,7 +247,9 @@ export function HeroSection({ content }: { content?: HeroContent }) {
               </div>
               <div className={styles.riskMeta}>
                 <span style={{ color: 'var(--color-tertiary-400)' }}>{content?.riskScore ?? '92 / 100'}</span>
-                <span>{content?.riskSummary ?? 'Highly Verified'}</span>
+                <div className={`${richTextStyles.prose} ${styles.riskSummaryRich}`}>
+                  {renderCmsRichText(content?.riskSummary ?? 'Highly Verified')}
+                </div>
               </div>
             </div>
           </div>

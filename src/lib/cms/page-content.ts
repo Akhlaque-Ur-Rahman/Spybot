@@ -1,5 +1,5 @@
 import { draftMode } from 'next/headers';
-import { getPublishedPageBySlug } from '@/lib/cms/service';
+import { getCmsPageBySlug } from '@/lib/cms/service';
 import {
   cmsRegistryPages,
   getCmsRegistryPageBySlug,
@@ -66,10 +66,17 @@ function fromRegistryPage(page: CmsRegistryPage): ManagedCmsPage {
 
 export async function getManagedPageBySlug(slug: string): Promise<ManagedCmsPage | null> {
   const registryPage = getCmsRegistryPageBySlug(slug);
-  const dbPage = await getPublishedPageBySlug(slug);
+  const dbPage = await getCmsPageBySlug(slug);
 
   if (!registryPage && !dbPage) return null;
+
+  const mode = await draftMode();
+  const useDraft = mode.isEnabled;
+
   if (!registryPage) {
+    if (dbPage && !useDraft && dbPage.status === 'draft') {
+      return null;
+    }
     return {
       key: dbPage!.key,
       title: dbPage!.title,
@@ -81,26 +88,28 @@ export async function getManagedPageBySlug(slug: string): Promise<ManagedCmsPage
     };
   }
 
-  const mode = await draftMode();
-  const useDraft = mode.isEnabled;
   const base = fromRegistryPage(registryPage);
 
   if (!dbPage) return base;
 
+  const applyDbMetadata = useDraft || dbPage.status === 'published';
+
   return {
     key: dbPage.key,
-    title: dbPage.title,
-    slug: dbPage.slug,
+    title: applyDbMetadata ? dbPage.title : registryPage.title,
+    slug: applyDbMetadata ? dbPage.slug : registryPage.slug,
     status: dbPage.status,
-    seoTitle: dbPage.seoTitle ?? registryPage.seoTitle,
-    seoDescription: dbPage.seoDescription ?? registryPage.seoDescription,
+    seoTitle: applyDbMetadata ? (dbPage.seoTitle ?? registryPage.seoTitle) : registryPage.seoTitle,
+    seoDescription: applyDbMetadata
+      ? (dbPage.seoDescription ?? registryPage.seoDescription)
+      : registryPage.seoDescription,
     sections: base.sections.map((section) => {
       const dbSection = dbPage.sections.find((item) => item.key === section.key);
       if (!dbSection) return section;
 
       return {
         key: section.key,
-        label: dbSection.label || section.label,
+        label: applyDbMetadata ? dbSection.label || section.label : section.label,
         position: section.position,
         blocks: section.blocks.map((block) => {
           const dbBlock = dbSection.blocks.find((item) => item.key === block.key || item.type === block.type);

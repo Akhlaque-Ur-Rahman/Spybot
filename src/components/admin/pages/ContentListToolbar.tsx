@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAdminApi } from '@/components/admin/AdminApiContext';
@@ -35,7 +36,8 @@ export default function ContentListToolbar() {
       setSlug('');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Create failed', 'error');
+      console.error('[ContentListToolbar] createPage', e);
+      push(e instanceof Error ? e.message : 'We could not create the page. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
@@ -52,20 +54,25 @@ export default function ContentListToolbar() {
       push(createdCount > 0 ? `${createdCount} website pages synced` : 'Website pages already synced', 'success');
       router.refresh();
     } catch (e) {
-      push(e instanceof Error ? e.message : 'Sync failed', 'error');
+      console.error('[ContentListToolbar] syncPages', e);
+      push(e instanceof Error ? e.message : 'We could not sync the pages. Please try again.', 'error');
     } finally {
       setSyncing(false);
     }
   }
 
   return (
-    <div className={pageStyles.row}>
+    <div style={{ marginBottom: 'var(--space-4)' }}>
+      <div className={pageStyles.row}>
       <button type="button" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`} disabled={syncing} onClick={syncPages}>
         {syncing ? 'Syncing…' : 'Sync website pages'}
       </button>
       <button type="button" className={pageStyles.btn} onClick={() => setOpen(true)}>
         New page
       </button>
+      <Link href="/admin/publish" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}>
+        Publish queue
+      </Link>
       {open ? (
         <div className={pageStyles.card} style={{ width: '100%', maxWidth: 480 }}>
           <h3 className={pageStyles.cardTitle}>Create page</h3>
@@ -91,6 +98,7 @@ export default function ContentListToolbar() {
           </div>
         </div>
       ) : null}
+      </div>
     </div>
   );
 }

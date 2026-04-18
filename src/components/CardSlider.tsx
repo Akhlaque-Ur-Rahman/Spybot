@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 import styles from './CardSlider.module.css';
+import richTextStyles from '@/components/CmsRichText.module.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 export type SliderItem = {
   title: string;
-  desc: string;
+  desc: CmsRichTextValue;
   tag?: string;
 };
 
@@ -29,7 +32,7 @@ export default function CardSlider({ items, ariaLabel = 'Featured items' }: Prop
       <div className={styles.card}>
         {item.tag && <span className={styles.tag}>{item.tag}</span>}
         <h3 className={styles.title}>{item.title}</h3>
-        <p className={styles.desc}>{item.desc}</p>
+        <div className={`${styles.desc} ${richTextStyles.prose}`}>{renderCmsRichText(item.desc)}</div>
       </div>
       <div className={styles.controls}>
         <button type="button" className={styles.btn} onClick={prev} aria-label="Previous slide">
