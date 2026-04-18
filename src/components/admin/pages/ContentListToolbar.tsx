@@ -62,43 +62,45 @@ export default function ContentListToolbar() {
   }
 
   return (
-    <div style={{ marginBottom: 'var(--space-4)' }}>
-      <div className={pageStyles.row}>
-      <button type="button" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`} disabled={syncing} onClick={syncPages}>
-        {syncing ? 'Syncing…' : 'Sync website pages'}
-      </button>
-      <button type="button" className={pageStyles.btn} onClick={() => setOpen(true)}>
-        New page
-      </button>
-      <Link href="/admin/publish" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}>
-        Publish queue
-      </Link>
+    <div className={pageStyles.contentToolbar}>
+      <div className={pageStyles.contentToolbarActions}>
+        <button type="button" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`} disabled={syncing} onClick={syncPages}>
+          {syncing ? 'Syncing…' : 'Sync website pages'}
+        </button>
+        <button type="button" className={pageStyles.btn} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+          {open ? 'Close form' : 'New page'}
+        </button>
+        <Link href="/admin/publish" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}>
+          Publish queue
+        </Link>
+      </div>
       {open ? (
-        <div className={pageStyles.card} style={{ width: '100%', maxWidth: 480 }}>
-          <h3 className={pageStyles.cardTitle}>Create page</h3>
-          <label className={pageStyles.lead} style={{ display: 'grid', gap: 8, marginBottom: 12 }}>
-            Key (unique id)
-            <input className={pageStyles.input} value={key} onChange={(e) => setKey(e.target.value)} />
-          </label>
-          <label className={pageStyles.lead} style={{ display: 'grid', gap: 8, marginBottom: 12 }}>
-            Title
-            <input className={pageStyles.input} value={title} onChange={(e) => setTitle(e.target.value)} />
-          </label>
-          <label className={pageStyles.lead} style={{ display: 'grid', gap: 8, marginBottom: 16 }}>
-            Slug (URL path)
-            <input className={pageStyles.input} value={slug} onChange={(e) => setSlug(e.target.value)} />
-          </label>
-          <div className={pageStyles.row}>
-            <button type="button" className={pageStyles.btn} disabled={loading} onClick={createPage}>
-              {loading ? 'Creating…' : 'Create'}
-            </button>
-            <button type="button" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`} onClick={() => setOpen(false)}>
-              Cancel
-            </button>
+        <div className={pageStyles.contentToolbarForm}>
+          <div className={pageStyles.card}>
+            <h3 className={pageStyles.cardTitle}>Create page</h3>
+            <label className={pageStyles.contentToolbarField}>
+              Key (unique id)
+              <input className={pageStyles.input} value={key} onChange={(e) => setKey(e.target.value)} autoComplete="off" />
+            </label>
+            <label className={pageStyles.contentToolbarField}>
+              Title
+              <input className={pageStyles.input} value={title} onChange={(e) => setTitle(e.target.value)} autoComplete="off" />
+            </label>
+            <label className={pageStyles.contentToolbarField} style={{ marginBottom: 'var(--space-4)' }}>
+              Slug (URL path)
+              <input className={pageStyles.input} value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="/about" autoComplete="off" />
+            </label>
+            <div className={pageStyles.contentToolbarActions} style={{ marginBottom: 0 }}>
+              <button type="button" className={pageStyles.btn} disabled={loading} onClick={createPage}>
+                {loading ? 'Creating…' : 'Create'}
+              </button>
+              <button type="button" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`} onClick={() => setOpen(false)}>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
-      </div>
     </div>
   );
 }

@@ -142,7 +142,7 @@
   --site-header-stack: calc(var(--site-topbar-height) + var(--site-nav-row-height));
   /* Space below sticky chrome for first paint on inner pages + home hero */
   --site-content-below-header: var(--site-header-stack);
-  --site-hero-padding-top: calc(var(--site-header-stack) + var(--space-4));
+  --site-hero-padding-top: calc(var(--site-header-stack) + var(--space-2));
 
   /* Mesh / card surface accents */
   --mesh-primary: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(11, 114, 204, 0.14), transparent 55%);

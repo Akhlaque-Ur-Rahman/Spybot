@@ -1,6 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { Fragment, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
+import { createPortal } from 'react-dom';
+import { Fragment, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import styles from './Navbar.module.css';
 import ThemeToggle from './ThemeToggle';
 import BrandLogoMark from '@/components/BrandLogoMark';
@@ -16,7 +18,8 @@ import {
   Gamepad2,
   ShieldCheck,
   ChevronDown,
-  Layers
+  Layers,
+  X,
 } from 'lucide-react';
 import type { NavMenuItem } from '@/lib/cms/types';
 
@@ -69,6 +72,21 @@ function slugify(label: string) {
   return label.toLowerCase().replace(/\s+/g, '-');
 }
 
+function mergeMenuWithDefaults(items: NavMenuItem[]): NavLink[] {
+  return items.map((item) => {
+    const def = navLinks.find(
+      (l) =>
+        l.href === item.href ||
+        l.label.trim().toLowerCase() === item.label.trim().toLowerCase(),
+    );
+    return {
+      label: item.label,
+      href: item.href,
+      ...(def?.dropdown ? { dropdown: def.dropdown } : {}),
+    };
+  });
+}
+
 export default function Navbar({
   menuItems,
   utilityMenuItems,
@@ -80,14 +98,115 @@ export default function Navbar({
   primaryCtaHref?: string;
   primaryCtaText?: string;
 }) {
+  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [drawerEntered, setDrawerEntered] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const resolvedLinks: NavLink[] = menuItems?.length
-    ? menuItems.map((item) => ({ label: item.label, href: item.href }))
-    : navLinks;
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const hadMobileOpen = useRef(false);
+  const prevPathname = useRef<string | null>(null);
+
+  const resolvedLinks: NavLink[] = menuItems?.length ? mergeMenuWithDefaults(menuItems) : navLinks;
 
   const closeDropdown = useCallback(() => setActiveDropdown(null), []);
+
+  const closeMobileMenu = useCallback(() => {
+    setMobileOpen(false);
+    setDrawerEntered(false);
+    closeDropdown();
+  }, [closeDropdown]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) {
+      setDrawerEntered(false);
+      return;
+    }
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setDrawerEntered(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeMobileMenu();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileOpen, closeMobileMenu]);
+
+  useEffect(() => {
+    if (prevPathname.current === null) {
+      prevPathname.current = pathname;
+      return;
+    }
+    if (prevPathname.current !== pathname) {
+      prevPathname.current = pathname;
+      closeMobileMenu();
+    }
+  }, [pathname, closeMobileMenu]);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      hadMobileOpen.current = true;
+      const t = window.setTimeout(() => closeButtonRef.current?.focus(), 40);
+      return () => window.clearTimeout(t);
+    }
+    if (hadMobileOpen.current) {
+      hadMobileOpen.current = false;
+      menuButtonRef.current?.focus();
+    }
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const panel = drawerRef.current;
+    if (!panel) return;
+
+    const selector =
+      'a[href], button:not([disabled]), summary, textarea, input, select, [tabindex]:not([tabindex="-1"])';
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const list = [...panel.querySelectorAll<HTMLElement>(selector)].filter(
+        (el) => el.offsetParent !== null || el.getClientRects().length > 0,
+      );
+      if (list.length === 0) return;
+      const first = list[0];
+      const last = list[list.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey) {
+        if (active === first || !panel.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    panel.addEventListener('keydown', onKeyDown);
+    return () => panel.removeEventListener('keydown', onKeyDown);
+  }, [mobileOpen]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -131,10 +250,130 @@ export default function Navbar({
     return () => el.removeEventListener('focusout', onFocusOut);
   }, [activeDropdown]);
 
+  const chromeRaised = mobileOpen ? styles.chromeRaised : '';
+
+  const mobileDrawer =
+    mounted && mobileOpen
+      ? createPortal(
+          <>
+            <button
+              type="button"
+              className={`${styles.mobileBackdrop} ${drawerEntered ? styles.mobileBackdropVisible : ''}`}
+              aria-hidden="true"
+              tabIndex={-1}
+              onClick={closeMobileMenu}
+            />
+            <div
+              ref={drawerRef}
+              id="mobile-nav-drawer"
+              className={`${styles.mobileDrawer} ${drawerEntered ? styles.mobileDrawerVisible : ''}`}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="mobile-nav-drawer-title"
+            >
+              <div className={styles.mobileDrawerHeader}>
+                <h2 id="mobile-nav-drawer-title" className={styles.mobileDrawerTitle}>
+                  Menu
+                </h2>
+                <button
+                  ref={closeButtonRef}
+                  type="button"
+                  className={styles.mobileDrawerClose}
+                  onClick={closeMobileMenu}
+                  aria-label="Close menu"
+                >
+                  <X size={22} strokeWidth={2} aria-hidden />
+                </button>
+              </div>
+              <div className={styles.mobileDrawerScroll}>
+                {resolvedLinks.map((link) => {
+                  if (!link.dropdown?.length) {
+                    return (
+                      <Link
+                        key={link.label}
+                        href={link.href}
+                        className={styles.mobileLink}
+                        onClick={closeMobileMenu}
+                      >
+                        {link.label}
+                      </Link>
+                    );
+                  }
+                  return (
+                    <details key={link.label} className={styles.mobileDisclosure}>
+                      <summary>
+                        <span>{link.label}</span>
+                        <ChevronDown size={18} className={styles.mobileDisclosureChevron} aria-hidden />
+                      </summary>
+                      <div className={styles.mobileSublist}>
+                        <Link href={link.href} className={styles.mobileSublink} onClick={closeMobileMenu}>
+                          <span className={styles.mobileSublinkIcon} aria-hidden>
+                            <Layers size={18} strokeWidth={1.5} />
+                          </span>
+                          <span className={styles.mobileSublinkText}>
+                            <span className={styles.mobileSublinkLabel}>
+                              {link.label === 'Solutions' ? 'All solutions' : 'All industries'}
+                            </span>
+                            <span className={styles.mobileSublinkDesc}>
+                              {link.label === 'Solutions'
+                                ? 'Browse the full solution catalog'
+                                : 'Browse industry playbooks and use cases'}
+                            </span>
+                          </span>
+                        </Link>
+                        {link.dropdown.map((item) => (
+                          <Link
+                            key={item.label}
+                            href={item.href}
+                            className={styles.mobileSublink}
+                            onClick={closeMobileMenu}
+                          >
+                            <span className={styles.mobileSublinkIcon} aria-hidden>
+                              {item.icon}
+                            </span>
+                            <span className={styles.mobileSublinkText}>
+                              <span className={styles.mobileSublinkLabel}>{item.label}</span>
+                              <span className={styles.mobileSublinkDesc}>{item.desc}</span>
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </details>
+                  );
+                })}
+              </div>
+              <div className={styles.mobileDrawerFooter}>
+                <ThemeToggle />
+                <div className={styles.mobileDrawerFooterCtas}>
+                  <Link
+                    href={CTA_LINKS.sandbox}
+                    className="btn btn-secondary"
+                    aria-label="Get sandbox access"
+                    onClick={closeMobileMenu}
+                  >
+                    Get Sandbox Access
+                  </Link>
+                  <Link
+                    href={primaryCtaHref}
+                    className="btn btn-primary"
+                    aria-label={primaryCtaText}
+                    onClick={closeMobileMenu}
+                  >
+                    {primaryCtaText}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </>,
+          document.body,
+        )
+      : null;
+
   return (
     <>
+      {mobileDrawer}
       {/* Utility bar */}
-      <div className={styles.topBar}>
+      <div className={`${styles.topBar} ${chromeRaised}`}>
         <div className={`container ${styles.topBarInner}`}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <ShieldCheck size={16} strokeWidth={2} />
@@ -164,7 +403,10 @@ export default function Navbar({
       </div>
 
       {/* Main nav */}
-      <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`} aria-label="Main Navigation">
+      <nav
+        className={`${styles.nav} ${scrolled ? styles.scrolled : ''} ${chromeRaised}`}
+        aria-label="Main Navigation"
+      >
         <div className={`container ${styles.navInner}`}>
           {/* Logo */}
           <Link href={ROUTES.home} className={styles.logo} aria-label="SpyBot homepage">
@@ -269,36 +511,17 @@ export default function Navbar({
 
           {/* Hamburger */}
           <button
+            ref={menuButtonRef}
+            type="button"
             className={`${styles.hamburger} ${mobileOpen ? styles.hamburgerOpen : ''}`}
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label={mobileOpen ? "Close mobile menu" : "Open mobile menu"}
+            onClick={() => (mobileOpen ? closeMobileMenu() : setMobileOpen(true))}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-drawer"
           >
             <span aria-hidden="true"/><span aria-hidden="true"/><span aria-hidden="true"/>
           </button>
         </div>
-
-        {/* Mobile menu */}
-        {mobileOpen && (
-          <div className={styles.mobileMenu} role="menu">
-            {resolvedLinks.map((link) => (
-            <Link 
-                key={link.label} 
-                href={link.href} 
-                className={styles.mobileLink} 
-                onClick={() => setMobileOpen(false)}
-                role="menuitem"
-              >
-                {link.label}
-              </Link>
-            ))}
-            <div className={styles.mobileCtas}>
-              <ThemeToggle />
-              <Link href={CTA_LINKS.sandbox} className="btn btn-secondary" aria-label="Get sandbox access">Get Sandbox Access</Link>
-              <Link href={primaryCtaHref} className="btn btn-primary" aria-label={primaryCtaText}>{primaryCtaText}</Link>
-            </div>
-          </div>
-        )}
       </nav>
     </>
   );

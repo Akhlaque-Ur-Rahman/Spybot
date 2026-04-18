@@ -33,6 +33,38 @@
   margin-bottom: var(--space-4);
 }
 
+/* Content Manager: actions row + form panel stacked */
+.contentToolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.contentToolbarActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.contentToolbarForm {
+  width: 100%;
+  max-width: 520px;
+}
+
+.contentToolbarForm .card {
+  margin-bottom: 0;
+}
+
+.contentToolbarField {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  font-size: var(--text-body-sm);
+  color: var(--color-text-secondary);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;

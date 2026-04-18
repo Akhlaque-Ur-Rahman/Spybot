@@ -1,10 +1,12 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import type { MediaClipMeta } from '@/lib/site-media';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 import type { CmsIconName } from '@/lib/cms/icon-map';
-import { cmsIconNames } from '@/lib/cms/icon-map';
+import { cmsIconNames, renderCmsIcon } from '@/lib/cms/icon-map';
 import styles from './fields.module.css';
 
 export function TextField({
@@ -227,13 +229,66 @@ export function IconSelectField({
   onChange: (value: CmsIconName) => void;
 }) {
   const safe = cmsIconNames.includes(value as CmsIconName) ? value : cmsIconNames[0];
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
   return (
-    <SelectField<CmsIconName>
-      label={label}
-      value={safe}
-      onChange={onChange}
-      options={cmsIconNames.map((name) => ({ value: name, label: name }))}
-    />
+    <div ref={rootRef} className={styles.iconSelectRoot}>
+      <span className={styles.iconSelectLabel}>{label}</span>
+      <button
+        type="button"
+        className={styles.iconSelectTrigger}
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span className={styles.iconSelectGlyph} aria-hidden>
+          {renderCmsIcon(safe, 'small')}
+        </span>
+        <span className={styles.iconSelectName}>{safe}</span>
+        <ChevronDown className={styles.iconSelectChevron} size={18} strokeWidth={2} aria-hidden />
+      </button>
+      {open ? (
+        <div className={styles.iconSelectPanel} role="listbox">
+          {cmsIconNames.map((name) => (
+            <button
+              key={name}
+              type="button"
+              role="option"
+              aria-selected={name === safe}
+              className={name === safe ? styles.iconSelectOptionActive : styles.iconSelectOption}
+              onClick={() => {
+                onChange(name);
+                setOpen(false);
+              }}
+            >
+              <span className={styles.iconSelectGlyph} aria-hidden>
+                {renderCmsIcon(name, 'small')}
+              </span>
+              <span className={styles.iconSelectOptionName}>{name}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
