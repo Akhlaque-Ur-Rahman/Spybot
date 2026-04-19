@@ -1,5 +1,7 @@
 import { UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminFormsPatchSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { prisma } from '@/lib/db/prisma';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
@@ -19,10 +21,13 @@ export async function PATCH(request: NextRequest) {
 
   const auth = await requireApiRole(UserRole.EDITOR);
   if (auth.error) return auth.error;
-  const body = await request.json();
+
+  const parsed = await readValidatedJson(request, adminFormsPatchSchema);
+  if (!parsed.ok) return parsed.response;
+
   const submission = await prisma.formSubmission.update({
-    where: { id: body.id },
-    data: { status: body.status },
+    where: { id: parsed.data.id },
+    data: { status: parsed.data.status },
   });
   return NextResponse.json({ submission });
 }

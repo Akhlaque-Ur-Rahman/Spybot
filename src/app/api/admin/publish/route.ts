@@ -1,6 +1,8 @@
 import { Prisma, UserRole } from '@prisma/client';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminPublishPostSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { prisma } from '@/lib/db/prisma';
@@ -8,7 +10,9 @@ import { notifyOps } from '@/lib/ops/notifications';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 import type { PublishSnapshot } from '@/app/api/admin/publish/snapshot-types';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const rateLimitError = applyRateLimit(request, 120);
+  if (rateLimitError) return rateLimitError;
   const auth = await requireApiRole();
   if (auth.error) return auth.error;
   const drafts = await prisma.page.findMany({ where: { status: 'draft' } });
@@ -23,7 +27,10 @@ export async function POST(request: NextRequest) {
 
   const auth = await requireApiRole(UserRole.EDITOR);
   if (auth.error) return auth.error;
-  const body = await request.json();
+
+  const parsed = await readValidatedJson(request, adminPublishPostSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
 
   const current = await prisma.page.findUnique({
     where: { key: body.pageKey },

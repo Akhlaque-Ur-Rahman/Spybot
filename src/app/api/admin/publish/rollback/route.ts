@@ -1,6 +1,8 @@
 import { Prisma, UserRole } from '@prisma/client';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminPublishRollbackSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { prisma } from '@/lib/db/prisma';
 import { isRichPublishSnapshot, type PublishSnapshot } from '@/app/api/admin/publish/snapshot-types';
@@ -15,7 +17,10 @@ export async function POST(request: NextRequest) {
   const auth = await requireApiRole(UserRole.OWNER);
   if (auth.error) return auth.error;
 
-  const body = await request.json();
+  const parsed = await readValidatedJson(request, adminPublishRollbackSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   const version = await prisma.pageVersion.findUnique({
     where: {
       pageId_version: {

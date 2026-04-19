@@ -3,6 +3,7 @@ import { getCmsPageByKey, getCmsPageBySlug, normalizeCmsPageSlug } from '@/lib/c
 import type { CmsPage } from '@/lib/cms/types';
 import {
   cmsRegistryPages,
+  getCmsRegistryPageByKey,
   getCmsRegistryPageBySlug,
   isCmsBlockType,
   type CmsBlockType,
@@ -179,7 +180,7 @@ function mergeRegistryWithDb(
 
 export async function getManagedPageBySlug(slug: string): Promise<ManagedCmsPage | null> {
   const pathSlug = normalizeCmsPageSlug(slug);
-  const registryPage =
+  let registryPage =
     getCmsRegistryPageBySlug(pathSlug) ?? getCmsRegistryPageBySlug(slug.trim()) ?? null;
 
   let dbPage: CmsPage | null = null;
@@ -196,6 +197,10 @@ export async function getManagedPageBySlug(slug: string): Promise<ManagedCmsPage
     }
   } else {
     dbPage = await getCmsPageBySlug(pathSlug);
+    const regByKey = dbPage ? getCmsRegistryPageByKey(dbPage.key) : null;
+    if (regByKey) {
+      registryPage = regByKey;
+    }
   }
 
   if (!registryPage && !dbPage) return null;
@@ -220,7 +225,11 @@ export async function getManagedPageBySlug(slug: string): Promise<ManagedCmsPage
 
 export async function getManagedPageByKey(key: string): Promise<ManagedCmsPage | null> {
   const registryHit = cmsRegistryPages.find((item) => item.key === key);
-  if (registryHit) return getManagedPageBySlug(registryHit.slug);
+  if (registryHit) {
+    const db = await getCmsPageByKey(key);
+    const slug = db?.slug ?? registryHit.slug;
+    return getManagedPageBySlug(slug);
+  }
   const db = await getCmsPageByKey(key);
   if (!db) return null;
   return getManagedPageBySlug(db.slug);

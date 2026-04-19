@@ -1,17 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { readJsonBody } from '@/lib/api/json-request';
 import { prisma } from '@/lib/db/prisma';
 import { notifyOps } from '@/lib/ops/notifications';
+import { applyRateLimit } from '@/lib/security/request-guards';
 
 const schema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  company: z.string().optional(),
-  message: z.string().min(1),
+  name: z.string().min(1).max(200).trim(),
+  email: z.string().email().max(320),
+  company: z.string().max(200).optional(),
+  message: z.string().min(1).max(8000).trim(),
 });
 
 export async function POST(request: NextRequest) {
-  const parsed = schema.safeParse(await request.json());
+  const rateLimitError = applyRateLimit(request, 15);
+  if (rateLimitError) return rateLimitError;
+
+  const raw = await readJsonBody(request);
+  if (!raw.ok) return raw.response;
+
+  const parsed = schema.safeParse(raw.data);
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
   }

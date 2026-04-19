@@ -1,10 +1,11 @@
 import { UserRole } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminSectionPostSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { defaultDraftForBlockType } from '@/lib/cms/default-block-drafts';
-import { isCmsBlockType } from '@/lib/cms/page-registry';
 import { prisma } from '@/lib/db/prisma';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 
@@ -21,16 +22,10 @@ export async function POST(
   if (auth.error) return auth.error;
 
   const { pageKey } = await context.params;
-  const body = (await request.json()) as { key?: string; label?: string; blockType?: string };
-  if (typeof body.key !== 'string' || !body.key.trim()) {
-    return NextResponse.json({ error: 'Section key is required' }, { status: 400 });
-  }
-  if (typeof body.label !== 'string' || !body.label.trim()) {
-    return NextResponse.json({ error: 'Section label is required' }, { status: 400 });
-  }
-  if (typeof body.blockType !== 'string' || !isCmsBlockType(body.blockType)) {
-    return NextResponse.json({ error: 'Valid blockType is required' }, { status: 400 });
-  }
+
+  const parsed = await readValidatedJson(request, adminSectionPostSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
 
   const page = await prisma.page.findUnique({
     where: { key: pageKey },
@@ -38,7 +33,7 @@ export async function POST(
   });
   if (!page) return NextResponse.json({ error: 'Page not found' }, { status: 404 });
 
-  const key = body.key.trim();
+  const key = body.key;
   const exists = page.sections.some((s) => s.key === key);
   if (exists) return NextResponse.json({ error: 'Section key already exists on this page' }, { status: 409 });
 
@@ -50,7 +45,7 @@ export async function POST(
     data: {
       pageId: page.id,
       key,
-      label: body.label.trim(),
+      label: body.label,
       position: maxPos + 1,
       blocks: {
         create: [

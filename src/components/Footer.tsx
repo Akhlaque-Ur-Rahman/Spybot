@@ -1,6 +1,6 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import styles from './Footer.module.css';
-import BrandLogoMark from '@/components/BrandLogoMark';
 import { footerColumns, socialLinks, ROUTES } from '@/site';
 import type { NavMenuItem } from '@/lib/cms/types';
 
@@ -21,7 +21,15 @@ export default function Footer({
         <div className={styles.top}>
           <div className={styles.brand}>
             <Link href={ROUTES.home} className={styles.logo} aria-label="SpyBot homepage">
-              <BrandLogoMark width={168} height={42} plain decorative />
+              <Image
+                src="/media/Round%20PNG%20Logo.png"
+                alt="SpyBot Verifacts Services Pvt. Ltd."
+                width={104}
+                height={104}
+                className={styles.footerLogo}
+                sizes="104px"
+                priority
+              />
             </Link>
             <p className={styles.brandDesc}>
               A comprehensive B2B Digital Identity Verification platform. 

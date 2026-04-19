@@ -1,6 +1,8 @@
 import { UserRole } from '@prisma/client';
 import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminFooterPatchSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { getFooterColumnsSetting } from '@/lib/cms/page-registry';
@@ -28,10 +30,9 @@ export async function PATCH(request: NextRequest) {
   const auth = await requireApiRole(UserRole.EDITOR);
   if (auth.error) return auth.error;
 
-  const body = (await request.json()) as { columns?: Record<string, NavMenuItem[]> };
-  if (!body.columns || typeof body.columns !== 'object') {
-    return NextResponse.json({ error: 'columns object is required' }, { status: 400 });
-  }
+  const parsed = await readValidatedJson(request, adminFooterPatchSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
 
   const before = await prisma.siteSetting.findUnique({ where: { key: FOOTER_KEY } });
 

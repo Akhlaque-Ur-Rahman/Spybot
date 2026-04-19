@@ -5,6 +5,8 @@
 import { UserRole } from '@prisma/client';
 import { draftMode } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminPublishPreviewPostSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 
@@ -17,7 +19,10 @@ export async function POST(request: NextRequest) {
   const auth = await requireApiRole(UserRole.EDITOR);
   if (auth.error) return auth.error;
 
-  const body = await request.json();
+  const parsed = await readValidatedJson(request, adminPublishPreviewPostSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   const draft = await draftMode();
   draft.enable();
   return NextResponse.json({ preview: true, redirectTo: body.redirectTo ?? '/' });

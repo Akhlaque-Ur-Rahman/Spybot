@@ -1,5 +1,7 @@
 import { UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminMediaPostSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import {
   buildMediaListOrderBy,
@@ -10,6 +12,8 @@ import { prisma } from '@/lib/db/prisma';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 
 export async function GET(request: NextRequest) {
+  const rateLimitError = applyRateLimit(request, 240);
+  if (rateLimitError) return rateLimitError;
   const auth = await requireApiRole();
   if (auth.error) return auth.error;
   const sp = Object.fromEntries(request.nextUrl.searchParams.entries());
@@ -44,9 +48,13 @@ export async function POST(request: NextRequest) {
 
   const auth = await requireApiRole(UserRole.EDITOR);
   if (auth.error) return auth.error;
-  const body = await request.json();
+
+  const parsed = await readValidatedJson(request, adminMediaPostSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   const asset = await prisma.mediaAsset.create({
-    data: { url: body.url, alt: body.alt, tags: body.tags ?? [], mimeType: body.mimeType },
+    data: { url: body.url, alt: body.alt ?? null, tags: body.tags ?? [], mimeType: body.mimeType ?? null },
   });
   return NextResponse.json({ asset }, { status: 201 });
 }

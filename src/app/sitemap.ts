@@ -1,15 +1,45 @@
 import type { MetadataRoute } from 'next';
-import { getPublishedPageLastModifiedForPaths, getSiteRuntimeConfig } from '@/lib/cms/service';
+import { cmsRegistryPages } from '@/lib/cms/page-registry';
+import { prisma } from '@/lib/db/prisma';
+import {
+  getPublishedPageLastModifiedForPaths,
+  getSiteRuntimeConfig,
+  normalizeCmsPageSlug,
+} from '@/lib/cms/service';
 import { ROUTES } from '@/site';
 
 export const revalidate = 300;
 
-/** Curated public URLs only — arbitrary `[...slug]` CMS pages are not listed (they stay reachable by direct link). */
-const SITEMAP_PATHS = [...new Set<string>(Object.values(ROUTES))];
+/** Curated marketing URLs; registry pages use the published DB slug when it differs from the default route. */
+async function curatedSitemapPaths(): Promise<string[]> {
+  const paths = new Set<string>(Object.values(ROUTES));
+  try {
+    const published = await prisma.page.findMany({
+      where: {
+        status: 'published',
+        key: { in: cmsRegistryPages.map((p) => p.key) },
+      },
+      select: { key: true, slug: true },
+    });
+    const slugByKey = new Map(published.map((r) => [r.key, normalizeCmsPageSlug(r.slug)]));
+    for (const reg of cmsRegistryPages) {
+      const dbSlug = slugByKey.get(reg.key);
+      const canonical = normalizeCmsPageSlug(reg.slug);
+      if (dbSlug && dbSlug !== canonical) {
+        paths.delete(canonical);
+        paths.add(dbSlug);
+      }
+    }
+  } catch {
+    /* keep ROUTES-only set when DB is unavailable */
+  }
+  return [...paths];
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const site = await getSiteRuntimeConfig();
   const base = site.siteUrl.replace(/\/$/, '');
+  const SITEMAP_PATHS = await curatedSitemapPaths();
   const lastModifiedByPath = await getPublishedPageLastModifiedForPaths(SITEMAP_PATHS);
 
   const sorted = [...SITEMAP_PATHS].sort((a, b) => {

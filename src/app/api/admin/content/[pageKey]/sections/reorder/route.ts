@@ -1,5 +1,7 @@
 import { UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminSectionReorderSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { prisma } from '@/lib/db/prisma';
@@ -18,10 +20,10 @@ export async function POST(
   if (auth.error) return auth.error;
 
   const { pageKey } = await context.params;
-  const body = (await request.json()) as { sectionKeys?: string[] };
-  if (!Array.isArray(body.sectionKeys) || body.sectionKeys.length === 0) {
-    return NextResponse.json({ error: 'sectionKeys array is required' }, { status: 400 });
-  }
+
+  const parsed = await readValidatedJson(request, adminSectionReorderSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
 
   const page = await prisma.page.findUnique({
     where: { key: pageKey },

@@ -22,7 +22,10 @@ export function applyRateLimit(request: NextRequest, max = 60, windowMs = 60_000
 }
 
 export function verifyCsrf(request: NextRequest) {
-  const expected = process.env.CMS_CSRF_TOKEN;
+  const expected = process.env.CMS_CSRF_TOKEN?.trim();
+  if (process.env.NODE_ENV === 'production' && !expected) {
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 503 });
+  }
   if (!expected) return null;
   const incoming = request.headers.get('x-csrf-token');
   if (incoming !== expected) {

@@ -1,5 +1,7 @@
 import { Prisma, UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminContentPostSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { createAuditLog } from '@/lib/cms/audit';
 import { prisma } from '@/lib/db/prisma';
 import { requireApiRole } from '@/lib/api/admin';
@@ -8,7 +10,9 @@ import { normalizeCmsPageSlug } from '@/lib/cms/service';
 import { validatePublicCmsSlugInput } from '@/lib/cms/slug-validation';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const rateLimitError = applyRateLimit(request, 240);
+  if (rateLimitError) return rateLimitError;
   const auth = await requireApiRole();
   if (auth.error) return auth.error;
 
@@ -28,28 +32,14 @@ export async function POST(request: NextRequest) {
   const auth = await requireApiRole(UserRole.EDITOR);
   if (auth.error) return auth.error;
 
-  const body = (await request.json()) as { key?: string; title?: string; slug?: string };
-  if (typeof body.key !== 'string' || !body.key.trim()) {
-    return NextResponse.json({ error: 'key is required' }, { status: 400 });
-  }
-  if (typeof body.title !== 'string' || !body.title.trim()) {
-    return NextResponse.json({ error: 'title is required' }, { status: 400 });
-  }
-  if (typeof body.slug !== 'string' || !body.slug.trim()) {
-    return NextResponse.json({ error: 'slug is required' }, { status: 400 });
-  }
+  const parsed = await readValidatedJson(request, adminContentPostSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
 
-  const slug = normalizeCmsPageSlug(body.slug.trim().startsWith('/') ? body.slug.trim() : `/${body.slug.trim()}`);
-  const registryDef = getCmsRegistryPageByKey(body.key.trim());
+  const slug = normalizeCmsPageSlug(body.slug.startsWith('/') ? body.slug : `/${body.slug}`);
+  const registryDef = getCmsRegistryPageByKey(body.key);
   const slugErr = validatePublicCmsSlugInput(slug, registryDef?.slug);
   if (slugErr) return NextResponse.json({ error: slugErr }, { status: 400 });
-
-  if (registryDef && normalizeCmsPageSlug(slug) !== normalizeCmsPageSlug(registryDef.slug)) {
-    return NextResponse.json(
-      { error: 'This page key uses a fixed URL; slug must match that path.' },
-      { status: 400 }
-    );
-  }
 
   const existingSlug = await prisma.page.findUnique({ where: { slug } });
   if (existingSlug) return NextResponse.json({ error: 'Slug already in use' }, { status: 409 });
@@ -58,8 +48,8 @@ export async function POST(request: NextRequest) {
   try {
     page = await prisma.page.create({
       data: {
-        key: body.key.trim(),
-        title: body.title.trim(),
+        key: body.key,
+        title: body.title,
         slug,
         status: 'draft',
       },

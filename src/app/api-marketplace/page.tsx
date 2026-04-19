@@ -7,7 +7,7 @@ import DemoSection from '@/components/DemoSection';
 import DecisionFlow from '@/components/DecisionFlow';
 import CoverageCarousel from '@/components/CoverageCarousel';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
-import { getManagedBlock, getManagedPageBySlug } from '@/lib/cms/page-content';
+import { getManagedBlock, getManagedPageByKey } from '@/lib/cms/page-content';
 import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { CTA_LINKS, ROUTES } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ApiMarketplacePage() {
-  const cmsPage = await getManagedPageBySlug(ROUTES.apiMarketplace);
+  const cmsPage = await getManagedPageByKey('api-marketplace');
   const pageHeader = getManagedBlock(cmsPage, 'pageHeader', 'pageHeader');
   const coverage = getManagedBlock(cmsPage, 'coverageCarousel', 'coverageCarousel');
   const challenges = getManagedBlock(cmsPage, 'challenges', 'challenges');

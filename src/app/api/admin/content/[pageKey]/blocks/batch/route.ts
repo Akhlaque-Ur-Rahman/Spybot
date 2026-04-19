@@ -1,12 +1,12 @@
 import { Prisma, UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminBlockBatchPatchSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { validateBlockDraftJson } from '@/lib/cms/block-draft-validation';
 import { createAuditLog } from '@/lib/cms/audit';
 import { prisma } from '@/lib/db/prisma';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
-
-type UpdateRow = { blockId: string; draftJson: unknown };
 
 export async function PATCH(
   request: NextRequest,
@@ -27,14 +27,9 @@ export async function PATCH(
   });
   if (!page) return NextResponse.json({ error: 'Page not found' }, { status: 404 });
 
-  const body = (await request.json()) as { updates?: UpdateRow[] };
-  const updates = Array.isArray(body.updates) ? body.updates : [];
-  if (updates.length === 0) {
-    return NextResponse.json({ error: 'updates array required' }, { status: 400 });
-  }
-  if (updates.length > 80) {
-    return NextResponse.json({ error: 'Too many updates in one request' }, { status: 400 });
-  }
+  const parsed = await readValidatedJson(request, adminBlockBatchPatchSchema);
+  if (!parsed.ok) return parsed.response;
+  const updates = parsed.data.updates;
 
   const blockById = new Map<string, { block: (typeof page.sections)[0]['blocks'][0]; type: string }>();
   for (const section of page.sections) {

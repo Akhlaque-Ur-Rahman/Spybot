@@ -1,5 +1,7 @@
 import { Prisma, UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminBlockDraftPatchSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { validateBlockDraftJson } from '@/lib/cms/block-draft-validation';
 import { createAuditLog } from '@/lib/cms/audit';
@@ -30,10 +32,9 @@ export async function PATCH(
   });
   if (!block) return NextResponse.json({ error: 'Block not found' }, { status: 404 });
 
-  const body = (await request.json()) as { draftJson?: unknown };
-  if (body.draftJson === undefined) {
-    return NextResponse.json({ error: 'draftJson required' }, { status: 400 });
-  }
+  const parsed = await readValidatedJson(request, adminBlockDraftPatchSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
 
   const valid = validateBlockDraftJson(block.type, body.draftJson);
   if (!valid.ok) {

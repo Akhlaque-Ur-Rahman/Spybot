@@ -1,6 +1,8 @@
 import { UserRole } from '@prisma/client';
 import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminContentPatchSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { prisma } from '@/lib/db/prisma';
@@ -10,9 +12,11 @@ import { validatePublicCmsSlugInput } from '@/lib/cms/slug-validation';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: RouteContext<'/api/admin/content/[pageKey]'>
 ) {
+  const rateLimitError = applyRateLimit(request, 240);
+  if (rateLimitError) return rateLimitError;
   const auth = await requireApiRole();
   if (auth.error) return auth.error;
 
@@ -39,7 +43,11 @@ export async function PATCH(
   if (auth.error) return auth.error;
 
   const { pageKey } = await context.params;
-  const body = (await request.json()) as Record<string, unknown>;
+
+  const parsed = await readValidatedJson(request, adminContentPatchSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   const before = await prisma.page.findUnique({ where: { key: pageKey } });
 
   const data: {
@@ -49,36 +57,21 @@ export async function PATCH(
     seoDescription?: string | null;
     status?: string;
   } = {};
-  if (typeof body.title === 'string') data.title = body.title;
-  if (typeof body.slug === 'string' && body.slug.trim()) {
+  if (body.title !== undefined) data.title = body.title;
+  if (body.slug !== undefined && body.slug.trim()) {
     const slug = normalizeCmsPageSlug(
       body.slug.trim().startsWith('/') ? body.slug.trim() : `/${body.slug.trim()}`
     );
     const registryPage = getCmsRegistryPageByKey(pageKey);
     const err = validatePublicCmsSlugInput(slug, registryPage?.slug);
     if (err) return NextResponse.json({ error: err }, { status: 400 });
-    if (registryPage && normalizeCmsPageSlug(slug) !== normalizeCmsPageSlug(registryPage.slug)) {
-      return NextResponse.json(
-        { error: 'Built-in pages cannot change their public path.' },
-        { status: 400 }
-      );
-    }
     const other = await prisma.page.findFirst({ where: { slug, NOT: { key: pageKey } } });
     if (other) return NextResponse.json({ error: 'Slug already in use' }, { status: 409 });
     data.slug = slug;
   }
-  if ('seoTitle' in body) data.seoTitle = (body.seoTitle as string | null) ?? null;
-  if ('seoDescription' in body) data.seoDescription = (body.seoDescription as string | null) ?? null;
-  if (typeof body.status === 'string') {
-    if (body.status === 'published') {
-      return NextResponse.json(
-        { error: 'Use POST /api/admin/publish to publish; status cannot be set to published here.' },
-        { status: 400 },
-      );
-    }
-    if (body.status !== 'draft') {
-      return NextResponse.json({ error: 'Invalid status; only "draft" is allowed.' }, { status: 400 });
-    }
+  if (body.seoTitle !== undefined) data.seoTitle = body.seoTitle;
+  if (body.seoDescription !== undefined) data.seoDescription = body.seoDescription;
+  if (body.status !== undefined) {
     data.status = body.status;
   }
 

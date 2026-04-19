@@ -1,5 +1,7 @@
 import { UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminSeoPatchSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { prisma } from '@/lib/db/prisma';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
@@ -21,7 +23,11 @@ export async function PATCH(request: NextRequest) {
 
   const auth = await requireApiRole(UserRole.EDITOR);
   if (auth.error) return auth.error;
-  const body = await request.json();
+
+  const parsed = await readValidatedJson(request, adminSeoPatchSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   const page = await prisma.page.update({
     where: { key: body.pageKey },
     data: { seoTitle: body.seoTitle, seoDescription: body.seoDescription },

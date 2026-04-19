@@ -1,18 +1,12 @@
 import { UserRole } from '@prisma/client';
 import { hash } from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
+import { adminUsersPatchSchema, adminUsersPostSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { prisma } from '@/lib/db/prisma';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
-
-const createUserBodySchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  name: z.string().trim().max(200).optional(),
-  role: z.nativeEnum(UserRole).optional(),
-});
 
 export async function GET() {
   const auth = await requireApiRole(UserRole.OWNER);
@@ -33,17 +27,8 @@ export async function POST(request: NextRequest) {
   const auth = await requireApiRole(UserRole.OWNER);
   if (auth.error) return auth.error;
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-  }
-
-  const parsed = createUserBodySchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid email, password, or role' }, { status: 400 });
-  }
+  const parsed = await readValidatedJson(request, adminUsersPostSchema);
+  if (!parsed.ok) return parsed.response;
 
   const email = parsed.data.email.trim().toLowerCase();
   const name = parsed.data.name?.trim() ? parsed.data.name.trim() : null;
@@ -77,10 +62,13 @@ export async function PATCH(request: NextRequest) {
 
   const auth = await requireApiRole(UserRole.OWNER);
   if (auth.error) return auth.error;
-  const body = await request.json();
+
+  const parsed = await readValidatedJson(request, adminUsersPatchSchema);
+  if (!parsed.ok) return parsed.response;
+
   const user = await prisma.user.update({
-    where: { id: body.id },
-    data: { role: body.role as UserRole },
+    where: { id: parsed.data.id },
+    data: { role: parsed.data.role },
   });
   return NextResponse.json({ user });
 }
