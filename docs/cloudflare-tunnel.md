@@ -61,7 +61,7 @@ For repeated demos or a semi-stable URL, use a [named tunnel](https://developers
 
 - Anyone with the URL can hit your machine while the tunnel is up. Use a **strong** `ADMIN_PASSWORD` and set **`CMS_CSRF_TOKEN`** for write APIs.
 - Quick tunnels are **public**; do not leave them running overnight with weak credentials.
-- This is for **demos**, not a substitute for production hosting (Vercel + Neon, etc.).
+- This is for **demos**, not a substitute for production on your own host (for example a VM with HTTPS reverse proxy and Postgres).
 
 ## Troubleshooting
 
