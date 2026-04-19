@@ -87,20 +87,25 @@ jobs:
             echo "::notice::Deploy skipped — add repository secrets SSH_PRIVATE_KEY and DEPLOY_HOST."
             exit 0
           fi
-          eval "$(ssh-agent -s)"
-          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+          KEYFILE="$(mktemp)"
+          trap 'rm -f "$KEYFILE"' EXIT
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > "$KEYFILE"
+          chmod 600 "$KEYFILE"
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
           USER="${DEPLOY_USER:-ubuntu}"
           REMOTE="${DEPLOY_PATH:-/var/www/Spybot}"
+          # Use only this key (avoids ssh trying other local keys and failing with "Permission denied").
+          RSYNC_RSH="ssh -i ${KEYFILE} -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
           rsync -az --delete \
             --exclude node_modules \
             --exclude .next \
             --exclude .env \
             --exclude '.env.*' \
             --exclude .git \
-            -e ssh \
+            -e "$RSYNC_RSH" \
             ./ "${USER}@${DEPLOY_HOST}:${REMOTE}/"
-          ssh -o BatchMode=yes "${USER}@${DEPLOY_HOST}" \
+          ssh -i "$KEYFILE" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
+            "${USER}@${DEPLOY_HOST}" \
             "set -euo pipefail; cd \"${REMOTE}\"; export NODE_ENV=production; pnpm install --frozen-lockfile; pnpm db:push; pnpm build; if systemctl is-enabled spybot >/dev/null 2>&1; then sudo -n systemctl restart spybot; else echo '::warning::Enable spybot.service once — see deploy/spybot.service'; fi"
