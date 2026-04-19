@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './Footer.module.css';
+import { MEDIA_FOOTER_BRAND_LOGO } from '@/lib/site-media';
 import { footerColumns, socialLinks, ROUTES } from '@/site';
 import type { NavMenuItem } from '@/lib/cms/types';
 
@@ -22,8 +23,8 @@ export default function Footer({
           <div className={styles.brand}>
             <Link href={ROUTES.home} className={styles.logo} aria-label="SpyBot homepage">
               <Image
-                src="/media/Round%20PNG%20Logo.png"
-                alt="SpyBot Verifacts Services Pvt. Ltd."
+                src={MEDIA_FOOTER_BRAND_LOGO}
+                alt="Spybot Verifacts Services Pvt. Ltd."
                 width={104}
                 height={104}
                 className={styles.footerLogo}

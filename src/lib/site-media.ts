@@ -2,6 +2,9 @@
 
 export const MEDIA_BRAND_LOGO = '/media/spybot-brand-logo.jpeg';
 
+/** Circular badge used in the site footer (`Footer.tsx`). */
+export const MEDIA_FOOTER_BRAND_LOGO = '/media/Round PNG Logo.png';
+
 export type MediaClipMeta = {
   src: string;
   poster: string;
