@@ -1,5 +1,7 @@
 # Civo compute instance — essentials and post-creation
 
+For the full production picture (Caddy, DNS, TLS, CORS, systemd), see **[production-server.md](./production-server.md)**.
+
 ## What to record at creation time
 
 - **Region** (e.g. mum1) and **instance name** (e.g. Spybot).
@@ -40,12 +42,6 @@ On **push** to `main` or `master`, CI runs (lint, test, build with ephemeral Pos
 **Server once:** install `deploy/spybot.service` → `/etc/systemd/system/spybot.service`, then `sudo systemctl daemon-reload && sudo systemctl enable --now spybot`. Allow passwordless restart for CI: e.g. `sudo visudo -f /etc/sudoers.d/spybot-deploy` with `ubuntu ALL=(ALL) NOPASSWD: /bin/systemctl restart spybot`.
 
 Deploy does **not** upload `.env`; keep production env only on the server.
-
-If deploy fails with **Permission denied (publickey)**:
-
-- The **`SSH_PRIVATE_KEY`** secret must be the **full private** key (e.g. `id_ed25519`), and the matching **`.pub`** line must be in **`~/.ssh/authorized_keys`** on the server for **`DEPLOY_USER`** (default `ubuntu`).
-- Confirm locally: `ssh -i /path/to/same-private-key ubuntu@YOUR_HOST` → should log in without a password.
-- Use a **deploy-only** key (`ssh-keygen -t ed25519 -N "" -f github_deploy`) if you do not want to reuse your laptop key; add `github_deploy.pub` to the server, put `github_deploy` contents in **`SSH_PRIVATE_KEY`**.
 
 ## Quick verification
 

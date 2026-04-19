@@ -48,6 +48,8 @@ To show the site and CMS to someone **without deploying** (local DB stays local)
 
 ## Deploying on a Civo VM (or similar VPS)
 
+**Full server runbook (DNS, Caddy, TLS, systemd, CORS):** [docs/production-server.md](docs/production-server.md).
+
 Provision a Linux instance from [Civo](https://dashboard.civo.com) (or any VPS), point DNS at its public IP, and run the app behind HTTPS (Caddy, nginx, or a load balancer). **Media** shipped in `public/media` is served by the same Node process as the site; no separate object store is required unless you later move large files off the box.
 
 - Install **Node 20+**, **pnpm**, and clone this repo on the server (or deploy build artifacts from CI).
