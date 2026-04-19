@@ -66,11 +66,15 @@ jobs:
       - name: Build
         run: pnpm build
 
-  # Push to main/master only (not PRs). Requires secrets: SSH_PRIVATE_KEY, DEPLOY_HOST; optional DEPLOY_USER, DEPLOY_PATH.
-  # Server: passwordless sudo for `systemctl restart spybot` (see deploy/spybot.service).
+  # Runs only when SSH_PRIVATE_KEY + DEPLOY_HOST are set (Repo → Settings → Secrets and variables → Actions).
+  # Optional: DEPLOY_USER (default ubuntu), DEPLOY_PATH (default /var/www/Spybot). Server: sudo NOPASSWD for systemctl restart spybot.
   deploy:
     needs: lint-test-build
-    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    if: >-
+      github.event_name != 'pull_request' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') &&
+      secrets.SSH_PRIVATE_KEY != '' &&
+      secrets.DEPLOY_HOST != ''
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
