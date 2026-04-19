@@ -81,6 +81,7 @@ After edits: `sudo systemctl restart spybot`.
 ## Browser notes
 
 - If **HTTPS** works in **curl** but fails in **Brave** with `ERR_SSL_PROTOCOL_ERROR`, try **Incognito** or clear **site data** for that host — stale cache/HSTS after certificate or DNS changes can cause that.
+- A **broken padlock** or **mixed content** warnings usually mean **HTTP subresources** on an HTTPS page, or **TLS** still settling after DNS/cert changes — set **`NEXT_PUBLIC_SITE_URL`** to the same **`https://`** host the browser uses, and avoid hard-coded `http://` asset URLs in content.
 
 ---
 

@@ -41,7 +41,7 @@ To show the site and CMS to someone **without deploying** (local DB stays local)
 ## Security Baseline
 
 - Session auth via NextAuth credentials.
-- Route protection via `src/proxy.ts` for `/admin/*`.
+- Route protection via `src/middleware.ts` for `/admin/*`.
 - Role-based checks in admin API handlers.
 - CSRF token verification for sensitive write paths.
 - Basic in-memory request rate limiting in API guards.

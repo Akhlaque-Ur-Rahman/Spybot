@@ -27,7 +27,14 @@ function authorizeWithEnvFallback(email: string, password: string) {
   };
 }
 
+const nextAuthUrl = process.env.NEXTAUTH_URL ?? '';
+const nextAuthIsExplicitHttp = nextAuthUrl.startsWith('http://');
+
 export const authOptions: AuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
+  useSecureCookies:
+    nextAuthUrl.startsWith('https://') ||
+    (process.env.NODE_ENV === 'production' && !nextAuthIsExplicitHttp),
   adapter: PrismaAdapter(prisma),
   session: { strategy: 'jwt' },
   pages: { signIn: '/admin/login' },

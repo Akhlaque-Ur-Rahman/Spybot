@@ -1,12 +1,20 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import styles from './LoginForm.module.css';
 
+function safeSameOriginPath(raw: string | null): string {
+  if (!raw) return '/admin';
+  if (!raw.startsWith('/') || raw.startsWith('//') || raw.includes('..')) return '/admin';
+  return raw;
+}
+
 export default function LoginForm() {
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -17,10 +25,11 @@ export default function LoginForm() {
     event.preventDefault();
     setLoading(true);
     setError(null);
+    const callbackUrl = safeSameOriginPath(searchParams.get('callbackUrl'));
     const result = await signIn('credentials', {
       email,
       password,
-      callbackUrl: '/admin',
+      callbackUrl,
       redirect: false,
     });
     if (result?.error) setError('Invalid credentials');
