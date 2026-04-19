@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
@@ -13,7 +13,21 @@ function safeSameOriginPath(raw: string | null): string {
   return raw;
 }
 
+function sameOriginNavigationPath(url: string, fallback: string): string {
+  if (url.startsWith('/')) return url;
+  try {
+    const parsed = new URL(url);
+    if (parsed.origin === window.location.origin) {
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    }
+  } catch {
+    /* ignore */
+  }
+  return fallback;
+}
+
 export default function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,8 +46,13 @@ export default function LoginForm() {
       callbackUrl,
       redirect: false,
     });
-    if (result?.error) setError('Invalid credentials');
-    if (result?.url && !result.error) window.location.href = result.url;
+    if (result?.error) {
+      setError('Invalid credentials');
+    } else if (result?.url && !result.error) {
+      const dest = sameOriginNavigationPath(result.url, callbackUrl);
+      router.replace(dest);
+      router.refresh();
+    }
     setLoading(false);
   }
 

@@ -5,6 +5,7 @@ import { type AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
+import { nextAuthUseSecureCookies } from '@/lib/auth/secure-cookies';
 
 const credentialsSchema = z.object({
   email: z.string().email(),
@@ -27,14 +28,9 @@ function authorizeWithEnvFallback(email: string, password: string) {
   };
 }
 
-const nextAuthUrl = process.env.NEXTAUTH_URL ?? '';
-const nextAuthIsExplicitHttp = nextAuthUrl.startsWith('http://');
-
 export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
-  useSecureCookies:
-    nextAuthUrl.startsWith('https://') ||
-    (process.env.NODE_ENV === 'production' && !nextAuthIsExplicitHttp),
+  useSecureCookies: nextAuthUseSecureCookies(),
   adapter: PrismaAdapter(prisma),
   session: { strategy: 'jwt' },
   pages: { signIn: '/admin/login' },
