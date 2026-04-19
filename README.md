@@ -6,7 +6,7 @@ Public marketing website and an authenticated **owner dashboard** at `/admin` fo
 
 - **Public site**: Home, solutions, industries, resources, FAQ, support, contact, API marketplace, and CMS-driven pages (including dynamic routes such as `[...slug]`).
 - **Admin (CMS)**: Page/section/block editing with draft vs live JSON, navigation menus, footer, global settings, SEO fields, media registry, form submissions inbox, users and roles, publish queue, and audit log.
-- **Auth**: NextAuth.js with credentials provider and Prisma adapter; middleware protects `/admin/*` except `/admin/login`.
+- **Auth**: NextAuth.js with credentials provider and Prisma adapter; `src/proxy.ts` protects `/admin/*` except `/admin/login`.
 - **Security baseline**: Session auth, role checks on admin APIs, CSRF verification on sensitive writes, and basic in-memory rate limiting in API guards.
 
 ## Tech stack

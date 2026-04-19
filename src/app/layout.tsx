@@ -101,7 +101,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <ThemeProvider>
           <SmoothScrollProvider>
             <AppShell
