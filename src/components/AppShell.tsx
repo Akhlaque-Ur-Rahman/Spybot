@@ -43,9 +43,15 @@ export default function AppShell({
       pathPrimed.current = true;
       return;
     }
-    setRouteAnim(true);
-    const id = window.setTimeout(() => setRouteAnim(false), 400);
-    return () => window.clearTimeout(id);
+    let timeoutId: ReturnType<typeof window.setTimeout> | undefined;
+    const rafId = requestAnimationFrame(() => {
+      setRouteAnim(true);
+      timeoutId = window.setTimeout(() => setRouteAnim(false), 400);
+    });
+    return () => {
+      cancelAnimationFrame(rafId);
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+    };
   }, [pathname, entranceDone]);
 
   if (isAdminRoute) {

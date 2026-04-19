@@ -121,12 +121,12 @@ export default function Navbar({
   }, [closeDropdown]);
 
   useEffect(() => {
-    setMounted(true);
+    queueMicrotask(() => setMounted(true));
   }, []);
 
   useEffect(() => {
     if (!mobileOpen) {
-      setDrawerEntered(false);
+      queueMicrotask(() => setDrawerEntered(false));
       return;
     }
     const id = requestAnimationFrame(() => {
@@ -160,7 +160,7 @@ export default function Navbar({
     }
     if (prevPathname.current !== pathname) {
       prevPathname.current = pathname;
-      closeMobileMenu();
+      queueMicrotask(() => closeMobileMenu());
     }
   }, [pathname, closeMobileMenu]);
 

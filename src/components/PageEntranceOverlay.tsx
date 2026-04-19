@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import styles from './PageEntranceOverlay.module.css';
 
 type Props = {
@@ -21,26 +21,38 @@ function waitForFullLoad(): Promise<void> {
   });
 }
 
+const reducedMotionQuery = '(prefers-reduced-motion: reduce)';
+
+function subscribeReducedMotion(onStoreChange: () => void) {
+  const mq = window.matchMedia(reducedMotionQuery);
+  mq.addEventListener('change', onStoreChange);
+  return () => mq.removeEventListener('change', onStoreChange);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia(reducedMotionQuery).matches;
+}
+
+function getReducedMotionServerSnapshot() {
+  return false;
+}
+
 export default function PageEntranceOverlay({ onDismiss }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
   const tRef = useRef(0);
   const [exiting, setExiting] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const reducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
 
   const dismiss = useCallback(() => {
     setExiting(true);
     const t = window.setTimeout(onDismiss, 560);
     return () => window.clearTimeout(t);
   }, [onDismiss]);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches);
-    const onMq = () => setReducedMotion(mq.matches);
-    mq.addEventListener('change', onMq);
-    return () => mq.removeEventListener('change', onMq);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
