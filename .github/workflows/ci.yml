@@ -1,0 +1,106 @@
+name: CI and deploy
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Next build runs Prisma during prerender; ephemeral Postgres only for CI (not your server).
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      NEXTAUTH_SECRET: ci-placeholder-not-for-production
+      NEXTAUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Sync database schema (for build prerender)
+        run: pnpm db:push
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  # Push to main/master only (not PRs). Requires secrets: SSH_PRIVATE_KEY, DEPLOY_HOST; optional DEPLOY_USER, DEPLOY_PATH.
+  # Server: passwordless sudo for `systemctl restart spybot` (see deploy/spybot.service).
+  deploy:
+    needs: lint-test-build
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Trust host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Rsync to server and run deploy
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+          USER="${DEPLOY_USER:-ubuntu}"
+          REMOTE="${DEPLOY_PATH:-/var/www/Spybot}"
+          rsync -az --delete \
+            --exclude node_modules \
+            --exclude .next \
+            --exclude .env \
+            --exclude '.env.*' \
+            --exclude .git \
+            -e ssh \
+            ./ "${USER}@${DEPLOY_HOST}:${REMOTE}/"
+          ssh -o BatchMode=yes "${USER}@${DEPLOY_HOST}" \
+            "set -euo pipefail; cd \"${REMOTE}\"; export NODE_ENV=production; pnpm install --frozen-lockfile; pnpm db:push; pnpm build; if systemctl is-enabled spybot >/dev/null 2>&1; then sudo -n systemctl restart spybot; else echo '::warning::Enable spybot.service once — see deploy/spybot.service'; fi"

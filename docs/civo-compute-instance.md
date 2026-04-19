@@ -24,6 +24,23 @@
 11. **DNS** — point your domain **A/AAAA** to the instance (or reserved) IP; wait for propagation; set `NEXTAUTH_URL` and `NEXT_PUBLIC_SITE_URL` to match.
 12. **Backups** — plan DB backups (dump/cron or managed DB backups) and snapshot/restore strategy for `public/media` if you add files on disk.
 
+## GitHub Actions deploy (`.github/workflows/ci.yml`)
+
+On **push** to `main` or `master`, CI runs (lint, test, build with ephemeral Postgres), then **deploy** rsyncs the repo to the server and runs `pnpm install`, `pnpm db:push`, `pnpm build`, and `sudo systemctl restart spybot` if the unit exists.
+
+**Repository secrets** (Settings → Secrets and variables → Actions):
+
+| Secret | Required | Example |
+|--------|----------|---------|
+| `SSH_PRIVATE_KEY` | Yes | Private key whose **public** key is in `ubuntu@server:~/.ssh/authorized_keys` |
+| `DEPLOY_HOST` | Yes | Server IP or hostname (e.g. `212.2.250.167`) |
+| `DEPLOY_USER` | No | Default `ubuntu` |
+| `DEPLOY_PATH` | No | Default `/var/www/Spybot` |
+
+**Server once:** install `deploy/spybot.service` → `/etc/systemd/system/spybot.service`, then `sudo systemctl daemon-reload && sudo systemctl enable --now spybot`. Allow passwordless restart for CI: e.g. `sudo visudo -f /etc/sudoers.d/spybot-deploy` with `ubuntu ALL=(ALL) NOPASSWD: /bin/systemctl restart spybot`.
+
+Deploy does **not** upload `.env`; keep production env only on the server.
+
 ## Quick verification
 
 - `https://your-domain/` loads the site.
