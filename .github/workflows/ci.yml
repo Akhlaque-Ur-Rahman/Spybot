@@ -66,36 +66,32 @@ jobs:
       - name: Build
         run: pnpm build
 
-  # Runs only when SSH_PRIVATE_KEY + DEPLOY_HOST are set (Repo → Settings → Secrets and variables → Actions).
-  # Optional: DEPLOY_USER (default ubuntu), DEPLOY_PATH (default /var/www/Spybot). Server: sudo NOPASSWD for systemctl restart spybot.
+  # Deploy: set secrets SSH_PRIVATE_KEY, DEPLOY_HOST (optional DEPLOY_USER, DEPLOY_PATH). Job-level `if` cannot use `secrets` — skip is handled in the step below.
   deploy:
     needs: lint-test-build
-    if: >-
-      github.event_name != 'pull_request' &&
-      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') &&
-      secrets.SSH_PRIVATE_KEY != '' &&
-      secrets.DEPLOY_HOST != ''
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Trust host key
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
-
-      - name: Rsync to server and run deploy
+      - name: Rsync to server and deploy
         env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           set -euo pipefail
+          if [ -z "${SSH_PRIVATE_KEY:-}" ] || [ -z "${DEPLOY_HOST:-}" ]; then
+            echo "::notice::Deploy skipped — add repository secrets SSH_PRIVATE_KEY and DEPLOY_HOST."
+            exit 0
+          fi
+          eval "$(ssh-agent -s)"
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
           USER="${DEPLOY_USER:-ubuntu}"
           REMOTE="${DEPLOY_PATH:-/var/www/Spybot}"
           rsync -az --delete \
