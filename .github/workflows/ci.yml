@@ -87,25 +87,28 @@ jobs:
             echo "::notice::Deploy skipped — add repository secrets SSH_PRIVATE_KEY and DEPLOY_HOST."
             exit 0
           fi
-          KEYFILE="$(mktemp)"
-          trap 'rm -f "$KEYFILE"' EXIT
-          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > "$KEYFILE"
-          chmod 600 "$KEYFILE"
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
+          KEYFILE="$HOME/.ssh/ci_deploy_key"
+          # File + direct -i is more reliable than ssh-add stdin (avoids libcrypto parse issues on bad pastes).
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' | sed $'1s/^\xef\xbb\xbf//' > "$KEYFILE"
+          chmod 600 "$KEYFILE"
+          if ! ssh-keygen -y -f "$KEYFILE" >/dev/null 2>&1; then
+            echo "::error::SSH_PRIVATE_KEY is not a valid OpenSSH private key (or it has a passphrase). Use the private key matching your Civo key, no passphrase, full BEGIN/END block."
+            exit 1
+          fi
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
           USER="${DEPLOY_USER:-ubuntu}"
           REMOTE="${DEPLOY_PATH:-/var/www/Spybot}"
-          # Use only this key (avoids ssh trying other local keys and failing with "Permission denied").
-          RSYNC_RSH="ssh -i ${KEYFILE} -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new"
+          SSH_OPTS="-i $KEYFILE -o IdentitiesOnly=yes -o BatchMode=yes"
           rsync -az --delete \
             --exclude node_modules \
             --exclude .next \
             --exclude .env \
             --exclude '.env.*' \
             --exclude .git \
-            -e "$RSYNC_RSH" \
+            -e "ssh $SSH_OPTS" \
             ./ "${USER}@${DEPLOY_HOST}:${REMOTE}/"
-          ssh -i "$KEYFILE" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
-            "${USER}@${DEPLOY_HOST}" \
+          ssh $SSH_OPTS "${USER}@${DEPLOY_HOST}" \
             "set -euo pipefail; cd \"${REMOTE}\"; export NODE_ENV=production; pnpm install --frozen-lockfile; pnpm db:push; pnpm build; if systemctl is-enabled spybot >/dev/null 2>&1; then sudo -n systemctl restart spybot; else echo '::warning::Enable spybot.service once — see deploy/spybot.service'; fi"
+          shred -u "$KEYFILE" 2>/dev/null || rm -f "$KEYFILE"
