@@ -1,4 +1,5 @@
 import { UserRole } from '@prisma/client';
+import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
@@ -89,6 +90,14 @@ export async function PATCH(
     where: { key: pageKey },
     data,
   });
+
+  if (page.status === 'published') {
+    try {
+      revalidateTag('cms-sitemap-pages', 'max');
+    } catch {
+      /* best-effort */
+    }
+  }
 
   await createAuditLog({
     actorId: auth.session.user.id,

@@ -3,21 +3,17 @@ import PageHeader from '@/components/PageHeader';
 import FaqAccordion from '@/components/FaqAccordion';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
-import { getManagedBlock, getManagedPageBySlug, getManagedPageSeoBySlug } from '@/lib/cms/page-content';
+import { getManagedBlock, getManagedPageBySlug } from '@/lib/cms/page-content';
+import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { CTA_LINKS, ROUTES } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getManagedPageSeoBySlug(ROUTES.faq);
-  return {
-    title: seo?.title ?? 'FAQ | Identity Verification, KYC, KYB, Support',
+  return marketingPageMetadata(ROUTES.faq, {
+    title: 'FAQ | Identity Verification, KYC, KYB, Support',
     description:
-      seo?.description ??
       'Find answers to common questions about SpyBot identity verification APIs, KYC, KYB, fraud prevention workflows, implementation, and support.',
-    alternates: {
-      canonical: ROUTES.faq,
-    },
-  };
+  });
 }
 
 export default async function FaqPage() {

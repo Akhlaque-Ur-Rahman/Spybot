@@ -4,21 +4,17 @@ import SupportPathways from '@/components/SupportPathways';
 import SupportSlaStrip from '@/components/SupportSlaStrip';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
-import { getManagedBlock, getManagedPageBySlug, getManagedPageSeoBySlug } from '@/lib/cms/page-content';
+import { getManagedBlock, getManagedPageBySlug } from '@/lib/cms/page-content';
+import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { CTA_LINKS, ROUTES } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getManagedPageSeoBySlug(ROUTES.support);
-  return {
-    title: seo?.title ?? 'Support | Verification Workflows, API Guidance, Onboarding Help',
+  return marketingPageMetadata(ROUTES.support, {
+    title: 'Support | Verification Workflows, API Guidance, Onboarding Help',
     description:
-      seo?.description ??
       'Get support for SpyBot verification workflows, implementation planning, API rollout questions, and onboarding operations.',
-    alternates: {
-      canonical: ROUTES.support,
-    },
-  };
+  });
 }
 
 export default async function SupportPage() {

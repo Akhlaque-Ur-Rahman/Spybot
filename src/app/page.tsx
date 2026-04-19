@@ -5,7 +5,8 @@ import Benefits from '@/components/Benefits';
 import DecisionFlow from '@/components/DecisionFlow';
 import DemoSection from '@/components/DemoSection';
 import type { Metadata } from 'next';
-import { getManagedBlock, getManagedPageBySlug, getManagedPageSeoBySlug } from '@/lib/cms/page-content';
+import { getManagedBlock, getManagedPageBySlug } from '@/lib/cms/page-content';
+import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { MEDIA_BRAND_LOGO, MEDIA_CLIPS, mediaEncodingFormat, siteOrigin } from '@/lib/site-media';
 
 const origin = siteOrigin();
@@ -24,16 +25,11 @@ const heroVideoJsonLd = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getManagedPageSeoBySlug('/');
-  return {
-    title: seo?.title ?? 'B2B Identity Verification And Onboarding Platform',
+  return marketingPageMetadata('/', {
+    title: 'B2B Identity Verification And Onboarding Platform',
     description:
-      seo?.description ??
       'Reduce onboarding friction with SpyBot identity verification, KYB, financial verification, and orchestration workflows built for modern digital businesses.',
-    alternates: {
-      canonical: '/',
-    },
-  };
+  });
 }
 
 export default async function Home() {

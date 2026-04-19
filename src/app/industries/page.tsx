@@ -5,22 +5,18 @@ import CoverageCarousel from '@/components/CoverageCarousel';
 import CardSlider from '@/components/CardSlider';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
-import { getManagedBlock, getManagedPageBySlug, getManagedPageSeoBySlug } from '@/lib/cms/page-content';
+import { getManagedBlock, getManagedPageBySlug } from '@/lib/cms/page-content';
+import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { CTA_LINKS, ROUTES, industryNavItems } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 import styles from './industries.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getManagedPageSeoBySlug(ROUTES.industries);
-  return {
-    title: seo?.title ?? 'Industries | Fintech, E-commerce, Telecom, Gaming Verification',
+  return marketingPageMetadata(ROUTES.industries, {
+    title: 'Industries | Fintech, E-commerce, Telecom, Gaming Verification',
     description:
-      seo?.description ??
       'See how SpyBot supports industry-specific onboarding and verification workflows for fintech, e-commerce, telecom, and gaming platforms.',
-    alternates: {
-      canonical: ROUTES.industries,
-    },
-  };
+  });
 }
 
 export default async function IndustriesPage() {

@@ -5,22 +5,18 @@ import CoverageCarousel from '@/components/CoverageCarousel';
 import CardSlider from '@/components/CardSlider';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
-import { getManagedBlock, getManagedPageBySlug, getManagedPageSeoBySlug } from '@/lib/cms/page-content';
+import { getManagedBlock, getManagedPageBySlug } from '@/lib/cms/page-content';
+import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { CTA_LINKS, ROUTES, solutionNavItems } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 import styles from './solutions.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getManagedPageSeoBySlug(ROUTES.solutions);
-  return {
-    title: seo?.title ?? 'Solutions | Identity Verification, KYB, Financial Verification, Video KYC',
+  return marketingPageMetadata(ROUTES.solutions, {
+    title: 'Solutions | Identity Verification, KYB, Financial Verification, Video KYC',
     description:
-      seo?.description ??
       'Explore SpyBot solutions for identity verification, KYB, financial verification, and video KYC workflows built to improve onboarding conversion and compliance outcomes.',
-    alternates: {
-      canonical: ROUTES.solutions,
-    },
-  };
+  });
 }
 
 export default async function SolutionsPage() {

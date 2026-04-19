@@ -7,21 +7,17 @@ import DemoSection from '@/components/DemoSection';
 import DecisionFlow from '@/components/DecisionFlow';
 import CoverageCarousel from '@/components/CoverageCarousel';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
-import { getManagedBlock, getManagedPageBySlug, getManagedPageSeoBySlug } from '@/lib/cms/page-content';
+import { getManagedBlock, getManagedPageBySlug } from '@/lib/cms/page-content';
+import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { CTA_LINKS, ROUTES } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getManagedPageSeoBySlug(ROUTES.apiMarketplace);
-  return {
-    title: seo?.title ?? 'API Marketplace | Identity Verification, KYC, KYB, Fraud APIs',
+  return marketingPageMetadata(ROUTES.apiMarketplace, {
+    title: 'API Marketplace | Identity Verification, KYC, KYB, Fraud APIs',
     description:
-      seo?.description ??
       'Explore SpyBot API Marketplace for identity verification, KYB, financial checks, video KYC, and onboarding automation APIs built for high-growth teams.',
-    alternates: {
-      canonical: ROUTES.apiMarketplace,
-    },
-  };
+  });
 }
 
 export default async function ApiMarketplacePage() {

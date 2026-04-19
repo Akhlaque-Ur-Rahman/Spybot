@@ -1,5 +1,5 @@
 import { Prisma, UserRole } from '@prisma/client';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/api/admin';
 import { prisma } from '@/lib/db/prisma';
@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
         revalidatePath('/', 'layout');
         const path = page.slug.startsWith('/') ? page.slug : `/${page.slug}`;
         revalidatePath(path);
+        revalidateTag('cms-sitemap-pages', 'max');
       } catch {
         /* best-effort */
       }
@@ -78,6 +79,18 @@ export async function POST(request: NextRequest) {
       status: snapshot.page?.status ?? 'published',
     },
   });
+
+  const rolledBack = await prisma.page.findUnique({ where: { id: body.pageId } });
+  if (rolledBack) {
+    try {
+      revalidatePath('/', 'layout');
+      const path = rolledBack.slug.startsWith('/') ? rolledBack.slug : `/${rolledBack.slug}`;
+      revalidatePath(path);
+      revalidateTag('cms-sitemap-pages', 'max');
+    } catch {
+      /* best-effort */
+    }
+  }
 
   return NextResponse.json({ ok: true, scope: 'metadata_only_legacy_snapshot' });
 }

@@ -183,3 +183,37 @@ export async function getSiteRuntimeConfig(): Promise<SiteRuntimeConfig> {
     { revalidate: 120, tags: ['cms-site-runtime-config'] }
   )();
 }
+
+/**
+ * Last-modified timestamps for URLs we intentionally list in `sitemap.xml`.
+ * Only queries the given paths (curated routes), not every published CMS slug.
+ */
+export async function getPublishedPageLastModifiedForPaths(
+  paths: readonly string[]
+): Promise<Map<string, Date>> {
+  const slugSet = new Set(paths.map((p) => normalizeCmsPageSlug(p)));
+  const normalized = [...slugSet].sort();
+  const fetchTimestamps = unstable_cache(
+    async (): Promise<Record<string, string>> =>
+      withCmsFallback({}, async () => {
+        if (normalized.length === 0) return {};
+        const rows = await prisma.page.findMany({
+          where: { status: 'published', slug: { in: normalized } },
+          select: { slug: true, updatedAt: true },
+        });
+        const rec: Record<string, string> = {};
+        for (const row of rows) {
+          const slug = normalizeCmsPageSlug(row.slug);
+          const iso = row.updatedAt.toISOString();
+          const cur = rec[slug];
+          if (!cur || iso > cur) rec[slug] = iso;
+        }
+        return rec;
+      }),
+    ['cms-sitemap-pages-lastmod', ...normalized],
+    { revalidate: 300, tags: ['cms-sitemap-pages'] }
+  );
+
+  const rec = await fetchTimestamps();
+  return new Map(Object.entries(rec).map(([k, v]) => [k, new Date(v)]));
+}

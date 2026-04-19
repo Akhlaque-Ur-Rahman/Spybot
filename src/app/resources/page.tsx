@@ -5,22 +5,18 @@ import ResourceGrid from '@/components/ResourceGrid';
 import CardSlider from '@/components/CardSlider';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
-import { getManagedBlock, getManagedPageBySlug, getManagedPageSeoBySlug } from '@/lib/cms/page-content';
+import { getManagedBlock, getManagedPageBySlug } from '@/lib/cms/page-content';
+import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { CTA_LINKS, ROUTES } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 import styles from './resources.module.css';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getManagedPageSeoBySlug(ROUTES.resources);
-  return {
-    title: seo?.title ?? 'Resources | KYC, KYB, Fraud Prevention, Onboarding Insights',
+  return marketingPageMetadata(ROUTES.resources, {
+    title: 'Resources | KYC, KYB, Fraud Prevention, Onboarding Insights',
     description:
-      seo?.description ??
       'Explore SpyBot resources for KYC, KYB, fraud prevention, onboarding optimization, and compliance education designed for product, risk, and operations teams.',
-    alternates: {
-      canonical: ROUTES.resources,
-    },
-  };
+  });
 }
 
 export default async function ResourcesPage() {

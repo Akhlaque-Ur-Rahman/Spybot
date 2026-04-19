@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import styles from './unauthorized.module.css';
+
+export const metadata: Metadata = {
+  title: 'Unauthorized',
+  robots: { index: false, follow: false },
+};
 
 export default function UnauthorizedPage() {
   return (

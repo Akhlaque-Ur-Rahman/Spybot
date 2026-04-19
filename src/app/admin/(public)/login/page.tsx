@@ -5,6 +5,7 @@ import LoginForm from '@/components/admin/LoginForm';
 export const metadata: Metadata = {
   title: 'CMS Login',
   description: 'Secure login for the SpyBot CMS control panel.',
+  robots: { index: false, follow: false },
 };
 
 export default function AdminLoginPage() {

@@ -1,5 +1,5 @@
 import { Prisma, UserRole } from '@prisma/client';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
@@ -107,6 +107,7 @@ export async function POST(request: NextRequest) {
     revalidatePath('/', 'layout');
     const path = page.slug.startsWith('/') ? page.slug : `/${page.slug}`;
     revalidatePath(path);
+    revalidateTag('cms-sitemap-pages', 'max');
   } catch {
     /* revalidate is best-effort */
   }

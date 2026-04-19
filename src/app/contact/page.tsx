@@ -4,20 +4,16 @@ import DemoSection from '@/components/DemoSection';
 import CoverageCarousel from '@/components/CoverageCarousel';
 import ContactHighlights from '@/components/ContactHighlights';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
-import { getManagedBlock, getManagedPageBySlug, getManagedPageSeoBySlug } from '@/lib/cms/page-content';
+import { getManagedBlock, getManagedPageBySlug } from '@/lib/cms/page-content';
+import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { CTA_LINKS, ROUTES } from '@/site';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getManagedPageSeoBySlug(ROUTES.contact);
-  return {
-    title: seo?.title ?? 'Contact Sales | Identity Verification And Onboarding Experts',
+  return marketingPageMetadata(ROUTES.contact, {
+    title: 'Contact Sales | Identity Verification And Onboarding Experts',
     description:
-      seo?.description ??
       'Talk to SpyBot about identity verification, KYC, KYB, fraud prevention, and onboarding optimization for your business.',
-    alternates: {
-      canonical: ROUTES.contact,
-    },
-  };
+  });
 }
 
 export default async function ContactPage() {
