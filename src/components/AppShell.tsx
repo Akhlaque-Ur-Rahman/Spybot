@@ -43,7 +43,7 @@ export default function AppShell({
       pathPrimed.current = true;
       return;
     }
-    let timeoutId: ReturnType<typeof window.setTimeout> | undefined;
+    let timeoutId: number | undefined;
     const rafId = requestAnimationFrame(() => {
       setRouteAnim(true);
       timeoutId = window.setTimeout(() => setRouteAnim(false), 400);
