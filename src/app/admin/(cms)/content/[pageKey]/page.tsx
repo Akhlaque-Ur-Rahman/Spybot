@@ -4,6 +4,7 @@ import ContentPageEditor, {
 } from '@/components/admin/pages/ContentPageEditor';
 import pageStyles from '@/components/admin/adminPage.module.css';
 import { prisma } from '@/lib/db/prisma';
+import { getCmsRegistryPageByKey } from '@/lib/cms/page-registry';
 
 export default async function AdminContentDetailPage({
   params,
@@ -32,6 +33,7 @@ export default async function AdminContentDetailPage({
   }
 
   const serialized = JSON.parse(JSON.stringify(page)) as SerializedPage;
+  const deletable = !getCmsRegistryPageByKey(page.key);
 
   return (
     <>
@@ -49,7 +51,7 @@ export default async function AdminContentDetailPage({
           {page.slug === '/' ? '/' : `/${String(page.slug).replace(/^\//, '')}`}
         </code>
       </p>
-      <ContentPageEditor key={page.updatedAt.toISOString()} page={serialized} />
+      <ContentPageEditor key={page.updatedAt.toISOString()} page={serialized} deletable={deletable} />
     </>
   );
 }

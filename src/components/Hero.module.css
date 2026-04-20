@@ -277,7 +277,6 @@
     padding-bottom: var(--space-10);
   }
   .dashboardWrap {
-    order: -1;
     padding-top: 0;
   }
   .dashboard { max-width: 100%; }

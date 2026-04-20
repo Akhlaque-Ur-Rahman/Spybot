@@ -82,7 +82,13 @@ function draftDiffersFromLive(raw: string, live: unknown): boolean {
   }
 }
 
-export default function ContentPageEditor({ page }: { page: SerializedPage }) {
+export default function ContentPageEditor({
+  page,
+  deletable = false,
+}: {
+  page: SerializedPage;
+  deletable?: boolean;
+}) {
   const router = useRouter();
   const { fetchJson } = useAdminApi();
   const { push } = useToast();
@@ -98,6 +104,8 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
   const [newSectionBlockType, setNewSectionBlockType] = useState<string>(CMS_BLOCK_TYPES[0] ?? 'utilityCtaBand');
   const [savingMeta, setSavingMeta] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
+  const [deletingPage, setDeletingPage] = useState(false);
+  const [duplicatingPage, setDuplicatingPage] = useState(false);
 
   const initialDrafts = useMemo(() => {
     const map: Record<string, string> = {};
@@ -267,6 +275,41 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
     }
   }
 
+  async function duplicatePage() {
+    setDuplicatingPage(true);
+    try {
+      const res = await fetchJson<{ page: { key: string } }>(
+        `/api/admin/content/${encodeURIComponent(page.key)}/duplicate`,
+        { method: 'POST', body: JSON.stringify({}) },
+      );
+      push('Page duplicated', 'success');
+      router.push(`/admin/content/${encodeURIComponent(res.page.key)}`);
+      router.refresh();
+    } catch (e) {
+      logAdminClientError('ContentPageEditor.duplicatePage', e);
+      push(e instanceof Error ? e.message : 'We could not duplicate this page.', 'error');
+    } finally {
+      setDuplicatingPage(false);
+    }
+  }
+
+  async function deletePage() {
+    if (!deletable) return;
+    if (!window.confirm(`Remove “${page.title}” from the site? This cannot be undone.`)) return;
+    setDeletingPage(true);
+    try {
+      await fetchJson(`/api/admin/content/${encodeURIComponent(page.key)}`, { method: 'DELETE' });
+      push('Page removed', 'success');
+      router.push('/admin/content');
+      router.refresh();
+    } catch (e) {
+      logAdminClientError('ContentPageEditor.deletePage', e);
+      push(e instanceof Error ? e.message : 'We could not remove this page.', 'error');
+    } finally {
+      setDeletingPage(false);
+    }
+  }
+
   async function openPreview() {
     try {
       const previewPath = slug.startsWith('/') ? slug : `/${slug}`;
@@ -304,6 +347,14 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
         ) : null}
         <button type="button" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`} onClick={() => void openPreview()}>
           Preview draft
+        </button>
+        <button
+          type="button"
+          className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+          disabled={duplicatingPage}
+          onClick={() => void duplicatePage()}
+        >
+          {duplicatingPage ? 'Duplicating…' : 'Duplicate page'}
         </button>
         <button type="button" className={pageStyles.btn} onClick={() => void publishPage()}>
           Publish page
@@ -355,6 +406,18 @@ export default function ContentPageEditor({ page }: { page: SerializedPage }) {
         <button type="button" className={pageStyles.btn} disabled={savingMeta || !metaDirty} onClick={() => void saveMeta()}>
           {savingMeta ? 'Saving…' : 'Save page details'}
         </button>
+        {deletable ? (
+          <div style={{ marginTop: 'var(--space-4)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-border-subtle)' }}>
+            <button
+              type="button"
+              className={`${pageStyles.btn} ${pageStyles.btnDanger}`}
+              disabled={deletingPage}
+              onClick={() => void deletePage()}
+            >
+              {deletingPage ? 'Removing…' : 'Remove page'}
+            </button>
+          </div>
+        ) : null}
       </div>
 
       <div className={pageStyles.card}>

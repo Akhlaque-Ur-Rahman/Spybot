@@ -3,6 +3,7 @@ import ContentPageListClient, { type ContentPageListRow } from '@/components/adm
 import EmptyState from '@/components/admin/EmptyState';
 import pageStyles from '@/components/admin/adminPage.module.css';
 import { prisma } from '@/lib/db/prisma';
+import { getCmsRegistryPageByKey } from '@/lib/cms/page-registry';
 
 export default async function AdminContentPage() {
   const pages = await prisma.page.findMany({
@@ -24,6 +25,7 @@ export default async function AdminContentPage() {
     slug: p.slug,
     status: p.status,
     updatedAt: p.updatedAt.toISOString(),
+    deletable: !getCmsRegistryPageByKey(p.key),
   }));
 
   return (

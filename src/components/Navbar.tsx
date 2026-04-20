@@ -250,31 +250,29 @@ export default function Navbar({
     return () => el.removeEventListener('focusout', onFocusOut);
   }, [activeDropdown]);
 
-  const chromeRaised = mobileOpen ? styles.chromeRaised : '';
-
   const mobileDrawer =
     mounted && mobileOpen
       ? createPortal(
-          <>
-            <button
-              type="button"
-              className={`${styles.mobileBackdrop} ${drawerEntered ? styles.mobileBackdropVisible : ''}`}
-              aria-hidden="true"
-              tabIndex={-1}
-              onClick={closeMobileMenu}
-            />
             <div
               ref={drawerRef}
               id="mobile-nav-drawer"
-              className={`${styles.mobileDrawer} ${drawerEntered ? styles.mobileDrawerVisible : ''}`}
+              className={`${styles.mobileMenuOverlay} ${drawerEntered ? styles.mobileMenuOverlayVisible : ''}`}
               role="dialog"
               aria-modal="true"
               aria-labelledby="mobile-nav-drawer-title"
             >
-              <div className={styles.mobileDrawerHeader}>
-                <h2 id="mobile-nav-drawer-title" className={styles.mobileDrawerTitle}>
-                  Menu
-                </h2>
+              <h2 id="mobile-nav-drawer-title" className="sr-only">
+                Menu
+              </h2>
+              <div className={styles.mobileMenuHeader}>
+                <Link
+                  href={ROUTES.home}
+                  className={styles.mobileMenuLogo}
+                  onClick={closeMobileMenu}
+                  aria-label="SpyBot homepage"
+                >
+                  <BrandLogoMark width={160} height={40} plain decorative sizes="160px" />
+                </Link>
                 <button
                   ref={closeButtonRef}
                   type="button"
@@ -363,8 +361,7 @@ export default function Navbar({
                   </Link>
                 </div>
               </div>
-            </div>
-          </>,
+            </div>,
           document.body,
         )
       : null;
@@ -373,7 +370,7 @@ export default function Navbar({
     <>
       {mobileDrawer}
       {/* Utility bar */}
-      <div className={`${styles.topBar} ${chromeRaised}`}>
+      <div className={styles.topBar}>
         <div className={`container ${styles.topBarInner}`}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <ShieldCheck size={16} strokeWidth={2} />
@@ -404,7 +401,7 @@ export default function Navbar({
 
       {/* Main nav */}
       <nav
-        className={`${styles.nav} ${scrolled ? styles.scrolled : ''} ${chromeRaised}`}
+        className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}
         aria-label="Main Navigation"
       >
         <div className={`container ${styles.navInner}`}>

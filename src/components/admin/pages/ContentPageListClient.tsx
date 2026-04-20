@@ -1,8 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
+import { useAdminApi } from '@/components/admin/AdminApiContext';
+import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
+import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
 export type ContentPageListRow = {
   id: string;
@@ -11,6 +15,7 @@ export type ContentPageListRow = {
   slug: string;
   status: string;
   updatedAt: string;
+  deletable: boolean;
 };
 
 function formatPageStatus(status: string): string {
@@ -31,8 +36,53 @@ function formatUpdated(iso: string) {
 }
 
 export default function ContentPageListClient({ pages }: { pages: ContentPageListRow[] }) {
+  const router = useRouter();
+  const { fetchJson } = useAdminApi();
+  const { push } = useToast();
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'published'>('all');
+  const [deletingKey, setDeletingKey] = useState<string | null>(null);
+  const [duplicatingKey, setDuplicatingKey] = useState<string | null>(null);
+
+  async function duplicatePage(row: ContentPageListRow) {
+    setDuplicatingKey(row.key);
+    try {
+      const res = await fetchJson<{ page: { key: string } }>(
+        `/api/admin/content/${encodeURIComponent(row.key)}/duplicate`,
+        { method: 'POST', body: JSON.stringify({}) },
+      );
+      push('Page duplicated', 'success');
+      router.push(`/admin/content/${encodeURIComponent(res.page.key)}`);
+      router.refresh();
+    } catch (e) {
+      logAdminClientError('ContentPageListClient.duplicatePage', e);
+      push(e instanceof Error ? e.message : 'We could not duplicate this page.', 'error');
+    } finally {
+      setDuplicatingKey(null);
+    }
+  }
+
+  async function deletePage(row: ContentPageListRow) {
+    if (!row.deletable) return;
+    if (
+      !window.confirm(
+        `Remove “${row.title}” from the site? This cannot be undone.`,
+      )
+    ) {
+      return;
+    }
+    setDeletingKey(row.key);
+    try {
+      await fetchJson(`/api/admin/content/${encodeURIComponent(row.key)}`, { method: 'DELETE' });
+      push('Page removed', 'success');
+      router.refresh();
+    } catch (e) {
+      logAdminClientError('ContentPageListClient.deletePage', e);
+      push(e instanceof Error ? e.message : 'We could not remove this page.', 'error');
+    } finally {
+      setDeletingKey(null);
+    }
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -90,6 +140,7 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
               <th>Address</th>
               <th>Status</th>
               <th>Updated</th>
+              <th style={{ textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -111,6 +162,27 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
                   </span>
                 </td>
                 <td>{formatUpdated(p.updatedAt)}</td>
+                <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  <button
+                    type="button"
+                    className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+                    style={{ marginRight: 8 }}
+                    disabled={duplicatingKey === p.key || deletingKey === p.key}
+                    onClick={() => void duplicatePage(p)}
+                  >
+                    {duplicatingKey === p.key ? 'Duplicating…' : 'Duplicate'}
+                  </button>
+                  {p.deletable ? (
+                    <button
+                      type="button"
+                      className={`${pageStyles.btn} ${pageStyles.btnDanger}`}
+                      disabled={deletingKey === p.key}
+                      onClick={() => void deletePage(p)}
+                    >
+                      {deletingKey === p.key ? 'Removing…' : 'Remove'}
+                    </button>
+                  ) : null}
+                </td>
               </tr>
             ))}
           </tbody>

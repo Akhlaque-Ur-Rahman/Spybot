@@ -1,5 +1,5 @@
 import { UserRole } from '@prisma/client';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminContentPatchSchema } from '@/lib/api/admin-body-schemas';
 import { readValidatedJson } from '@/lib/api/json-request';
@@ -102,4 +102,47 @@ export async function PATCH(
   });
 
   return NextResponse.json({ page });
+}
+
+export async function DELETE(
+  request: NextRequest,
+  context: RouteContext<'/api/admin/content/[pageKey]'>
+) {
+  const rateLimitError = applyRateLimit(request, 20);
+  if (rateLimitError) return rateLimitError;
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return csrfError;
+
+  const auth = await requireApiRole(UserRole.EDITOR);
+  if (auth.error) return auth.error;
+
+  const { pageKey } = await context.params;
+
+  if (getCmsRegistryPageByKey(pageKey)) {
+    return NextResponse.json({ error: 'This page is part of the site template and cannot be removed.' }, { status: 403 });
+  }
+
+  const before = await prisma.page.findUnique({ where: { key: pageKey } });
+  if (!before) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+  await prisma.page.delete({ where: { key: pageKey } });
+
+  try {
+    revalidatePath('/', 'layout');
+    const path = before.slug.startsWith('/') ? before.slug : `/${before.slug}`;
+    revalidatePath(path);
+    revalidateTag('cms-sitemap-pages', 'max');
+  } catch {
+    /* best-effort */
+  }
+
+  await createAuditLog({
+    actorId: auth.session.user.id,
+    action: 'content.delete_page',
+    entityType: 'page',
+    entityId: before.id,
+    beforeJson: before,
+  });
+
+  return NextResponse.json({ ok: true });
 }

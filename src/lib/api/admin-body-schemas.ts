@@ -92,6 +92,14 @@ export const adminContentPatchSchema = z
   })
   .strict();
 
+export const adminContentDuplicatePostSchema = z
+  .object({
+    title: z.union([z.string().min(1).max(500).trim(), z.null()]).optional(),
+    key: z.union([z.string().min(1).max(200).trim(), z.null()]).optional(),
+    slug: z.union([z.string().min(1).max(500).trim(), z.null()]).optional(),
+  })
+  .strict();
+
 export const adminBlockDraftPatchSchema = z.object({
   draftJson: z.unknown(),
 });
