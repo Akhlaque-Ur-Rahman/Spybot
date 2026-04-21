@@ -84,7 +84,9 @@ export function HeroSection({ content }: { content?: HeroContent }) {
     };
 
     if (staticPoster) {
-      setFramePosterUrl(null);
+      queueMicrotask(() => {
+        setFramePosterUrl(null);
+      });
       play();
       return () => revoke();
     }
