@@ -1,6 +1,7 @@
 import { PrismaClient, UserRole } from '@prisma/client';
 import { hash } from 'bcryptjs';
 import { SITE_RUNTIME_DEFAULTS } from '../src/lib/cms/site-runtime-defaults';
+import { footerColumns } from '../src/site';
 
 const prisma = new PrismaClient();
 
@@ -27,11 +28,10 @@ async function main() {
       key: 'header-main',
       items: {
         create: [
-          { label: 'API Marketplace', href: '/api-marketplace', position: 1 },
-          { label: 'Solutions', href: '/solutions', position: 2 },
-          { label: 'Industries', href: '/industries', position: 3 },
+          { label: 'Company', href: '/', position: 1 },
+          { label: 'Industries', href: '/industries', position: 2 },
+          { label: 'Solution', href: '/solutions', position: 3 },
           { label: 'Resources', href: '/resources', position: 4 },
-          { label: 'FAQ', href: '/faq', position: 5 },
         ],
       },
     },
@@ -62,6 +62,15 @@ async function main() {
           { label: 'Contact Sales', href: '/contact', position: 2 },
         ],
       },
+    },
+  });
+
+  await prisma.siteSetting.upsert({
+    where: { key: 'footer-columns' },
+    update: {},
+    create: {
+      key: 'footer-columns',
+      valueJson: footerColumns,
     },
   });
 

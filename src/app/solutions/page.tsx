@@ -4,8 +4,10 @@ import DirectoryGrid from '@/components/DirectoryGrid';
 import CoverageCarousel from '@/components/CoverageCarousel';
 import CardSlider from '@/components/CardSlider';
 import UtilityCtaBand from '@/components/UtilityCtaBand';
+import SolutionShowcase from '@/components/SolutionShowcase';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { getManagedBlock, getManagedPageBySlug } from '@/lib/cms/page-content';
+import { getSolutionShowcaseData } from '@/lib/solution-showcase-data';
 import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { CTA_LINKS, ROUTES, solutionNavItems } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
@@ -50,6 +52,10 @@ export default async function SolutionsPage() {
           badge: 'Solution',
         }))}
       />
+
+      <SectionScrollReveal>
+        <SolutionShowcase data={getSolutionShowcaseData('solutions')} />
+      </SectionScrollReveal>
 
       <CoverageCarousel label={coverage?.label ?? 'Coverage'} items={coverage?.items} />
 

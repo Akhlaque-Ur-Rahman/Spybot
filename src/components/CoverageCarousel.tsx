@@ -1,43 +1,64 @@
 import styles from './CoverageCarousel.module.css';
-
-const DEFAULT_ITEMS = [
-  'Aadhaar · PAN · Voter ID',
-  'KYB · MCA · GST',
-  'Penny drop · Bank statements',
-  'Video KYC · V-CIP',
-  'Superflow orchestration',
-  'SOC 2 · ISO 27001',
-];
+import TruncatedReadMore from '@/components/TruncatedReadMore';
+import Link from 'next/link';
+import type { CmsCoverageCarouselItem } from '@/lib/cms/page-registry';
+import { defaultCoverageItems } from '@/lib/cms/page-registry';
+import { getCmsRichTextPlainText, sanitizeCmsHref } from '@/lib/cms/rich-text';
+import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 
 type Props = {
-  items?: string[];
+  items?: Array<string | CmsCoverageCarouselItem>;
   label?: string;
 };
 
-export default function CoverageCarousel({ items = DEFAULT_ITEMS, label = 'Coverage' }: Props) {
-  const loop = items.length > 1 ? [...items, ...items] : items;
+function normalize(raw: string | CmsCoverageCarouselItem): { title: string; desc?: CmsRichTextValue; href?: string } {
+  if (typeof raw === 'string') return { title: raw };
+  return { title: raw.title ?? '', desc: raw.desc, href: raw.href };
+}
+
+function hasBodyText(desc: CmsRichTextValue | undefined): boolean {
+  if (desc === undefined || desc === null) return false;
+  return getCmsRichTextPlainText(desc).trim().length > 0;
+}
+
+export default function CoverageCarousel({ items = defaultCoverageItems, label = 'Coverage' }: Props) {
+  const rows = items.map(normalize).filter((r) => r.title.trim().length > 0);
 
   return (
-    <section className={styles.wrap} aria-label={label}>
-      <div className={styles.inner}>
-        <span className={styles.label}>{label}</span>
-        <div className={styles.marqueeHost}>
-          <div className={styles.mask}>
-            <div
-              className={items.length > 1 ? styles.track : styles.trackStatic}
-              aria-hidden={items.length > 1}
-            >
-              {loop.map((text, i) => (
-                <span key={`${text}-${i}`} className={styles.pill}>
-                  {text}
-                </span>
-              ))}
-            </div>
-          </div>
-          <p className="sr-only">
-            Coverage highlights scroll horizontally. You can reduce motion in your system settings.
-          </p>
-        </div>
+    <section className={styles.section} aria-label={label}>
+      <div className="container">
+        <header className={styles.header}>
+          <p className={styles.label}>{label}</p>
+        </header>
+
+        <ul className={styles.grid}>
+          {rows.map((item, i) => {
+            const safeHref = item.href ? sanitizeCmsHref(item.href) : null;
+            const showDesc = hasBodyText(item.desc);
+
+            return (
+              <li key={`${item.title}-${i}`} className={styles.card}>
+                <h3 className={styles.cardTitle}>{item.title}</h3>
+                {showDesc ? (
+                  <div className={styles.cardBody}>
+                    <TruncatedReadMore
+                      value={item.desc!}
+                      contextTitle={item.title}
+                      href={safeHref}
+                      tone="primary"
+                      maxChars={130}
+                      linkStickyBottom
+                    />
+                  </div>
+                ) : safeHref ? (
+                  <Link href={safeHref} className={styles.cardLinkStandalone}>
+                    Learn more →
+                  </Link>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );

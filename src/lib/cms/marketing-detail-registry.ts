@@ -1,4 +1,5 @@
 import type {
+  CmsCoverageCarouselItem,
   CmsDemoSectionBlock,
   CmsRegistryBlock,
   CmsRegistryPage,
@@ -12,7 +13,7 @@ export function buildMarketingDetailRegistryPages(deps: {
   block: typeof import('@/lib/cms/page-registry').block;
   createSimplePage: typeof import('@/lib/cms/page-registry').createSimplePage;
   defaultDemoSectionBlock: CmsDemoSectionBlock;
-  defaultCoverageItems: string[];
+  defaultCoverageItems: CmsCoverageCarouselItem[];
 }): CmsRegistryPage[] {
   const { section, block, createSimplePage, defaultDemoSectionBlock, defaultCoverageItems } = deps;
 

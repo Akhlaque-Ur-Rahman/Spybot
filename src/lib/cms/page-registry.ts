@@ -62,9 +62,15 @@ export type CmsPageHeaderBlock = {
   media?: MediaClipMeta;
 };
 
+export type CmsCoverageCarouselItem = {
+  title: string;
+  desc?: CmsRichTextValue;
+  href?: string;
+};
+
 export type CmsCoverageCarouselBlock = {
   label?: string;
-  items?: string[];
+  items?: Array<string | CmsCoverageCarouselItem>;
 };
 
 export type CmsDirectoryGridBlock = {
@@ -142,7 +148,7 @@ export type CmsBenefitsBlock = {
   title?: string;
   gradientText?: string;
   subtitle?: CmsRichTextValue;
-  items: Array<CmsNamedItem & { highlight: 'primary' | 'teal' }>;
+  items: Array<CmsNamedItem & { highlight: 'primary' | 'teal'; href?: string }>;
 };
 
 export type CmsChallengesBlock = {
@@ -158,7 +164,7 @@ export type CmsLifecycleBlock = {
   title?: string;
   gradientText?: string;
   subtitle?: CmsRichTextValue;
-  steps: Array<CmsNamedItem & { num: string }>;
+  steps: Array<CmsNamedItem & { num: string; href?: string }>;
 };
 
 export type CmsDecisionFlowBlock = {
@@ -308,13 +314,31 @@ export function block<T extends CmsBlockType>(key: string, type: T, value: CmsBl
   return { key, type, position: 1, value };
 }
 
-export const defaultCoverageItems = [
-  'Aadhaar · PAN · Voter ID',
-  'KYB · MCA · GST',
-  'Penny drop · Bank statements',
-  'Video KYC · V-CIP',
-  'Superflow orchestration',
-  'SOC 2 · ISO 27001',
+export const defaultCoverageItems: CmsCoverageCarouselItem[] = [
+  {
+    title: 'Aadhaar · PAN · Voter ID',
+    desc: 'National identity and document checks with UIDAI and NSDL-backed validation so onboarding stays fast and audit-ready.',
+  },
+  {
+    title: 'KYB · MCA · GST',
+    desc: 'Company intelligence from MCA, GST, and MSME signals in one place for merchant and B2B onboarding.',
+  },
+  {
+    title: 'Penny drop · Bank statements',
+    desc: 'Validate account ownership and income signals with penny drop and statement parsing to cut payout failures.',
+  },
+  {
+    title: 'Video KYC · V-CIP',
+    desc: 'Assisted capture with adaptive streaming and tamper-evident records for programs that need live verification.',
+  },
+  {
+    title: 'Superflow orchestration',
+    desc: 'Route checks, fallbacks, and approvals in a no-code canvas without rebuilding your stack for every policy change.',
+  },
+  {
+    title: 'SOC 2 · ISO 27001',
+    desc: 'Enterprise controls, encryption, and auditability so security and compliance teams stay aligned at scale.',
+  },
 ];
 
 export const defaultDemoSectionBlock: CmsDemoSectionBlock = {
@@ -644,6 +668,359 @@ const marketingDetailRegistryPages = buildMarketingDetailRegistryPages({
   defaultDemoSectionBlock,
   defaultCoverageItems,
 });
+
+const supplementalMarketingPages: CmsRegistryPage[] = [
+  createSimplePage({
+    key: 'about-us',
+    title: 'About Us',
+    slug: ROUTES.about,
+    seoTitle: 'About Us | SpyBot',
+    seoDescription:
+      'Learn about SpyBot, our verification platform, and the operating principles behind how we build onboarding infrastructure.',
+    pageHeader: {
+      label: 'Company',
+      title: 'Built for teams that need',
+      gradientText: 'trust, speed, and control',
+      description:
+        'SpyBot helps regulated and high-growth teams modernize identity, business, and onboarding workflows without adding operational drag.',
+      primaryCta: { label: 'Contact us', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Explore solutions', href: ROUTES.solutions },
+      media: MEDIA_CLIPS.homeHero,
+    },
+    utilityCtaBand: {
+      title: 'Want to see the platform in context?',
+      description:
+        'Share your onboarding journey and we will map the checks, workflows, and controls that fit your operating model.',
+      primary: { label: 'Book a demo', href: CTA_LINKS.demo },
+      secondary: { label: 'Browse the API marketplace', href: ROUTES.apiMarketplace },
+    },
+  }),
+  createSimplePage({
+    key: 'career',
+    title: 'Career',
+    slug: ROUTES.careers,
+    seoTitle: 'Career | SpyBot',
+    seoDescription:
+      'Explore careers at SpyBot and join a team building identity, risk, and onboarding infrastructure for modern businesses.',
+    pageHeader: {
+      label: 'Career',
+      title: 'Join the team building',
+      gradientText: 'trusted digital onboarding',
+      description:
+        'We work across product, engineering, design, compliance, and go-to-market to help customers ship safer onboarding systems.',
+      primaryCta: { label: 'Contact our team', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Why SpyBot', href: ROUTES.whySpybot },
+      media: MEDIA_CLIPS.demoSpotlight,
+    },
+    utilityCtaBand: {
+      title: 'Interested in working with us?',
+      description:
+        'Reach out with your background and what you want to build. We are especially interested in product-minded operators.',
+      primary: { label: 'Start a conversation', href: CTA_LINKS.contact },
+      secondary: { label: 'Learn about the company', href: ROUTES.about },
+    },
+  }),
+  createSimplePage({
+    key: 'why-spybot',
+    title: 'Why SpyBot',
+    slug: ROUTES.whySpybot,
+    seoTitle: 'Why SpyBot | Verification Platform Advantages',
+    seoDescription:
+      'See why teams choose SpyBot for identity verification, business onboarding, orchestration, and compliance-ready controls.',
+    pageHeader: {
+      label: 'Why SpyBot',
+      title: 'One platform for',
+      gradientText: 'verification, orchestration, and operations',
+      description:
+        'Teams choose SpyBot when they want fewer vendors, faster launches, clearer audit trails, and more control over onboarding outcomes.',
+      primaryCta: { label: 'See the API marketplace', href: ROUTES.apiMarketplace },
+      secondaryCta: { label: 'Talk to the team', href: CTA_LINKS.contact },
+      media: MEDIA_CLIPS.apiMarketplace,
+    },
+    utilityCtaBand: {
+      title: 'Need proof for your use case?',
+      description:
+        'We can walk through implementation shape, compliance expectations, and which verification steps matter most for your funnel.',
+      primary: { label: 'Book a consultation', href: CTA_LINKS.contact },
+      secondary: { label: 'Browse case studies', href: ROUTES.caseStudies },
+    },
+  }),
+  createSimplePage({
+    key: 'solution-business-verification',
+    title: 'Business Verification',
+    slug: ROUTES.businessVerification,
+    seoTitle: 'Business Verification | Merchant, Vendor, and KYB Checks',
+    seoDescription:
+      'Verify businesses, merchants, vendors, and partners with business verification workflows built for faster approvals and stronger KYB controls.',
+    pageHeader: {
+      label: 'Business Verification',
+      title: 'Approve businesses with',
+      gradientText: 'fewer manual handoffs',
+      description:
+        'Unify entity lookup, corporate verification, and supporting due diligence so merchant and partner onboarding moves faster without losing auditability.',
+      primaryCta: { label: 'Book a KYB walkthrough', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Explore all solutions', href: ROUTES.solutions },
+      media: MEDIA_CLIPS.kybSuite,
+    },
+    utilityCtaBand: {
+      title: 'Need a merchant onboarding plan?',
+      description:
+        'We help teams design business verification flows around risk tiers, turnaround times, and operational ownership.',
+      primary: { label: 'Talk to solutions', href: CTA_LINKS.contact },
+      secondary: { label: 'Read FAQs', href: ROUTES.faq },
+    },
+  }),
+  createSimplePage({
+    key: 'solution-income-verification',
+    title: 'Income Verification',
+    slug: ROUTES.incomeVerification,
+    seoTitle: 'Income Verification | Bank Statements, Salary, and Account Signals',
+    seoDescription:
+      'Validate income and repayment capacity with statement analysis, account verification, and income-linked onboarding checks.',
+    pageHeader: {
+      label: 'Income Verification',
+      title: 'Turn bank data into',
+      gradientText: 'clear underwriting signals',
+      description:
+        'Use payout, account, and statement-based verification steps to understand affordability, reduce fraud, and support faster financial decisions.',
+      primaryCta: { label: 'Discuss a verification flow', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'See related APIs', href: ROUTES.apiMarketplace },
+      media: MEDIA_CLIPS.apiMarketplace,
+    },
+    utilityCtaBand: {
+      title: 'Want income checks tuned to your policy?',
+      description:
+        'We can map the right mix of penny drop, statement parsing, and fallback review logic for your onboarding funnel.',
+      primary: { label: 'Book a consultation', href: CTA_LINKS.contact },
+      secondary: { label: 'Explore support', href: ROUTES.support },
+    },
+  }),
+  createSimplePage({
+    key: 'solution-ckyc-platform',
+    title: 'CKYC Platform',
+    slug: ROUTES.ckycPlatform,
+    seoTitle: 'CKYC Platform | Reusable Customer KYC Workflows',
+    seoDescription:
+      'Manage CKYC-aligned onboarding flows with reusable customer records, retrieval support, and compliance-aware verification journeys.',
+    pageHeader: {
+      label: 'CKYC Platform',
+      title: 'Design reusable KYC journeys',
+      gradientText: 'around a central customer record',
+      description:
+        'Support repeat onboarding and higher operational consistency with workflows that align retrieval, validation, and customer record reuse.',
+      primaryCta: { label: 'Talk to the team', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Explore solution catalog', href: ROUTES.solutions },
+      media: MEDIA_CLIPS.trustOps,
+    },
+    utilityCtaBand: {
+      title: 'Planning a CKYC-led onboarding flow?',
+      description:
+        'We can help sequence customer retrieval, validation, and step-up checks for the channels you operate.',
+      primary: { label: 'Book a working session', href: CTA_LINKS.contact },
+      secondary: { label: 'Browse resources', href: ROUTES.resources },
+    },
+  }),
+  createSimplePage({
+    key: 'industry-insurance',
+    title: 'Insurance',
+    slug: ROUTES.insurance,
+    seoTitle: 'Identity Verification for Insurance | SpyBot',
+    seoDescription:
+      'Support insurance onboarding, policy issuance, and claims-linked identity checks with verification workflows designed for trust and speed.',
+    pageHeader: {
+      label: 'Insurance',
+      title: 'Policy onboarding that stays',
+      gradientText: 'fast and defensible',
+      description:
+        'Insurance teams need identity, document, and payout-linked controls that reduce fraud while keeping acquisition and servicing smooth.',
+      primaryCta: { label: 'Talk to insurance specialists', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Explore industries', href: ROUTES.industries },
+      media: MEDIA_CLIPS.industriesHub,
+    },
+    utilityCtaBand: {
+      title: 'Need help with policyholder verification?',
+      description:
+        'We can map onboarding, servicing, and claims scenarios to the right verification sequence and operational controls.',
+      primary: { label: 'Contact us', href: CTA_LINKS.contact },
+      secondary: { label: 'See support options', href: ROUTES.support },
+    },
+  }),
+  createSimplePage({
+    key: 'industry-nbfc',
+    title: 'NBFC',
+    slug: ROUTES.nbfc,
+    seoTitle: 'Identity Verification for NBFCs | SpyBot',
+    seoDescription:
+      'Accelerate borrower onboarding for NBFCs with identity, account, and income checks built for lending and disbursal workflows.',
+    pageHeader: {
+      label: 'NBFC',
+      title: 'Lending journeys need',
+      gradientText: 'verification depth without funnel drag',
+      description:
+        'NBFCs balance growth, underwriting, and fraud prevention every day. SpyBot helps sequence checks so approvals stay fast and evidence stays clear.',
+      primaryCta: { label: 'Discuss lending workflows', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Browse income verification', href: ROUTES.incomeVerification },
+      media: MEDIA_CLIPS.industriesHub,
+    },
+    utilityCtaBand: {
+      title: 'Building a borrower onboarding flow?',
+      description:
+        'We can help align KYC, bank, and income verification to the underwriting and disbursal moments that matter most.',
+      primary: { label: 'Book a consultation', href: CTA_LINKS.contact },
+      secondary: { label: 'Browse FAQs', href: ROUTES.faq },
+    },
+  }),
+  createSimplePage({
+    key: 'industry-banks',
+    title: 'Banks',
+    slug: ROUTES.banks,
+    seoTitle: 'Identity Verification for Banks | SpyBot',
+    seoDescription:
+      'Support banking onboarding with identity verification, document checks, Video KYC, and operational controls designed for compliance-heavy journeys.',
+    pageHeader: {
+      label: 'Banks',
+      title: 'Compliant onboarding for',
+      gradientText: 'high-trust financial journeys',
+      description:
+        'Banks need strong assurance, clean records, and reliable audit trails across assisted and digital onboarding channels.',
+      primaryCta: { label: 'Talk to a banking specialist', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Explore Video KYC', href: ROUTES.videoKyc },
+      media: MEDIA_CLIPS.videoKyc,
+    },
+    utilityCtaBand: {
+      title: 'Need help with branch-to-digital workflows?',
+      description:
+        'We can help shape identity, CKYC, and assisted verification paths for onboarding journeys that span multiple channels.',
+      primary: { label: 'Contact us', href: CTA_LINKS.contact },
+      secondary: { label: 'Read case studies', href: ROUTES.caseStudies },
+    },
+  }),
+  createSimplePage({
+    key: 'industry-staffing',
+    title: 'Staffing',
+    slug: ROUTES.staffing,
+    seoTitle: 'Identity Verification for Staffing | SpyBot',
+    seoDescription:
+      'Verify workers, vendors, and staffing partners with onboarding flows designed for distributed operations and fast turnaround times.',
+    pageHeader: {
+      label: 'Staffing',
+      title: 'Move worker onboarding from',
+      gradientText: 'manual queues to controlled workflows',
+      description:
+        'Staffing teams often manage high volume, distributed channels, and partner dependencies. SpyBot helps standardize trust checks across that complexity.',
+      primaryCta: { label: 'Discuss staffing workflows', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Explore industries', href: ROUTES.industries },
+      media: MEDIA_CLIPS.trustOps,
+    },
+    utilityCtaBand: {
+      title: 'Need a faster staffing verification process?',
+      description:
+        'We can help design onboarding paths for workers, contractors, and partner organizations with less manual follow-up.',
+      primary: { label: 'Book a working session', href: CTA_LINKS.contact },
+      secondary: { label: 'Explore support', href: ROUTES.support },
+    },
+  }),
+  createSimplePage({
+    key: 'industry-trading',
+    title: 'Trading',
+    slug: ROUTES.trading,
+    seoTitle: 'Identity Verification for Trading Platforms | SpyBot',
+    seoDescription:
+      'Support client onboarding for trading platforms with KYC, risk, and account-linked verification steps designed for regulated growth.',
+    pageHeader: {
+      label: 'Trading',
+      title: 'Client onboarding with',
+      gradientText: 'strong controls at account opening',
+      description:
+        'Trading businesses need customer trust checks that support compliance, reduce fraud, and keep account activation timelines competitive.',
+      primaryCta: { label: 'Talk to our team', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Browse industries', href: ROUTES.industries },
+      media: MEDIA_CLIPS.industriesHub,
+    },
+    utilityCtaBand: {
+      title: 'Need help with regulated onboarding?',
+      description:
+        'We can help sequence the verification steps that matter most for account opening, funding, and ongoing risk controls.',
+      primary: { label: 'Contact solutions', href: CTA_LINKS.contact },
+      secondary: { label: 'Read resources', href: ROUTES.resources },
+    },
+  }),
+  createSimplePage({
+    key: 'resources-certifications',
+    title: 'Certifications & Accreditations',
+    slug: ROUTES.certifications,
+    seoTitle: 'Certifications & Accreditations | SpyBot',
+    seoDescription:
+      'Review SpyBot certifications, accreditations, and platform controls that support security and compliance conversations.',
+    pageHeader: {
+      label: 'Resources',
+      title: 'Security posture and',
+      gradientText: 'compliance credentials in one place',
+      description:
+        'Use this page as the starting point for security questionnaires, procurement reviews, and governance conversations.',
+      primaryCta: { label: 'Request details', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Browse resources', href: ROUTES.resources },
+      media: MEDIA_CLIPS.trustOps,
+    },
+    utilityCtaBand: {
+      title: 'Need information for procurement?',
+      description:
+        'Share your review checklist and we will route you to the right team for security and compliance follow-up.',
+      primary: { label: 'Contact us', href: CTA_LINKS.contact },
+      secondary: { label: 'Read FAQs', href: ROUTES.faq },
+    },
+  }),
+  createSimplePage({
+    key: 'blog',
+    title: 'Blog',
+    slug: ROUTES.blog,
+    seoTitle: 'Blog | SpyBot',
+    seoDescription:
+      'Read SpyBot insights on onboarding, KYC, KYB, fraud prevention, compliance operations, and product delivery.',
+    pageHeader: {
+      label: 'Blog',
+      title: 'Ideas and lessons from',
+      gradientText: 'modern trust operations',
+      description:
+        'Explore practical thinking on onboarding friction, verification strategy, operational controls, and what teams learn when they scale trust systems.',
+      primaryCta: { label: 'Browse resources', href: ROUTES.resources },
+      secondaryCta: { label: 'Talk to the team', href: CTA_LINKS.contact },
+      media: MEDIA_CLIPS.resourceLibrary,
+    },
+    utilityCtaBand: {
+      title: 'Need content tailored to your stack?',
+      description:
+        'Tell us what you are building and we will point you to the most relevant material for your implementation stage.',
+      primary: { label: 'Contact us', href: CTA_LINKS.contact },
+      secondary: { label: 'See case studies', href: ROUTES.caseStudies },
+    },
+  }),
+  createSimplePage({
+    key: 'resources-case-studies',
+    title: 'Case Studies',
+    slug: ROUTES.caseStudies,
+    seoTitle: 'Case Studies | SpyBot',
+    seoDescription:
+      'See how teams use SpyBot to improve verification, onboarding, fraud controls, and operational efficiency across industries.',
+    pageHeader: {
+      label: 'Case Studies',
+      title: 'Examples of how teams apply',
+      gradientText: 'verification and workflow design',
+      description:
+        'Use these examples to understand how different operating models shape identity checks, orchestration, and support requirements.',
+      primaryCta: { label: 'Explore industries', href: ROUTES.industries },
+      secondaryCta: { label: 'Talk to the team', href: CTA_LINKS.contact },
+      media: MEDIA_CLIPS.resourceLibrary,
+    },
+    utilityCtaBand: {
+      title: 'Want examples closer to your use case?',
+      description:
+        'Share your industry and onboarding channel mix and we can walk you through the most relevant implementation patterns.',
+      primary: { label: 'Book a consultation', href: CTA_LINKS.contact },
+      secondary: { label: 'Browse solutions', href: ROUTES.solutions },
+    },
+  }),
+];
 
 export const cmsRegistryPages: CmsRegistryPage[] = [
   {
@@ -990,6 +1367,7 @@ export const cmsRegistryPages: CmsRegistryPage[] = [
     decisionFlow: defaultDecisionFlowBlock,
     demoSection: defaultDemoSectionBlock,
   }),
+  ...supplementalMarketingPages,
   ...marketingDetailRegistryPages,
 ];
 

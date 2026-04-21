@@ -31,17 +31,3 @@
   display: block;
 }
 
-.reduced {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 2px solid color-mix(in srgb, var(--color-primary-400) 55%, transparent);
-  border-top-color: var(--color-tertiary-400);
-  animation: spin 0.9s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}

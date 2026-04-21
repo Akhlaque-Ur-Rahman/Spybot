@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system';
 
@@ -36,31 +36,47 @@ function getInitialTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
-  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(() => getSystemTheme());
+  const [theme, setThemeState] = useState<Theme>('system');
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('dark');
+  const themeRef = useRef<Theme>('system');
+
   const resolvedTheme = theme === 'system' ? systemTheme : theme;
 
   useEffect(() => {
-    applyTheme(resolvedTheme);
-  }, [resolvedTheme]);
+    themeRef.current = theme;
+  }, [theme]);
 
-  // Listen to system preference changes
+  useEffect(() => {
+    const t = getInitialTheme();
+    const s = getSystemTheme();
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time sync from localStorage / matchMedia after SSR */
+    setThemeState(t);
+    setSystemTheme(s);
+    /* eslint-enable react-hooks/set-state-in-effect */
+    applyTheme(t === 'system' ? s : t);
+  }, []);
+
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const handler = () => {
-      if (theme === 'system') {
-        setSystemTheme(getSystemTheme());
-      }
+      if (themeRef.current !== 'system') return;
+      const s = getSystemTheme();
+      setSystemTheme(s);
+      applyTheme(s);
     };
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
-  }, [theme]);
+  }, []);
 
   const setTheme = (t: Theme) => {
     setThemeState(t);
     localStorage.setItem('spybot-theme', t);
     if (t === 'system') {
-      setSystemTheme(getSystemTheme());
+      const s = getSystemTheme();
+      setSystemTheme(s);
+      applyTheme(s);
+    } else {
+      applyTheme(t);
     }
   };
 

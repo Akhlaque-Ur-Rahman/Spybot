@@ -180,7 +180,13 @@ function renderBlock(block: ManagedCmsPage['sections'][number]['blocks'][number]
   }
 }
 
-export default function CmsManagedPageBody({ page }: { page: ManagedCmsPage }) {
+export default function CmsManagedPageBody({
+  page,
+  asFragment,
+}: {
+  page: ManagedCmsPage;
+  asFragment?: boolean;
+}) {
   const sections = sortByPosition(page.sections);
   const nodes: ReactNode[] = [];
 
@@ -191,5 +197,8 @@ export default function CmsManagedPageBody({ page }: { page: ManagedCmsPage }) {
     }
   }
 
+  if (asFragment) {
+    return <>{nodes}</>;
+  }
   return <main>{nodes}</main>;
 }

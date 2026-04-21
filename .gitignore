@@ -40,6 +40,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# local database dumps (do not commit)
+*.dump
+
 # optional local deploy metadata
 .vercel
 

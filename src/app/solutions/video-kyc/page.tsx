@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import CmsManagedPageBody from '@/components/cms/CmsManagedPageBody';
+import SolutionShowcase from '@/components/SolutionShowcase';
 import { getManagedPageBySlug } from '@/lib/cms/page-content';
+import { getSolutionShowcaseData } from '@/lib/solution-showcase-data';
 import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { ROUTES } from '@/site';
 
@@ -16,5 +18,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function VideoKycPage() {
   const cmsPage = await getManagedPageBySlug(ROUTES.videoKyc);
   if (!cmsPage) notFound();
-  return <CmsManagedPageBody page={cmsPage} />;
+  return (
+    <main>
+      <CmsManagedPageBody page={cmsPage} asFragment />
+      <SolutionShowcase data={getSolutionShowcaseData('video-kyc')} />
+    </main>
+  );
 }

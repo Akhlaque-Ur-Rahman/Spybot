@@ -1,5 +1,6 @@
 import styles from './Lifecycle.module.css';
 import richTextStyles from '@/components/CmsRichText.module.css';
+import TruncatedReadMore from '@/components/TruncatedReadMore';
 import { Camera, Search, CreditCard, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import React from 'react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
@@ -11,6 +12,7 @@ export interface StepItem {
   title: string;
   desc: string;
   icon: React.ReactNode;
+  href?: string;
 }
 
 export type StepDataItem = {
@@ -18,6 +20,7 @@ export type StepDataItem = {
   title: string;
   desc: CmsRichTextValue;
   icon: CmsIconName;
+  href?: string;
 };
 
 export const defaultSteps: StepItem[] = [
@@ -86,6 +89,7 @@ export default function Lifecycle({
         icon: renderCmsIcon(item.icon, 'large'),
       }))
     : data;
+  const stepCount = resolvedData.length;
 
   return (
     <section className={styles.section} id="lifecycle">
@@ -111,10 +115,17 @@ export default function Lifecycle({
                 </div>
                 <div className={styles.stepNum}>{step.num}</div>
                 <h3 className={styles.stepTitle}>{step.title}</h3>
-                <div className={`${styles.stepDesc} ${richTextStyles.prose}`}>{renderCmsRichText(step.desc)}</div>
+                <div className={styles.stepDesc}>
+                  <TruncatedReadMore
+                    value={step.desc}
+                    contextTitle={step.title}
+                    href={'href' in step ? step.href : undefined}
+                    alignCenter={false}
+                  />
+                </div>
               </div>
               <div className={styles.connector} aria-hidden="true">
-                {i < data.length - 1 && <div className={styles.line} />}
+                {i < stepCount - 1 && <div className={styles.line} />}
               </div>
             </div>
           ))}
@@ -127,10 +138,17 @@ export default function Lifecycle({
               <div className={styles.stepBlockIcon} aria-hidden="true" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginInline: 'auto' }}>
                 {step.icon}
               </div>
-              {i < data.length - 1 && <div className={styles.arrowLine} aria-hidden="true"><div className={styles.arrow} /></div>}
+              {i < stepCount - 1 && <div className={styles.arrowLine} aria-hidden="true"><div className={styles.arrow} /></div>}
               <div className={styles.stepBlockNum}>{step.num}</div>
               <h3 className={styles.stepBlockTitle}>{step.title}</h3>
-              <div className={`${styles.stepBlockDesc} ${richTextStyles.prose}`}>{renderCmsRichText(step.desc)}</div>
+              <div className={styles.stepBlockDesc}>
+                <TruncatedReadMore
+                  value={step.desc}
+                  contextTitle={step.title}
+                  href={'href' in step ? step.href : undefined}
+                  alignCenter
+                />
+              </div>
             </div>
           ))}
         </div>

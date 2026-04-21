@@ -49,12 +49,13 @@ function cardLink(v: unknown): LinkValue & { variant?: 'primary' | 'ghost' } {
 
 function mediaMeta(v: unknown): MediaClipMeta {
   const o = v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
-  return {
+  const out: MediaClipMeta = {
     src: str(o.src, MEDIA_CLIPS.homeHero.src),
-    poster: str(o.poster, MEDIA_CLIPS.homeHero.poster),
     title: str(o.title, MEDIA_CLIPS.homeHero.title),
     description: str(o.description, MEDIA_CLIPS.homeHero.description),
   };
+  if (typeof o.poster === 'string') out.poster = o.poster;
+  return out;
 }
 
 function iconName(v: unknown): CmsIconName {
@@ -195,16 +196,63 @@ function EditorPageHeader({ value, onChange }: Props) {
 
 function EditorCoverageCarousel({ value, onChange }: Props) {
   const o = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
-  const items = Array.isArray(o.items) ? o.items.map((x) => str(x)) : [];
+  const raw = Array.isArray(o.items) ? o.items : [];
+  const items = raw.map((x) =>
+    typeof x === 'string'
+      ? { title: x.trim(), desc: undefined, href: undefined }
+      : x && typeof x === 'object' && !Array.isArray(x)
+        ? (x as Record<string, unknown>)
+        : { title: '', desc: undefined, href: undefined },
+  );
+  const patchItems = (next: unknown[]) => onChange({ ...o, items: next });
   return (
     <div style={{ display: 'grid', gap: 16 }}>
       <TextField label="Label (optional)" value={str(o.label)} onChange={(label) => onChange({ ...o, label })} />
-      <TextAreaField
-        label="Coverage lines (one per line)"
-        value={items.join('\n')}
-        onChange={(text) => onChange({ ...o, items: text.split('\n').map((s) => s.trim()).filter(Boolean) })}
-        rows={8}
-      />
+      <div className={styles.repeatToolbar}>
+        <strong>Items</strong>
+        <button
+          type="button"
+          className={styles.btnSmall}
+          onClick={() => patchItems([...items, { title: 'New item', desc: undefined, href: '' }])}
+        >
+          Add item
+        </button>
+      </div>
+      {items.map((row, i) => {
+        const r = row && typeof row === 'object' && !Array.isArray(row) ? (row as Record<string, unknown>) : {};
+        return (
+          <RepeatItemShell key={i} title="Coverage item" index={i} onRemove={() => patchItems(items.filter((_, j) => j !== i))}>
+            <TextField
+              label="Title"
+              value={str(r.title)}
+              onChange={(title) => {
+                const next = [...items];
+                next[i] = { ...r, title };
+                patchItems(next);
+              }}
+            />
+            <RichTextField
+              label="Description (optional)"
+              compact
+              value={r.desc}
+              onChange={(desc) => {
+                const next = [...items];
+                next[i] = { ...r, desc };
+                patchItems(next);
+              }}
+            />
+            <TextField
+              label="Page URL (optional)"
+              value={str(r.href)}
+              onChange={(href) => {
+                const next = [...items];
+                next[i] = { ...r, href };
+                patchItems(next);
+              }}
+            />
+          </RepeatItemShell>
+        );
+      })}
     </div>
   );
 }

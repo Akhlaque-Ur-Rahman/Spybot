@@ -4,6 +4,7 @@
   min-height: var(--site-topbar-height);
   box-sizing: border-box;
   padding: 8px 0;
+  font-family: var(--font-display);
   font-size: 0.75rem;
   color: var(--color-text-secondary);
   position: sticky;
@@ -28,6 +29,7 @@
   position: sticky;
   top: var(--site-topbar-height);
   z-index: 99;
+  font-family: var(--font-display);
   background: var(--color-nav-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -119,40 +121,60 @@ button.navLink {
   top: 100%;
   left: 0;
   padding-top: 6px;
-  min-width: 260px;
+  min-width: 340px;
   z-index: 200;
 }
 
 .dropdown {
   position: relative;
-  width: 260px;
+  width: clamp(360px, 48vw, 620px);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 8px;
+  padding: 12px;
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(20px);
   animation: fade-up 0.2s ease;
+}
+.dropdownGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 .dropdownItem {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 10px 12px;
+  min-height: 100%;
+  padding: 12px;
   border-radius: var(--radius-md);
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
   color: var(--color-text-primary);
+  border: 1px solid transparent;
 }
-.dropdownItem:hover { background: var(--color-surface-raised); }
+.dropdownItem:hover {
+  background: var(--color-surface-raised);
+  border-color: var(--color-border-subtle);
+  transform: translateY(-1px);
+}
+.dropdownOverview {
+  margin-bottom: 10px;
+  background: color-mix(in srgb, var(--color-surface-raised) 84%, transparent);
+  border-color: var(--color-border-subtle);
+}
 .dropdownIcon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
 .dropdownLabel { font-size: 0.875rem; font-weight: 600; }
-.dropdownDesc { font-size: 0.75rem; color: var(--color-text-secondary); margin-top: 2px; }
+.dropdownDesc { font-size: 0.75rem; color: var(--color-text-secondary); margin-top: 4px; line-height: 1.5; }
 
 .navCtas {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   flex-shrink: 0;
+}
+.navCtas :global(.btn),
+.mobileDrawerFooterCtas :global(.btn) {
+  font-family: var(--font-display);
 }
 
 .hamburger {
@@ -181,6 +203,7 @@ button.navLink {
   position: fixed;
   inset: 0;
   z-index: 1200;
+  font-family: var(--font-display);
   display: flex;
   flex-direction: column;
   background: var(--color-bg);
@@ -341,10 +364,10 @@ button.navLink {
 }
 
 .mobileSublist {
-  padding: 0 0 var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  padding: var(--space-3) 0 var(--space-4);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
   border-top: 1px solid var(--color-border-subtle);
   margin-top: var(--space-1);
 }
@@ -353,18 +376,26 @@ button.navLink {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 12px 8px;
+  min-height: 100%;
+  padding: 12px 10px;
   border-radius: var(--radius-md);
   color: var(--color-text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  border: 1px solid var(--color-border-subtle);
 }
 
 .mobileSublink:hover,
 .mobileSublink:focus-visible {
   background: var(--color-surface-raised);
   color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+.mobileSublinkOverview {
+  grid-column: 1 / -1;
+  background: color-mix(in srgb, var(--color-surface-raised) 84%, transparent);
 }
 
 .mobileSublinkIcon {
@@ -400,8 +431,23 @@ button.navLink {
 @media (max-width: 1024px) {
   .navLinks { gap: 0; }
   .navCtas { display: none; }
+  .dropdown {
+    width: clamp(340px, 60vw, 540px);
+  }
 }
 @media (max-width: 768px) {
   .navLinks { display: none; }
   .hamburger { display: flex; }
+}
+@media (max-width: 640px) {
+  .mobileSublist {
+    grid-template-columns: 1fr;
+  }
+}
+@media (min-width: 769px) {
+  .navItem:last-child .dropdownShell,
+  .navItem:nth-last-child(2) .dropdownShell {
+    left: auto;
+    right: 0;
+  }
 }

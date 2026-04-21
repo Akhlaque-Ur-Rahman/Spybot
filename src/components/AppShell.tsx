@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PageEntranceOverlay from '@/components/PageEntranceOverlay';
+import SciFiLoaderCanvas from '@/components/loaders/SciFiLoaderCanvas';
 import type { NavMenuItem } from '@/lib/cms/types';
 import shellStyles from './AppShell.module.css';
 
@@ -16,6 +17,22 @@ type AppShellProps = {
   primaryCtaHref?: string;
   primaryCtaText?: string;
 };
+
+const reducedMotionQuery = '(prefers-reduced-motion: reduce)';
+
+function subscribeReducedMotion(onStoreChange: () => void) {
+  const mq = window.matchMedia(reducedMotionQuery);
+  mq.addEventListener('change', onStoreChange);
+  return () => mq.removeEventListener('change', onStoreChange);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia(reducedMotionQuery).matches;
+}
+
+function getReducedMotionServerSnapshot() {
+  return false;
+}
 
 export default function AppShell({
   children,
@@ -30,7 +47,13 @@ export default function AppShell({
   const [entranceVisible, setEntranceVisible] = useState(true);
   const [entranceDone, setEntranceDone] = useState(false);
   const [routeAnim, setRouteAnim] = useState(false);
+  const [routeLoader, setRouteLoader] = useState(false);
   const pathPrimed = useRef(false);
+  const reducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
 
   const onEntranceDismiss = useCallback(() => {
     setEntranceVisible(false);
@@ -43,14 +66,18 @@ export default function AppShell({
       pathPrimed.current = true;
       return;
     }
-    let timeoutId: number | undefined;
+    let timeoutAnim: number | undefined;
+    let timeoutLoader: number | undefined;
     const rafId = requestAnimationFrame(() => {
       setRouteAnim(true);
-      timeoutId = window.setTimeout(() => setRouteAnim(false), 400);
+      setRouteLoader(true);
+      timeoutAnim = window.setTimeout(() => setRouteAnim(false), 400);
+      timeoutLoader = window.setTimeout(() => setRouteLoader(false), 440);
     });
     return () => {
       cancelAnimationFrame(rafId);
-      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      if (timeoutAnim !== undefined) window.clearTimeout(timeoutAnim);
+      if (timeoutLoader !== undefined) window.clearTimeout(timeoutLoader);
     };
   }, [pathname, entranceDone]);
 
@@ -60,18 +87,30 @@ export default function AppShell({
 
   return (
     <>
-      <Navbar
-        menuItems={headerMenu}
-        utilityMenuItems={headerUtilityMenu}
-        primaryCtaHref={primaryCtaHref}
-        primaryCtaText={primaryCtaText}
-      />
-      <div
-        className={`${shellStyles.pageStage} ${routeAnim ? shellStyles.pageStageRouteIn : ''}`}
-      >
-        {children}
+      <div className={!entranceDone ? `shellMarketingBooting ${shellStyles.shellChrome}` : shellStyles.shellChrome}>
+        <Navbar
+          menuItems={headerMenu}
+          utilityMenuItems={headerUtilityMenu}
+          primaryCtaHref={primaryCtaHref}
+          primaryCtaText={primaryCtaText}
+        />
+        <div
+          className={`${shellStyles.pageStage} ${routeAnim ? shellStyles.pageStageRouteIn : ''}`}
+        >
+          {children}
+        </div>
+        <Footer cmsColumns={footerMenu} />
       </div>
-      <Footer cmsColumns={footerMenu} />
+      {routeLoader ? (
+        <div className={shellStyles.routeLoaderDock} aria-hidden>
+          <SciFiLoaderCanvas
+            variant="route"
+            active
+            reducedMotion={reducedMotion}
+            className={shellStyles.routeLoaderCanvas}
+          />
+        </div>
+      ) : null}
       {entranceVisible ? <PageEntranceOverlay onDismiss={onEntranceDismiss} /> : null}
     </>
   );

@@ -6,6 +6,7 @@ import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { defaultDraftForBlockType } from '@/lib/cms/default-block-drafts';
+import { getSectionTemplateDraftJson } from '@/lib/cms/section-templates';
 import { prisma } from '@/lib/db/prisma';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 
@@ -38,7 +39,10 @@ export async function POST(
   if (exists) return NextResponse.json({ error: 'Section key already exists on this page' }, { status: 409 });
 
   const maxPos = page.sections.reduce((m, s) => Math.max(m, s.position), 0);
-  const draft = defaultDraftForBlockType(body.blockType);
+  const draft =
+    body.templateId !== undefined
+      ? (getSectionTemplateDraftJson(body.templateId) ?? defaultDraftForBlockType(body.blockType))
+      : defaultDraftForBlockType(body.blockType);
   const json = draft as Prisma.InputJsonValue;
 
   const section = await prisma.section.create({

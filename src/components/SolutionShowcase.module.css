@@ -1,0 +1,205 @@
+.section {
+  padding: clamp(3rem, 7vw, 4.5rem) 0;
+  background: var(--color-section-alt);
+  border-block: 1px solid var(--color-border-subtle);
+}
+
+.header {
+  text-align: center;
+  max-width: 46rem;
+  margin: 0 auto clamp(var(--space-8), 5vw, var(--space-10));
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4.2vw, 2.625rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.18;
+  margin: 0 0 var(--space-4);
+  text-wrap: balance;
+}
+
+.gradient {
+  display: inline;
+  background: linear-gradient(135deg, var(--gradient-text-from), var(--gradient-text-to));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  margin: 0 auto;
+  max-width: 40em;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2) var(--space-3);
+  margin: 0 auto clamp(var(--space-8), 4vw, 2.25rem);
+  max-width: 56rem;
+  padding: 0 var(--space-2);
+}
+
+.tab {
+  font-family: var(--font-display);
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.tab:hover {
+  border-color: var(--color-primary-400);
+  color: var(--color-text-primary);
+  background: var(--color-surface-raised);
+}
+
+.tab:active {
+  transform: scale(0.98);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-primary-400);
+  outline-offset: 3px;
+}
+
+.tabActive {
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+  border: 2px solid var(--color-text-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.tabActive:hover {
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+  border-color: var(--color-text-primary);
+}
+
+.tabPanel {
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+.panelBand {
+  text-align: center;
+  margin-bottom: var(--space-8);
+  padding: 0 var(--space-2);
+}
+
+.panelTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-3);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.panelDesc {
+  margin: 0 auto;
+  max-width: 42rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+}
+
+.cardGrid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 560px) {
+  .cardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .cardGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  min-height: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.card:hover {
+  border-color: var(--color-primary-400);
+  background: var(--color-surface-raised);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='dark'] .card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.cardIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: var(--color-badge-primary-bg);
+  border: 1px solid var(--color-badge-primary-border);
+  color: var(--color-primary-400);
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.cardDesc {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.ctaRow {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+}

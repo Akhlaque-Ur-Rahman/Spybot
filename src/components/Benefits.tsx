@@ -1,9 +1,9 @@
 import styles from './Benefits.module.css';
 import richTextStyles from '@/components/CmsRichText.module.css';
+import TruncatedReadMore from '@/components/TruncatedReadMore';
 import { LibraryBig, Hammer, Globe, Lock, FileText, Building2 } from 'lucide-react';
 import React from 'react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
-import { CTA_LINKS } from '@/site';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
 
@@ -12,6 +12,7 @@ export interface BenefitItem {
   title: string;
   desc: string;
   highlight: 'primary' | 'teal';
+  href?: string;
 }
 
 export type BenefitDataItem = {
@@ -19,6 +20,7 @@ export type BenefitDataItem = {
   title: string;
   desc: CmsRichTextValue;
   highlight: 'primary' | 'teal';
+  href?: string;
 };
 
 export const defaultBenefits: BenefitItem[] = [
@@ -117,10 +119,15 @@ export default function Benefits({
                 <span className={styles.cardIcon} aria-hidden="true">{b.icon}</span>
               </div>
               <h3 className={styles.cardTitle}>{b.title}</h3>
-              <div className={`${styles.cardDesc} ${richTextStyles.prose}`}>{renderCmsRichText(b.desc)}</div>
-              <a href={CTA_LINKS.solutionsCatalog} className={styles.cardLink} aria-label={`Learn more about ${b.title}`}>
-                Learn more →
-              </a>
+              <div className={styles.cardDesc}>
+                <TruncatedReadMore
+                  value={b.desc}
+                  contextTitle={b.title}
+                  href={'href' in b ? b.href : undefined}
+                  tone={b.highlight === 'teal' ? 'teal' : 'primary'}
+                  linkStickyBottom
+                />
+              </div>
             </div>
           ))}
         </div>

@@ -1,6 +1,7 @@
 import { SubmissionStatus, UserRole } from '@prisma/client';
 import { z } from 'zod';
 import { isCmsBlockType } from '@/lib/cms/page-registry';
+import { getSectionTemplateById } from '@/lib/cms/section-templates';
 
 const safeRelativePath = z
   .string()
@@ -116,13 +117,35 @@ export const adminBlockBatchPatchSchema = z.object({
     .max(80),
 });
 
+function emptyToUndefined(v: unknown): unknown {
+  if (v === null || v === undefined) return undefined;
+  if (typeof v === 'string') {
+    const t = v.trim();
+    return t === '' ? undefined : t;
+  }
+  return v;
+}
+
+function trimString(v: unknown): unknown {
+  return typeof v === 'string' ? v.trim() : v;
+}
+
 export const adminSectionPostSchema = z
   .object({
     key: z.string().min(1).max(200).trim(),
     label: z.string().min(1).max(300).trim(),
-    blockType: z.string().min(1).max(64).refine((t) => isCmsBlockType(t), 'Invalid block type'),
+    blockType: z.preprocess(trimString, z.string().min(1).max(64).refine((t) => isCmsBlockType(t), 'Invalid block type')),
+    templateId: z.preprocess(emptyToUndefined, z.string().min(1).max(64).optional()),
   })
-  .strict();
+  .strict()
+  .refine(
+    (d) => {
+      if (!d.templateId) return true;
+      const t = getSectionTemplateById(d.templateId);
+      return t !== undefined && t.blockType === d.blockType;
+    },
+    { message: 'Invalid or mismatched templateId for blockType' },
+  );
 
 export const adminSectionReorderSchema = z.object({
   sectionKeys: z.array(z.string().min(1).max(200)).min(1).max(100),

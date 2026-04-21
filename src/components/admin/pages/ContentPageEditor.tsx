@@ -11,6 +11,7 @@ import pageStyles from '@/components/admin/adminPage.module.css';
 import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 import { stableStringify } from '@/lib/cms/json-stable';
 import { CMS_BLOCK_TYPES, cmsBlockTypeLabel } from '@/lib/cms/page-registry';
+import { CMS_SECTION_TEMPLATES } from '@/lib/cms/section-templates';
 
 type SerializedBlock = {
   id: string;
@@ -102,6 +103,9 @@ export default function ContentPageEditor({
   const [newSectionKey, setNewSectionKey] = useState('');
   const [newSectionLabel, setNewSectionLabel] = useState('');
   const [newSectionBlockType, setNewSectionBlockType] = useState<string>(CMS_BLOCK_TYPES[0] ?? 'utilityCtaBand');
+  /** Empty = custom block type only; otherwise starter template id (matches block type). */
+  const [newSectionTemplateId, setNewSectionTemplateId] = useState<string>('');
+  const [addingSection, setAddingSection] = useState(false);
   const [savingMeta, setSavingMeta] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
   const [deletingPage, setDeletingPage] = useState(false);
@@ -430,7 +434,7 @@ export default function ContentPageEditor({
       <div className={pageStyles.card}>
         <h3 className={pageStyles.cardTitle}>Sections</h3>
         <p className={pageStyles.lead} style={{ marginTop: 0 }}>
-          Reorder sections or add a new section with one block.
+          Reorder sections or add a section.
         </p>
         <ol style={{ paddingLeft: 18, marginBottom: 16 }}>
           {sectionKeys.map((key, idx) => (
@@ -505,6 +509,32 @@ export default function ContentPageEditor({
         {addOpen ? (
           <div style={{ marginTop: 16, display: 'grid', gap: 10 }}>
             <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
+              Starter template
+              <select
+                className={pageStyles.input}
+                value={newSectionTemplateId}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setNewSectionTemplateId(v);
+                  if (v) {
+                    const t = CMS_SECTION_TEMPLATES.find((x) => x.id === v);
+                    if (t) {
+                      setNewSectionKey(t.suggestedKey);
+                      setNewSectionLabel(t.suggestedLabel);
+                      setNewSectionBlockType(t.blockType);
+                    }
+                  }
+                }}
+              >
+                <option value="">Custom</option>
+                {CMS_SECTION_TEMPLATES.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
               Section code (short id)
               <input className={pageStyles.input} value={newSectionKey} onChange={(e) => setNewSectionKey(e.target.value)} />
             </label>
@@ -517,7 +547,11 @@ export default function ContentPageEditor({
               <select
                 className={pageStyles.input}
                 value={newSectionBlockType}
-                onChange={(e) => setNewSectionBlockType(e.target.value)}
+                onChange={(e) => {
+                  setNewSectionBlockType(e.target.value);
+                  setNewSectionTemplateId('');
+                }}
+                disabled={Boolean(newSectionTemplateId)}
               >
                 {CMS_BLOCK_TYPES.map((t) => (
                   <option key={t} value={t}>
@@ -529,30 +563,48 @@ export default function ContentPageEditor({
             <button
               type="button"
               className={pageStyles.btn}
+              disabled={
+                addingSection ||
+                !newSectionKey.trim() ||
+                !newSectionLabel.trim() ||
+                !newSectionBlockType.trim()
+              }
               onClick={() =>
                 void (async () => {
+                  const key = newSectionKey.trim();
+                  const label = newSectionLabel.trim();
+                  if (!key || !label || !newSectionBlockType.trim()) return;
+                  setAddingSection(true);
                   try {
+                    const payload: { key: string; label: string; blockType: string; templateId?: string } = {
+                      key,
+                      label,
+                      blockType: newSectionBlockType.trim(),
+                    };
+                    const tid = newSectionTemplateId.trim();
+                    if (tid) {
+                      payload.templateId = tid;
+                    }
                     await fetchJson(`/api/admin/content/${encodeURIComponent(page.key)}/sections`, {
                       method: 'POST',
-                      body: JSON.stringify({
-                        key: newSectionKey.trim(),
-                        label: newSectionLabel.trim(),
-                        blockType: newSectionBlockType,
-                      }),
+                      body: JSON.stringify(payload),
                     });
                     push('Section added', 'success');
                     setNewSectionKey('');
                     setNewSectionLabel('');
+                    setNewSectionTemplateId('');
                     setAddOpen(false);
                     router.refresh();
                   } catch (e) {
                     logAdminClientError('ContentPageEditor.addSection', e);
                     push(e instanceof Error ? e.message : 'We could not add that section.', 'error');
+                  } finally {
+                    setAddingSection(false);
                   }
                 })()
               }
             >
-              Create section
+              {addingSection ? 'Adding…' : 'Create section'}
             </button>
           </div>
         ) : null}

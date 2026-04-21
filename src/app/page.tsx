@@ -4,10 +4,14 @@ import Lifecycle from '@/components/Lifecycle';
 import Benefits from '@/components/Benefits';
 import DecisionFlow from '@/components/DecisionFlow';
 import DemoSection from '@/components/DemoSection';
+import SolutionShowcase from '@/components/SolutionShowcase';
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { getManagedBlock, getManagedPageBySlug } from '@/lib/cms/page-content';
+import { getSolutionShowcaseData } from '@/lib/solution-showcase-data';
 import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { MEDIA_BRAND_LOGO, MEDIA_CLIPS, mediaEncodingFormat, siteOrigin } from '@/lib/site-media';
+import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 
 const origin = siteOrigin();
 const heroEncodingFormat = mediaEncodingFormat(MEDIA_CLIPS.homeHero.src);
@@ -43,14 +47,19 @@ export default async function Home() {
 
   return (
     <main>
-      <script
+      <Script
+        id="home-hero-video-jsonld"
         type="application/ld+json"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(heroVideoJsonLd) }}
       />
       <HeroSection content={hero ?? undefined} />
       <Challenges content={challenges ?? undefined} />
       <Lifecycle content={lifecycle ?? undefined} />
       <Benefits content={benefits ?? undefined} />
+      <SectionScrollReveal>
+        <SolutionShowcase data={getSolutionShowcaseData('home')} />
+      </SectionScrollReveal>
       {decisionFlow ? (
         <DecisionFlow
           label={decisionFlow.label}

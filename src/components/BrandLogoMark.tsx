@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import styles from './BrandLogoMark.module.css';
+import { MEDIA_BRAND_LOGO_DARK, MEDIA_BRAND_LOGO_LIGHT } from '@/lib/site-media';
 
 type Props = {
   /** Square mark when `width` / `height` omitted */
@@ -36,13 +37,22 @@ export default function BrandLogoMark({
       style={{ width: w, height: h, maxWidth: '100%' }}
     >
       <Image
-        src="/media/spybot-brand-logo.jpeg"
+        src={MEDIA_BRAND_LOGO_LIGHT}
         alt={decorative ? '' : 'SpyBot'}
         width={w}
         height={h}
-        className={styles.img}
+        className={`${styles.img} ${styles.imgLight}`}
         sizes={sizes}
         priority={usePriority}
+      />
+      <Image
+        src={MEDIA_BRAND_LOGO_DARK}
+        alt={decorative ? '' : 'SpyBot'}
+        width={w}
+        height={h}
+        className={`${styles.img} ${styles.imgDark}`}
+        sizes={sizes}
+        priority={false}
       />
     </span>
   );

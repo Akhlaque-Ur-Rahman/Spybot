@@ -193,6 +193,31 @@ function renderNode(node: unknown, key: string): ReactNode {
   return null;
 }
 
+export function getCmsRichTextPlainText(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (!isCmsRichTextDoc(value)) return '';
+  const parts: string[] = [];
+  const walk = (node: unknown): void => {
+    if (!isRecord(node)) return;
+    if (node.type === 'text' && typeof node.text === 'string') {
+      parts.push(node.text);
+      return;
+    }
+    if (node.type === 'hardBreak') {
+      parts.push(' ');
+      return;
+    }
+    if (node.type === 'paragraph' || node.type === 'heading') {
+      if (parts.length > 0 && !/\s$/.test(parts[parts.length - 1]!)) parts.push(' ');
+      if (Array.isArray(node.content)) node.content.forEach(walk);
+      return;
+    }
+    if (Array.isArray(node.content)) node.content.forEach(walk);
+  };
+  if (Array.isArray(value.content)) value.content.forEach(walk);
+  return parts.join('').replace(/\s+/g, ' ').trim();
+}
+
 /** Renders validated rich-text JSON or legacy plain string as safe React elements. */
 export function renderCmsRichText(value: unknown): ReactNode {
   if (typeof value === 'string') {

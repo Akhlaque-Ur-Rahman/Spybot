@@ -1,13 +1,21 @@
 /** Public `/media/*` assets (see `public/media`). Used for SEO-friendly video + brand markup. */
 
-export const MEDIA_BRAND_LOGO = '/media/spybot-brand-logo.jpeg';
+export const MEDIA_BRAND_LOGO_LIGHT = '/media/spybot-logo.webp';
+export const MEDIA_BRAND_LOGO_DARK = '/media/spybot-logo-dark.webp';
 
-/** Circular badge used in the site footer (`Footer.tsx`). */
-export const MEDIA_FOOTER_BRAND_LOGO = '/media/Round PNG Logo.png';
+/** Posters, JSON-LD, video thumbnails — light variant reads well as a generic thumbnail */
+export const MEDIA_BRAND_LOGO = MEDIA_BRAND_LOGO_LIGHT;
+
+/** Footer wordmark on dark footer surface */
+export const MEDIA_FOOTER_BRAND_LOGO = MEDIA_BRAND_LOGO_DARK;
+
+/** Footer decorative background (`Footer.module.css`) */
+export const MEDIA_FOOTER_BG = '/media/footer-bg.webp';
 
 export type MediaClipMeta = {
   src: string;
-  poster: string;
+  /** Omit to derive a frame from the video client-side (same-origin clips). */
+  poster?: string;
   title: string;
   description: string;
 };
@@ -24,7 +32,7 @@ export function siteOrigin(): string {
 export const MEDIA_CLIPS = {
   homeHero: {
     src: '/media/media1.webm',
-    poster: MEDIA_BRAND_LOGO,
+    poster: undefined,
     title: 'SpyBot identity and onboarding experience',
     description:
       'Motion preview of SpyBot verification flows for banks, fintech, telecom, gaming, and marketplace onboarding.',

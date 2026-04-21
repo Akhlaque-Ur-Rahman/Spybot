@@ -33,6 +33,24 @@
     color-mix(in srgb, var(--color-bg) 88%, transparent) 100%
   );
 }
+
+/* Light theme: pale scrim tokens were washing the video out; ease overlay + strengthen clip */
+[data-theme='light'] .heroVideo {
+  opacity: 0.62;
+  filter: contrast(1.06) saturate(1.08);
+}
+[data-theme='light'] .heroScrim {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-hero-bg-start) 38%, transparent) 0%,
+    color-mix(in srgb, var(--color-hero-bg-mid) 32%, transparent) 45%,
+    color-mix(in srgb, var(--color-bg) 48%, transparent) 100%
+  );
+}
+[data-theme='light'] .canvas {
+  opacity: 0.34;
+}
+
 .canvas {
   position: absolute;
   inset: 0;

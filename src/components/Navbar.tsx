@@ -6,19 +6,36 @@ import { Fragment, useState, useEffect, useCallback, useRef, type ReactNode } fr
 import styles from './Navbar.module.css';
 import ThemeToggle from './ThemeToggle';
 import BrandLogoMark from '@/components/BrandLogoMark';
-import { CTA_LINKS, ROUTES, industryNavItems, solutionNavItems } from '@/site';
+import {
+  CTA_LINKS,
+  ROUTES,
+  companyNavItems,
+  industryNavItems,
+  resourceNavItems,
+  solutionNavItems,
+} from '@/site';
 import {
   BadgeCheck,
+  BookOpen,
+  Briefcase,
   Building2,
-  Landmark,
-  Video,
   CreditCard,
+  Landmark,
+  ChevronDown,
+  FileSearch,
+  HelpCircle,
+  Home,
+  Info,
+  Layers,
+  PhoneCall,
+  ScrollText,
+  ShieldCheck,
   ShoppingCart,
   Smartphone,
-  Gamepad2,
-  ShieldCheck,
-  ChevronDown,
-  Layers,
+  TrendingUp,
+  Users,
+  Video,
+  Wallet,
   X,
 } from 'lucide-react';
 import type { NavMenuItem } from '@/lib/cms/types';
@@ -37,52 +54,153 @@ type NavLink = {
 };
 
 const navLinks: NavLink[] = [
-  { label: 'API Marketplace', href: ROUTES.apiMarketplace },
   {
-    label: 'Solutions',
-    href: ROUTES.solutions,
-    dropdown: solutionNavItems.map((item, index) => ({
+    label: 'Company',
+    href: ROUTES.home,
+    dropdown: companyNavItems.map((item) => ({
       ...item,
-      icon: [
-        <BadgeCheck key="identity" size={18} strokeWidth={1.5} />,
-        <Building2 key="kyb" size={18} strokeWidth={1.5} />,
-        <Landmark key="financial" size={18} strokeWidth={1.5} />,
-        <Video key="video" size={18} strokeWidth={1.5} />,
-      ][index],
+      icon: getNavIcon(item.label),
     })),
   },
   {
     label: 'Industries',
     href: ROUTES.industries,
-    dropdown: industryNavItems.map((item, index) => ({
+    dropdown: industryNavItems.map((item) => ({
       ...item,
-      icon: [
-        <CreditCard key="fintech" size={18} strokeWidth={1.5} />,
-        <ShoppingCart key="ecommerce" size={18} strokeWidth={1.5} />,
-        <Smartphone key="telecom" size={18} strokeWidth={1.5} />,
-        <Gamepad2 key="gaming" size={18} strokeWidth={1.5} />,
-      ][index],
+      icon: getNavIcon(item.label),
     })),
   },
-  { label: 'Resources', href: ROUTES.resources },
-  { label: 'FAQ', href: ROUTES.faq },
+  {
+    label: 'Solution',
+    href: ROUTES.solutions,
+    dropdown: solutionNavItems.map((item) => ({
+      ...item,
+      icon: getNavIcon(item.label),
+    })),
+  },
+  {
+    label: 'Resources',
+    href: ROUTES.resources,
+    dropdown: resourceNavItems.map((item) => ({
+      ...item,
+      icon: getNavIcon(item.label),
+    })),
+  },
 ];
 
 function slugify(label: string) {
   return label.toLowerCase().replace(/\s+/g, '-');
 }
 
+function navOverviewCopy(label: string) {
+  switch (label) {
+    case 'Company':
+      return {
+        title: 'Company overview',
+        desc: 'Start from the company overview page',
+      };
+    case 'Industries':
+      return {
+        title: 'All industries',
+        desc: 'Browse industry playbooks and use cases',
+      };
+    case 'Resources':
+      return {
+        title: 'All resources',
+        desc: 'Browse certifications, content, and FAQs',
+      };
+    default:
+      return {
+        title: 'All solutions',
+        desc: 'Browse the full solution catalog',
+      };
+  }
+}
+
+function normalizeLabel(value: string) {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, ' ');
+}
+
+function canonicalMenuLabel(item: NavMenuItem) {
+  const label = normalizeLabel(item.label);
+  const href = item.href.trim().toLowerCase();
+
+  if (label === 'company' || href === ROUTES.home) return 'Company';
+  if (label === 'industries' || href === ROUTES.industries) return 'Industries';
+  if (label === 'solution' || label === 'solutions' || href === ROUTES.solutions) return 'Solution';
+  if (label === 'resources' || href === ROUTES.resources) return 'Resources';
+
+  return null;
+}
+
+function getNavIcon(label: string) {
+  const iconProps = { size: 18, strokeWidth: 1.5 } as const;
+
+  switch (label) {
+    case 'Home':
+      return <Home key={label} {...iconProps} />;
+    case 'About Us':
+      return <Info key={label} {...iconProps} />;
+    case 'Career':
+      return <Briefcase key={label} {...iconProps} />;
+    case 'Why SpyBot':
+      return <ShieldCheck key={label} {...iconProps} />;
+    case 'Contact Us':
+      return <PhoneCall key={label} {...iconProps} />;
+    case 'Insurance':
+      return <ShieldCheck key={label} {...iconProps} />;
+    case 'NBFC':
+    case 'Fintech':
+      return <CreditCard key={label} {...iconProps} />;
+    case 'Banks':
+      return <Landmark key={label} {...iconProps} />;
+    case 'Staffing':
+      return <Users key={label} {...iconProps} />;
+    case 'Telecom':
+      return <Smartphone key={label} {...iconProps} />;
+    case 'Trading':
+      return <TrendingUp key={label} {...iconProps} />;
+    case 'E-commerce':
+      return <ShoppingCart key={label} {...iconProps} />;
+    case 'Identity Verification':
+      return <BadgeCheck key={label} {...iconProps} />;
+    case 'Business Verification':
+      return <Building2 key={label} {...iconProps} />;
+    case 'Income Verification':
+      return <Wallet key={label} {...iconProps} />;
+    case 'Video KYC':
+      return <Video key={label} {...iconProps} />;
+    case 'CKYC Platform':
+      return <FileSearch key={label} {...iconProps} />;
+    case 'Certifications & Accreditations':
+      return <ScrollText key={label} {...iconProps} />;
+    case 'Blog':
+      return <BookOpen key={label} {...iconProps} />;
+    case 'Case Studies':
+      return <Layers key={label} {...iconProps} />;
+    case 'FAQs':
+      return <HelpCircle key={label} {...iconProps} />;
+    default:
+      return <Layers key={label} {...iconProps} />;
+  }
+}
+
 function mergeMenuWithDefaults(items: NavMenuItem[]): NavLink[] {
-  return items.map((item) => {
-    const def = navLinks.find(
-      (l) =>
-        l.href === item.href ||
-        l.label.trim().toLowerCase() === item.label.trim().toLowerCase(),
-    );
+  const overrides = new Map<string, NavMenuItem>();
+  for (const item of items) {
+    const canonical = canonicalMenuLabel(item);
+    if (canonical && !overrides.has(canonical)) {
+      overrides.set(canonical, item);
+    }
+  }
+
+  return navLinks.map((link) => {
+    const override = overrides.get(link.label);
+    if (!override) return link;
+
     return {
-      label: item.label,
-      href: item.href,
-      ...(def?.dropdown ? { dropdown: def.dropdown } : {}),
+      ...link,
+      href: override.href || link.href,
     };
   });
 }
@@ -297,6 +415,7 @@ export default function Navbar({
                       </Link>
                     );
                   }
+                  const overview = navOverviewCopy(link.label);
                   return (
                     <details key={link.label} className={styles.mobileDisclosure}>
                       <summary>
@@ -304,19 +423,17 @@ export default function Navbar({
                         <ChevronDown size={18} className={styles.mobileDisclosureChevron} aria-hidden />
                       </summary>
                       <div className={styles.mobileSublist}>
-                        <Link href={link.href} className={styles.mobileSublink} onClick={closeMobileMenu}>
+                        <Link
+                          href={link.href}
+                          className={`${styles.mobileSublink} ${styles.mobileSublinkOverview}`}
+                          onClick={closeMobileMenu}
+                        >
                           <span className={styles.mobileSublinkIcon} aria-hidden>
                             <Layers size={18} strokeWidth={1.5} />
                           </span>
                           <span className={styles.mobileSublinkText}>
-                            <span className={styles.mobileSublinkLabel}>
-                              {link.label === 'Solutions' ? 'All solutions' : 'All industries'}
-                            </span>
-                            <span className={styles.mobileSublinkDesc}>
-                              {link.label === 'Solutions'
-                                ? 'Browse the full solution catalog'
-                                : 'Browse industry playbooks and use cases'}
-                            </span>
+                            <span className={styles.mobileSublinkLabel}>{overview.title}</span>
+                            <span className={styles.mobileSublinkDesc}>{overview.desc}</span>
                           </span>
                         </Link>
                         {link.dropdown.map((item) => (
@@ -415,6 +532,7 @@ export default function Navbar({
             {resolvedLinks.map((link) => {
               const dropdownSlug = slugify(link.label);
               const hasDropdown = Boolean(link.dropdown);
+              const overview = navOverviewCopy(link.label);
 
               return (
                 <div
@@ -458,7 +576,7 @@ export default function Navbar({
                       >
                         <Link
                           href={link.href}
-                          className={styles.dropdownItem}
+                          className={`${styles.dropdownItem} ${styles.dropdownOverview}`}
                           role="menuitem"
                           onClick={closeDropdown}
                         >
@@ -466,31 +584,27 @@ export default function Navbar({
                             <Layers size={18} strokeWidth={1.5} />
                           </span>
                           <div>
-                            <div className={styles.dropdownLabel}>
-                              {link.label === 'Solutions' ? 'All solutions' : 'All industries'}
-                            </div>
-                            <div className={styles.dropdownDesc}>
-                              {link.label === 'Solutions'
-                                ? 'Browse the full solution catalog'
-                                : 'Browse industry playbooks and use cases'}
-                            </div>
+                            <div className={styles.dropdownLabel}>{overview.title}</div>
+                            <div className={styles.dropdownDesc}>{overview.desc}</div>
                           </div>
                         </Link>
-                        {link.dropdown!.map((item) => (
-                          <Link
-                            key={item.label}
-                            href={item.href}
-                            className={styles.dropdownItem}
-                            role="menuitem"
-                            onClick={closeDropdown}
-                          >
-                            <span className={styles.dropdownIcon} aria-hidden="true">{item.icon}</span>
-                            <div>
-                              <div className={styles.dropdownLabel}>{item.label}</div>
-                              <div className={styles.dropdownDesc}>{item.desc}</div>
-                            </div>
-                          </Link>
-                        ))}
+                        <div className={styles.dropdownGrid}>
+                          {link.dropdown!.map((item) => (
+                            <Link
+                              key={item.label}
+                              href={item.href}
+                              className={styles.dropdownItem}
+                              role="menuitem"
+                              onClick={closeDropdown}
+                            >
+                              <span className={styles.dropdownIcon} aria-hidden="true">{item.icon}</span>
+                              <div>
+                                <div className={styles.dropdownLabel}>{item.label}</div>
+                                <div className={styles.dropdownDesc}>{item.desc}</div>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}

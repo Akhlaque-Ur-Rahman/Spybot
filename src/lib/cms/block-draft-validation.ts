@@ -31,7 +31,21 @@ const refinements: Record<CmsBlockType, Refine> = {
     if (o.description === undefined || o.description === null) return null;
     return validateCmsRichTextField(o.description);
   },
-  coverageCarousel: () => null,
+  coverageCarousel: (o) => {
+    if (o.items === undefined || o.items === null) return null;
+    if (!Array.isArray(o.items)) return 'coverageCarousel: items must be an array';
+    for (const it of o.items) {
+      if (typeof it === 'string') continue;
+      if (!it || typeof it !== 'object' || Array.isArray(it)) return 'coverageCarousel: invalid item';
+      const row = it as Record<string, unknown>;
+      if (typeof row.title !== 'string' || !row.title.trim()) return 'coverageCarousel: each item needs a non-empty title';
+      if (row.desc !== undefined && row.desc !== null) {
+        const e = validateCmsRichTextField(row.desc);
+        if (e) return e;
+      }
+    }
+    return null;
+  },
   directoryGrid: (o) => {
     if (!Array.isArray(o.items)) return 'directoryGrid: items (array) required';
     if (o.subheading !== undefined && o.subheading !== null) {

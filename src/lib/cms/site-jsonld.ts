@@ -1,4 +1,5 @@
 import type { SiteRuntimeConfig } from '@/lib/cms/site-runtime-config';
+import { MEDIA_BRAND_LOGO } from '@/lib/site-media';
 
 export function buildRootJsonLd(site: SiteRuntimeConfig) {
   const origin = site.siteUrl.replace(/\/$/, '');
@@ -12,7 +13,7 @@ export function buildRootJsonLd(site: SiteRuntimeConfig) {
         url: origin,
         logo: {
           '@type': 'ImageObject',
-          url: `${origin}/media/spybot-brand-logo.jpeg`,
+          url: `${origin}${MEDIA_BRAND_LOGO}`,
         },
         sameAs: site.jsonLdSameAs,
       },

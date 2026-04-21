@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './Hero.module.css';
 import richTextStyles from '@/components/CmsRichText.module.css';
 import { Rocket } from 'lucide-react';
@@ -58,18 +58,82 @@ type HeroContent = {
 export function HeroSection({ content }: { content?: HeroContent }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const resolvedClip = content?.media ?? heroClip;
+  const resolvedClip = (content?.media ?? heroClip) as MediaClipMeta;
+  const staticPoster = resolvedClip.poster?.trim() || undefined;
+  const [framePosterUrl, setFramePosterUrl] = useState<string | null>(null);
+  const heroPoster = staticPoster ?? framePosterUrl ?? undefined;
   const heroVideoType = mediaEncodingFormat(resolvedClip.src);
   const resolvedStats = content?.stats ?? stats;
   const resolvedThreats = content?.threats ?? threats;
 
   useEffect(() => {
     const v = videoRef.current;
-    if (v) {
-      v.muted = true;
+    if (!v) return;
+    v.muted = true;
+
+    let blobUrl: string | null = null;
+    const revoke = () => {
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+        blobUrl = null;
+      }
+    };
+
+    const play = () => {
       void v.play().catch(() => {});
+    };
+
+    if (staticPoster) {
+      setFramePosterUrl(null);
+      play();
+      return () => revoke();
     }
-  }, []);
+
+    let primed = false;
+    const onLoadedData = () => {
+      if (primed) return;
+      primed = true;
+      try {
+        const vw = v.videoWidth;
+        const vh = v.videoHeight;
+        if (vw && vh) {
+          const c = document.createElement('canvas');
+          c.width = vw;
+          c.height = vh;
+          const ctx = c.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(v, 0, 0, vw, vh);
+            c.toBlob(
+              (blob) => {
+                if (!blob) return;
+                revoke();
+                blobUrl = URL.createObjectURL(blob);
+                setFramePosterUrl(blobUrl);
+              },
+              'image/jpeg',
+              0.86,
+            );
+          }
+        }
+      } catch {
+        /* decode / tainted */
+      }
+      play();
+    };
+
+    v.addEventListener('loadeddata', onLoadedData, { once: true });
+    if (v.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      onLoadedData();
+    } else {
+      play();
+    }
+
+    return () => {
+      v.removeEventListener('loadeddata', onLoadedData);
+      revoke();
+      setFramePosterUrl(null);
+    };
+  }, [staticPoster, resolvedClip.src]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -146,7 +210,7 @@ export function HeroSection({ content }: { content?: HeroContent }) {
           loop
           playsInline
           preload="metadata"
-          poster={resolvedClip.poster}
+          poster={heroPoster}
           tabIndex={-1}
         >
           <source src={resolvedClip.src} type={heroVideoType} />

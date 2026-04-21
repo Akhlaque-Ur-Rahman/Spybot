@@ -211,7 +211,13 @@ export function MediaClipFields({
       </label>
       <div className={styles.fieldGrid2} style={{ marginTop: 12 }}>
         <TextField label="Video src" value={value.src} onChange={(src) => onChange({ ...value, src })} />
-        <TextField label="Poster" value={value.poster} onChange={(poster) => onChange({ ...value, poster })} />
+        <TextField
+          label="Poster"
+          value={value.poster ?? ''}
+          onChange={(poster) =>
+            onChange({ ...value, ...(poster.trim() === '' ? { poster: undefined } : { poster }) })
+          }
+        />
         <TextField label="Title" value={value.title} onChange={(title) => onChange({ ...value, title })} />
         <TextField label="Description" value={value.description} onChange={(description) => onChange({ ...value, description })} />
       </div>
