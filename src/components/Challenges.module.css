@@ -13,10 +13,25 @@
 }
 .header {
   text-align: center;
+  max-width: min(100%, 920px);
+  margin-inline: auto;
   margin-bottom: var(--space-16);
 }
-.header .section-subtitle { margin-inline: auto; }
-.grid { position: relative; z-index: 1; }
+.header :global(.section-title) {
+  max-width: 20ch;
+  margin-inline: auto;
+  text-wrap: balance;
+}
+.header :global(.section-subtitle) {
+  margin-inline: auto;
+  max-width: 72ch;
+  text-wrap: pretty;
+}
+.grid {
+  position: relative;
+  z-index: 1;
+  align-items: stretch;
+}
 .card {
   position: relative;
   background: var(--color-surface);
@@ -24,6 +39,7 @@
   border-radius: var(--radius-xl);
   padding: var(--space-6);
   overflow: hidden;
+  height: 100%;
   transition: all 0.3s ease;
   animation: fade-up 0.6s ease both;
 }
@@ -72,9 +88,11 @@
   color: var(--color-text-primary);
   margin-bottom: var(--space-3);
   line-height: 1.3;
+  text-wrap: balance;
 }
 .cardDesc {
   font-size: var(--text-body-sm);
   color: var(--color-text-secondary);
   line-height: 1.6;
+  text-wrap: pretty;
 }

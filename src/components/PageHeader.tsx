@@ -1,4 +1,5 @@
 import styles from './PageHeader.module.css';
+import ViewportVideo from './ViewportVideo';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
 import { mediaEncodingFormat, type MediaClipMeta } from '@/lib/site-media';
@@ -58,16 +59,13 @@ export default function PageHeader({
 
           {media && (
             <figure className={styles.mediaFigure}>
-              <video
+              <ViewportVideo
                 className={styles.mediaVideo}
-                controls
-                playsInline
-                preload="metadata"
                 poster={media.poster}
-                aria-label={media.title}
-              >
-                <source src={media.src} type={mediaType} />
-              </video>
+                ariaLabel={media.title}
+                src={media.src}
+                type={mediaType!}
+              />
               <figcaption className={styles.mediaCaption}>
                 <strong>{media.title}</strong>
                 <span className={styles.mediaCaptionSep}> — </span>

@@ -1,6 +1,7 @@
 'use client';
 import { useRef, useState } from 'react';
 import styles from './DemoSection.module.css';
+import ViewportVideo from './ViewportVideo';
 import richTextStyles from '@/components/CmsRichText.module.css';
 import { Rocket, Target, BarChart3, ShieldCheck, CheckCircle2, Star } from 'lucide-react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
@@ -154,16 +155,13 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
             </div>
 
             <figure className={styles.clipFigure}>
-              <video
+              <ViewportVideo
                 className={styles.clipVideo}
-                controls
-                playsInline
-                preload="metadata"
                 poster={resolvedClip.poster}
-                aria-label={resolvedClip.title}
-              >
-                <source src={resolvedClip.src} type={resolvedClipType} />
-              </video>
+                ariaLabel={resolvedClip.title}
+                src={resolvedClip.src}
+                type={resolvedClipType}
+              />
               <figcaption className={styles.clipCaption}>
                 <strong>{resolvedClip.title}</strong>
                 <span className={styles.clipCaptionSep}> — </span>
