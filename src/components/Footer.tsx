@@ -1,12 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  BadgeCheck,
-  Building2,
-  MapPin,
-  Phone,
-} from 'lucide-react';
+import { Building2, Heart, MapPin, Phone } from 'lucide-react';
 import styles from './Footer.module.css';
 import { MEDIA_FOOTER_BG, MEDIA_FOOTER_BRAND_LOGO } from '@/lib/site-media';
 import { footerColumns, socialLinks, ROUTES } from '@/site';
@@ -21,6 +16,15 @@ const companyDetails = {
   cin: 'U80200BR2023PTC065755',
   certifications: ['ISO 27001:2022', 'ISO 9001:2015'],
 } as const;
+
+/** Single footer trust line (compact copy, no duplicate ISO blocks) */
+const trustLineParts = [
+  'SOC 2 Type II',
+  ...companyDetails.certifications,
+  'UIDAI Certified',
+] as const;
+
+const EDUNEX_HREF = 'https://edunexservices.in/';
 
 function normalizeHeading(value: string) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, ' ');
@@ -116,10 +120,10 @@ export default function Footer({
       }
     >
       <h2 id="footer-heading" className="sr-only">Footer</h2>
-      <div className={`glow-orb glow-orb-blue ${styles.glow}`} style={{ width: 500, height: 500 }} aria-hidden="true" />
+      <div className={`glow-orb glow-orb-blue ${styles.glow}`} style={{ width: 380, height: 380 }} aria-hidden="true" />
       <div className="container">
         <div className={styles.top}>
-          <div className={styles.infoColumn}>
+          <div className={styles.logoRow}>
             <Link href={ROUTES.home} className={styles.logo} aria-label="SpyBot homepage">
               <Image
                 src={MEDIA_FOOTER_BRAND_LOGO}
@@ -131,8 +135,10 @@ export default function Footer({
                 priority
               />
             </Link>
+          </div>
 
-            <div className={`${styles.detailGroup} ${styles.infoCard}`}>
+          <div className={styles.cardsRow}>
+            <div className={`${styles.detailGroup} ${styles.infoCard} ${styles.connectCard}`}>
               <h3 className={styles.sectionTitle}>Connect with Us</h3>
               <div className={styles.infoRow}>
                 <span className={styles.infoIcon} aria-hidden>
@@ -154,53 +160,42 @@ export default function Footer({
                   ))}
                 </div>
               </div>
-            </div>
 
-            <div className={`${styles.detailGroup} ${styles.inlineMeta}`}>
-              <a href={`tel:${companyDetails.phone}`} className={styles.infoLink}>
-                <span className={styles.infoIcon} aria-hidden>
-                  <Phone size={16} strokeWidth={2} />
-                </span>
-                <span>{companyDetails.phone}</span>
-              </a>
-              <p className={styles.metaPill}>CIN : {companyDetails.cin}</p>
-            </div>
-
-            <div className={`${styles.detailGroup} ${styles.infoCard}`}>
-              <h3 className={styles.sectionTitle}>Certified</h3>
-              <div className={styles.certList}>
-                {companyDetails.certifications.map((item) => (
-                  <span key={item} className={styles.certItem}>
-                    <BadgeCheck size={15} strokeWidth={1.9} aria-hidden />
-                    {item}
+              <div className={styles.contactActions}>
+                <a href={`tel:${companyDetails.phone}`} className={styles.infoLink}>
+                  <span className={styles.infoIcon} aria-hidden>
+                    <Phone size={16} strokeWidth={2} />
                   </span>
-                ))}
+                  <span>{companyDetails.phone}</span>
+                </a>
+                <p className={styles.metaPill}>CIN : {companyDetails.cin}</p>
+              </div>
+
+              <div className={styles.followRow}>
+                <h3 className={styles.sectionTitle}>Follow Us</h3>
+                <div className={styles.socials}>
+                  {socialLinks.map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      aria-label={s.label}
+                      className={styles.socialButton}
+                      target="_blank"
+                      rel="noreferrer"
+                      title={s.label}
+                    >
+                      {socialIcon(s.label)}
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div className={styles.detailGroup}>
-              <h3 className={styles.sectionTitle}>Follow Us</h3>
-              <div className={styles.socials}>
-                {socialLinks.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    aria-label={s.label}
-                    className={styles.socialButton}
-                    target="_blank"
-                    rel="noreferrer"
-                    title={s.label}
-                  >
-                    {socialIcon(s.label)}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.linkColumns}>
             {Object.entries(columns).map(([col, links]) => (
-              <div key={col} className={styles.linkCol}>
+              <div
+                key={col}
+                className={`${styles.linkCol}${col === 'Industries' ? ` ${styles.linkColSplit}` : ''}`}
+              >
                 <h4 className={styles.colTitle}>{col}</h4>
                 <ul>
                   {links.map((link: NavMenuItem) => (
@@ -219,16 +214,28 @@ export default function Footer({
         <div className={styles.divider} aria-hidden="true" />
 
         <div className={styles.bottom}>
-          <div className={styles.certBadges}>
-            {['SOC 2 Type II', 'ISO 27001', 'ISO 9001', 'UIDAI Certified'].map((b) => (
-              <span key={b} className={styles.certBadge}>
-                {b}
+          <p className={styles.trustLine}>
+            {trustLineParts.map((part, i) => (
+              <span key={part}>
+                {i > 0 ? <span className={styles.trustSep}> · </span> : null}
+                {part}
               </span>
             ))}
-          </div>
-          <p className={styles.copyright}>
-            © {new Date().getFullYear()} {companyDetails.legalName}. All rights reserved.
           </p>
+          <div className={styles.bottomAside}>
+            <p className={styles.copyright}>
+              © {new Date().getFullYear()} {companyDetails.legalName}. All rights reserved.
+            </p>
+            <p className={styles.credit}>
+              Design with Love{' '}
+              <Heart className={styles.creditHeart} size={14} strokeWidth={2} aria-hidden />
+              {' '}
+              by{' '}
+              <a href={EDUNEX_HREF} className={styles.creditLink} target="_blank" rel="noreferrer">
+                EduNex
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
