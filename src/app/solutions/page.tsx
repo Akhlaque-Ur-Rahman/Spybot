@@ -28,6 +28,8 @@ export default async function SolutionsPage() {
   const coverage = getManagedBlock(cmsPage, 'coverageCarousel', 'coverageCarousel');
   const sliderSection = getManagedBlock(cmsPage, 'sliderSection', 'sliderSection');
   const utilityCtaBand = getManagedBlock(cmsPage, 'utilityCtaBand', 'utilityCtaBand');
+  const solutionShowcase =
+    getManagedBlock(cmsPage, 'solutionShowcase', 'solutionShowcase') ?? getSolutionShowcaseData('solutions');
 
   return (
     <main>
@@ -54,7 +56,7 @@ export default async function SolutionsPage() {
       />
 
       <SectionScrollReveal>
-        <SolutionShowcase data={getSolutionShowcaseData('solutions')} />
+        <SolutionShowcase data={solutionShowcase} />
       </SectionScrollReveal>
 
       <CoverageCarousel label={coverage?.label ?? 'Coverage'} items={coverage?.items} />

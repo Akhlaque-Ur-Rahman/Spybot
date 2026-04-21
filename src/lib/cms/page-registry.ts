@@ -4,6 +4,7 @@ import { MEDIA_CLIPS } from '@/lib/site-media';
 import { CTA_LINKS, ROUTES, footerColumns, industryNavItems, solutionNavItems } from '@/site';
 import type { CmsIconName } from '@/lib/cms/icon-map';
 import { buildMarketingDetailRegistryPages } from '@/lib/cms/marketing-detail-registry';
+import { getSolutionShowcaseDraft, type SolutionShowcaseData } from '@/lib/solution-showcase-data';
 
 export type CmsLink = {
   label: string;
@@ -213,12 +214,16 @@ export type CmsDemoSectionBlock = {
   media: MediaClipMeta;
 };
 
+/** Tabbed “verification lanes” grid; same shape as {@link SolutionShowcaseData}. */
+export type CmsSolutionShowcaseBlock = SolutionShowcaseData;
+
 /** Single source of truth for known CMS block `type` strings (registry, validation, admin). */
 export const CMS_BLOCK_TYPES = [
   'hero',
   'pageHeader',
   'coverageCarousel',
   'directoryGrid',
+  'solutionShowcase',
   'sliderSection',
   'utilityCtaBand',
   'faqAccordion',
@@ -241,6 +246,7 @@ export const CMS_BLOCK_TYPE_LABELS = {
   pageHeader: 'Page header',
   coverageCarousel: 'Coverage carousel',
   directoryGrid: 'Directory grid',
+  solutionShowcase: 'Verification lanes (tabbed grid)',
   sliderSection: 'Slider',
   utilityCtaBand: 'Call-to-action band',
   faqAccordion: 'FAQ',
@@ -269,6 +275,7 @@ export type CmsBlockValueMap = {
   pageHeader: CmsPageHeaderBlock;
   coverageCarousel: CmsCoverageCarouselBlock;
   directoryGrid: CmsDirectoryGridBlock;
+  solutionShowcase: CmsSolutionShowcaseBlock;
   sliderSection: CmsSliderSectionBlock;
   utilityCtaBand: CmsUtilityCtaBandBlock;
   faqAccordion: CmsFaqAccordionBlock;
@@ -620,6 +627,7 @@ export function createSimplePage(args: {
   challenges?: CmsChallengesBlock;
   lifecycle?: CmsLifecycleBlock;
   directoryGrid?: CmsDirectoryGridBlock;
+  solutionShowcase?: CmsSolutionShowcaseBlock;
   sliderSection?: CmsSliderSectionBlock;
   faqAccordion?: CmsFaqAccordionBlock;
   supportPathways?: CmsSupportPathwaysBlock;
@@ -637,6 +645,11 @@ export function createSimplePage(args: {
   let position = 2;
 
   if (args.directoryGrid) sections.push(section('directoryGrid', 'Directory Grid', position++, block('directoryGrid', 'directoryGrid', args.directoryGrid)));
+  if (args.solutionShowcase) {
+    sections.push(
+      section('solutionShowcase', 'Verification lanes', position++, block('solutionShowcase', 'solutionShowcase', args.solutionShowcase))
+    );
+  }
   if (args.coverageLabel) sections.push(section('coverageCarousel', 'Coverage Carousel', position++, block('coverageCarousel', 'coverageCarousel', { label: args.coverageLabel, items: defaultCoverageItems })));
   if (args.benefits) sections.push(section('benefits', 'Benefits', position++, block('benefits', 'benefits', args.benefits)));
   if (args.challenges) sections.push(section('challenges', 'Challenges', position++, block('challenges', 'challenges', args.challenges)));
@@ -1091,8 +1104,14 @@ export const cmsRegistryPages: CmsRegistryPage[] = [
           ],
         })
       ),
-      section('decisionFlow', 'Decision Flow', 5, block('decisionFlow', 'decisionFlow', defaultDecisionFlowBlock)),
-      section('demoSection', 'Demo Section', 6, block('demoSection', 'demoSection', defaultDemoSectionBlock)),
+      section(
+        'solutionShowcase',
+        'Verification lanes',
+        5,
+        block('solutionShowcase', 'solutionShowcase', getSolutionShowcaseDraft('home'))
+      ),
+      section('decisionFlow', 'Decision Flow', 6, block('decisionFlow', 'decisionFlow', defaultDecisionFlowBlock)),
+      section('demoSection', 'Demo Section', 7, block('demoSection', 'demoSection', defaultDemoSectionBlock)),
     ],
   },
   createSimplePage({
@@ -1124,6 +1143,7 @@ export const cmsRegistryPages: CmsRegistryPage[] = [
         badge: 'Solution',
       })),
     },
+    solutionShowcase: getSolutionShowcaseDraft('solutions'),
     coverageLabel: 'Coverage',
     sliderSection: {
       heading: 'Which module fits',

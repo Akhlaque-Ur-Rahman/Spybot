@@ -44,6 +44,8 @@ export default async function Home() {
   const benefits = getManagedBlock(cmsPage, 'benefits', 'benefits');
   const decisionFlow = getManagedBlock(cmsPage, 'decisionFlow', 'decisionFlow');
   const demo = getManagedBlock(cmsPage, 'demoSection', 'demoSection') ?? getManagedBlock(cmsPage, 'demo', 'demoSection');
+  const solutionShowcase =
+    getManagedBlock(cmsPage, 'solutionShowcase', 'solutionShowcase') ?? getSolutionShowcaseData('home');
 
   return (
     <main>
@@ -58,7 +60,7 @@ export default async function Home() {
       <Lifecycle content={lifecycle ?? undefined} />
       <Benefits content={benefits ?? undefined} />
       <SectionScrollReveal>
-        <SolutionShowcase data={getSolutionShowcaseData('home')} />
+        <SolutionShowcase data={solutionShowcase} />
       </SectionScrollReveal>
       {decisionFlow ? (
         <DecisionFlow

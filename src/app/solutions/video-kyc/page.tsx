@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import CmsManagedPageBody from '@/components/cms/CmsManagedPageBody';
-import SolutionShowcase from '@/components/SolutionShowcase';
 import { getManagedPageBySlug } from '@/lib/cms/page-content';
-import { getSolutionShowcaseData } from '@/lib/solution-showcase-data';
 import { marketingPageMetadata } from '@/lib/seo/page-social-metadata';
 import { ROUTES } from '@/site';
 
@@ -21,7 +19,6 @@ export default async function VideoKycPage() {
   return (
     <main>
       <CmsManagedPageBody page={cmsPage} asFragment />
-      <SolutionShowcase data={getSolutionShowcaseData('video-kyc')} />
     </main>
   );
 }

@@ -381,3 +381,8 @@ export function getSolutionShowcaseData(variant: SolutionShowcaseVariant): Solut
     verticals: verticalsFor(variant),
   };
 }
+
+/** Deep clone for CMS registry defaults and new block drafts (safe to mutate in the admin editor). */
+export function getSolutionShowcaseDraft(variant: SolutionShowcaseVariant): SolutionShowcaseData {
+  return JSON.parse(JSON.stringify(getSolutionShowcaseData(variant))) as SolutionShowcaseData;
+}

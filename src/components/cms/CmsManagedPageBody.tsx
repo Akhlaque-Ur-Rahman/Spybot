@@ -14,6 +14,7 @@ import ContactHighlights from '@/components/ContactHighlights';
 import DecisionFlow from '@/components/DecisionFlow';
 import SupportPathways from '@/components/SupportPathways';
 import SupportSlaStrip from '@/components/SupportSlaStrip';
+import SolutionShowcase from '@/components/SolutionShowcase';
 import { HeroSection } from '@/components/Hero';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import type { ManagedCmsPage } from '@/lib/cms/page-content';
@@ -31,6 +32,7 @@ import type {
   CmsPageHeaderBlock,
   CmsResourceGridBlock,
   CmsSliderSectionBlock,
+  CmsSolutionShowcaseBlock,
   CmsSupportPathwaysBlock,
   CmsSupportSlaStripBlock,
   CmsUtilityCtaBandBlock,
@@ -83,6 +85,8 @@ function renderBlock(block: ManagedCmsPage['sections'][number]['blocks'][number]
         />
       );
     }
+    case 'solutionShowcase':
+      return wrapScroll(key, <SolutionShowcase key={key} data={v as CmsSolutionShowcaseBlock} />, true);
     case 'sliderSection': {
       const s = v as CmsSliderSectionBlock;
       const headingId = `${block.key}-heading`;

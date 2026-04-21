@@ -28,6 +28,7 @@ export const CMS_SECTION_TEMPLATES: readonly CmsSectionTemplate[] = (
     'pageHeader',
     'coverageCarousel',
     'directoryGrid',
+    'solutionShowcase',
     'sliderSection',
     'utilityCtaBand',
     'faqAccordion',

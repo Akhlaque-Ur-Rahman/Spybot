@@ -1,4 +1,5 @@
 import type { CmsBlockType } from '@/lib/cms/page-registry';
+import { getSolutionShowcaseDraft } from '@/lib/solution-showcase-data';
 import {
   defaultContactHighlightsBlock,
   defaultCoverageItems,
@@ -35,6 +36,8 @@ export function defaultDraftForBlockType(type: CmsBlockType): unknown {
         heading: 'Directory',
         items: [],
       };
+    case 'solutionShowcase':
+      return getSolutionShowcaseDraft('home');
     case 'sliderSection':
       return { heading: 'Slider', items: [] };
     case 'utilityCtaBand':

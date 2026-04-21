@@ -6,6 +6,21 @@ const draftObject = z.record(z.string(), z.unknown());
 
 type Refine = (o: Record<string, unknown>) => string | null;
 
+const SOLUTION_SHOWCASE_ICONS = new Set([
+  'fileText',
+  'badgeCheck',
+  'creditCard',
+  'landmark',
+  'building2',
+  'scanFace',
+  'video',
+  'penLine',
+  'shield',
+  'userCheck',
+  'briefcase',
+  'banknote',
+]);
+
 function validateEachRichField(items: unknown, key: 'desc' | 'description'): string | null {
   if (!Array.isArray(items)) return null;
   for (const raw of items) {
@@ -53,6 +68,46 @@ const refinements: Record<CmsBlockType, Refine> = {
       if (e) return e;
     }
     return validateEachRichField(o.items, 'description');
+  },
+  solutionShowcase: (o) => {
+    if (typeof o.title !== 'string') return 'solutionShowcase: title (string) required';
+    if (o.titleGradient !== undefined && o.titleGradient !== null && typeof o.titleGradient !== 'string') {
+      return 'solutionShowcase: titleGradient must be a string';
+    }
+    if (typeof o.subtitle !== 'string') return 'solutionShowcase: subtitle (string) required';
+    const pc = o.primaryCta;
+    const sc = o.secondaryCta;
+    const ctaOk = (x: unknown) =>
+      x !== null &&
+      typeof x === 'object' &&
+      !Array.isArray(x) &&
+      typeof (x as { label?: unknown }).label === 'string' &&
+      typeof (x as { href?: unknown }).href === 'string';
+    if (!ctaOk(pc)) return 'solutionShowcase: primaryCta with label and href required';
+    if (!ctaOk(sc)) return 'solutionShowcase: secondaryCta with label and href required';
+    if (!Array.isArray(o.verticals) || o.verticals.length === 0) {
+      return 'solutionShowcase: verticals (non-empty array) required';
+    }
+    for (const vert of o.verticals) {
+      if (!vert || typeof vert !== 'object' || Array.isArray(vert)) return 'solutionShowcase: invalid vertical';
+      const v = vert as Record<string, unknown>;
+      for (const key of ['id', 'label', 'panelTitle', 'panelDescription'] as const) {
+        if (typeof v[key] !== 'string' || !String(v[key]).trim()) {
+          return `solutionShowcase: vertical.${key} (non-empty string) required`;
+        }
+      }
+      if (!Array.isArray(v.cards)) return 'solutionShowcase: vertical.cards (array) required';
+      for (const card of v.cards) {
+        if (!card || typeof card !== 'object' || Array.isArray(card)) return 'solutionShowcase: invalid card';
+        const c = card as Record<string, unknown>;
+        if (typeof c.icon !== 'string' || !SOLUTION_SHOWCASE_ICONS.has(c.icon)) {
+          return 'solutionShowcase: card.icon must be a known icon key';
+        }
+        if (typeof c.title !== 'string' || !c.title.trim()) return 'solutionShowcase: card.title required';
+        if (typeof c.description !== 'string') return 'solutionShowcase: card.description required';
+      }
+    }
+    return null;
   },
   sliderSection: (o) => {
     if (typeof o.heading !== 'string' || !Array.isArray(o.items)) {

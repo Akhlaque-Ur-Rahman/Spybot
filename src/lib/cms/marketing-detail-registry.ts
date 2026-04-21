@@ -7,6 +7,7 @@ import type {
 } from '@/lib/cms/page-registry';
 import { CTA_LINKS, ROUTES } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
+import { getSolutionShowcaseDraft } from '@/lib/solution-showcase-data';
 
 export function buildMarketingDetailRegistryPages(deps: {
   section: (key: string, label: string, position: number, blockDef: CmsRegistryBlock) => CmsRegistrySection;
@@ -41,15 +42,21 @@ export function buildMarketingDetailRegistryPages(deps: {
         })
       ),
       section(
+        'solutionShowcase',
+        'Verification lanes',
+        2,
+        block('solutionShowcase', 'solutionShowcase', getSolutionShowcaseDraft('video-kyc'))
+      ),
+      section(
         'coverageCarousel',
         'Coverage Carousel',
-        2,
+        3,
         block('coverageCarousel', 'coverageCarousel', { label: 'V-CIP building blocks', items: defaultCoverageItems })
       ),
       section(
         'benefits',
         'Benefits',
-        3,
+        4,
         block('benefits', 'benefits', {
           label: 'The Platform Features',
           title: 'Enterprise-Grade',
@@ -81,7 +88,7 @@ export function buildMarketingDetailRegistryPages(deps: {
       section(
         'lifecycle',
         'Lifecycle',
-        4,
+        5,
         block('lifecycle', 'lifecycle', {
           label: 'The V-CIP Flow',
           title: 'From click to',
@@ -99,7 +106,7 @@ export function buildMarketingDetailRegistryPages(deps: {
       section(
         'challenges',
         'Challenges',
-        5,
+        6,
         block('challenges', 'challenges', {
           label: 'The Friction',
           title: 'The challenge of remote',
@@ -128,7 +135,7 @@ export function buildMarketingDetailRegistryPages(deps: {
           ],
         })
       ),
-      section('demoSection', 'Demo Section', 6, block('demoSection', 'demoSection', defaultDemoSectionBlock)),
+      section('demoSection', 'Demo Section', 7, block('demoSection', 'demoSection', defaultDemoSectionBlock)),
     ],
   };
 
@@ -156,15 +163,21 @@ export function buildMarketingDetailRegistryPages(deps: {
         })
       ),
       section(
+        'solutionShowcase',
+        'Verification lanes',
+        2,
+        block('solutionShowcase', 'solutionShowcase', getSolutionShowcaseDraft('kyb-suite'))
+      ),
+      section(
         'coverageCarousel',
         'Coverage Carousel',
-        2,
+        3,
         block('coverageCarousel', 'coverageCarousel', { label: 'KYB signals', items: defaultCoverageItems })
       ),
       section(
         'lifecycle',
         'Lifecycle',
-        3,
+        4,
         block('lifecycle', 'lifecycle', {
           label: 'The KYB Journey',
           title: 'Automating the',
@@ -182,7 +195,7 @@ export function buildMarketingDetailRegistryPages(deps: {
       section(
         'challenges',
         'Challenges',
-        4,
+        5,
         block('challenges', 'challenges', {
           label: 'The Compliance Bottleneck',
           title: 'Why B2B Onboarding is',
@@ -214,7 +227,7 @@ export function buildMarketingDetailRegistryPages(deps: {
       section(
         'benefits',
         'Benefits',
-        5,
+        6,
         block('benefits', 'benefits', {
           label: 'The Corporate Suite',
           title: 'Deep Corporate',
@@ -242,7 +255,7 @@ export function buildMarketingDetailRegistryPages(deps: {
           ],
         })
       ),
-      section('demoSection', 'Demo Section', 6, block('demoSection', 'demoSection', defaultDemoSectionBlock)),
+      section('demoSection', 'Demo Section', 7, block('demoSection', 'demoSection', defaultDemoSectionBlock)),
     ],
   };
 
@@ -601,6 +614,7 @@ export function buildMarketingDetailRegistryPages(deps: {
       secondaryCta: { label: 'Explore the API marketplace', href: CTA_LINKS.solutionsCatalog },
       media: MEDIA_CLIPS.identityVerification,
     },
+    solutionShowcase: getSolutionShowcaseDraft('identity-verification'),
     benefits: {
       label: 'The Identity Suite',
       title: 'Everything you need to',
@@ -687,6 +701,7 @@ export function buildMarketingDetailRegistryPages(deps: {
       secondaryCta: { label: 'Explore marketplace coverage', href: CTA_LINKS.solutionsCatalog },
       media: MEDIA_CLIPS.financialVerification,
     },
+    solutionShowcase: getSolutionShowcaseDraft('financial-verification'),
     benefits: {
       label: 'The Financial Suite',
       title: 'Intelligent',
