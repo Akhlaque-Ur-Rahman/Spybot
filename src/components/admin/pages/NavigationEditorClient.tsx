@@ -11,6 +11,33 @@ import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 export type NavItemRow = { id: string; label: string; href: string; description: string | null };
 export type MenuRow = { id: string; key: string; items: NavItemRow[] };
 
+function menuSummary(key: string) {
+  if (key === 'header-main') {
+    return {
+      title: 'Primary site navigation',
+      description:
+        'This is the main public navbar. Item order, label, and URL are editable here.',
+      note:
+        'Company, Industries, Solution, and Resources keep their dropdown groups while the item still maps to that section. Any other item becomes a normal link.',
+    };
+  }
+
+  if (key === 'header-utility') {
+    return {
+      title: 'Top utility bar',
+      description:
+        'These links appear in the slim bar above the main navbar.',
+      note: 'Utility links are simple links only and do not have dropdowns.',
+    };
+  }
+
+  return {
+    title: key,
+    description: 'Menu items in this group can be reordered and saved.',
+    note: 'Notes are stored in CMS but are not shown publicly.',
+  };
+}
+
 export default function NavigationEditorClient({ menus }: { menus: MenuRow[] }) {
   const router = useRouter();
   const { fetchJson } = useAdminApi();
@@ -99,7 +126,16 @@ export default function NavigationEditorClient({ menus }: { menus: MenuRow[] }) 
     <div>
       {state.map((menu, menuIdx) => (
         <section key={menu.key} className={pageStyles.card}>
-          <h3 className={pageStyles.cardTitle}>Menu: {menu.key}</h3>
+          <h3 className={pageStyles.cardTitle}>{menuSummary(menu.key).title}</h3>
+          <p className={pageStyles.lead} style={{ marginBottom: 8 }}>
+            <strong>Menu key:</strong> {menu.key}
+          </p>
+          <p className={pageStyles.lead} style={{ marginBottom: 8 }}>
+            {menuSummary(menu.key).description}
+          </p>
+          <p className={pageStyles.lead} style={{ marginBottom: 16 }}>
+            {menuSummary(menu.key).note}
+          </p>
           <div className={pageStyles.row}>
             <button type="button" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`} onClick={() => addItem(menuIdx)}>
               Add item
@@ -126,7 +162,7 @@ export default function NavigationEditorClient({ menus }: { menus: MenuRow[] }) 
                   <TextField label="Label" value={item.label} onChange={(v) => updateItem(menuIdx, itemIdx, { label: v })} />
                   <TextField label="Href" value={item.href} onChange={(v) => updateItem(menuIdx, itemIdx, { href: v })} />
                   <TextField
-                    label="Description"
+                    label="Note (internal)"
                     value={item.description}
                     onChange={(v) => updateItem(menuIdx, itemIdx, { description: v })}
                   />

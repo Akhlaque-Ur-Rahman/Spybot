@@ -47,44 +47,56 @@ type NavDropdownItem = {
   icon: ReactNode;
 };
 
+type CanonicalMenuLabel = 'Company' | 'Industries' | 'Solution' | 'Resources';
+
 type NavLink = {
+  id: string;
   label: string;
   href: string;
   dropdown?: NavDropdownItem[];
+  canonicalLabel?: CanonicalMenuLabel | null;
 };
 
 const navLinks: NavLink[] = [
   {
+    id: 'company',
     label: 'Company',
     href: ROUTES.home,
     dropdown: companyNavItems.map((item) => ({
       ...item,
       icon: getNavIcon(item.label),
     })),
+    canonicalLabel: 'Company',
   },
   {
+    id: 'industries',
     label: 'Industries',
     href: ROUTES.industries,
     dropdown: industryNavItems.map((item) => ({
       ...item,
       icon: getNavIcon(item.label),
     })),
+    canonicalLabel: 'Industries',
   },
   {
+    id: 'solution',
     label: 'Solution',
     href: ROUTES.solutions,
     dropdown: solutionNavItems.map((item) => ({
       ...item,
       icon: getNavIcon(item.label),
     })),
+    canonicalLabel: 'Solution',
   },
   {
+    id: 'resources',
     label: 'Resources',
     href: ROUTES.resources,
     dropdown: resourceNavItems.map((item) => ({
       ...item,
       icon: getNavIcon(item.label),
     })),
+    canonicalLabel: 'Resources',
   },
 ];
 
@@ -92,7 +104,7 @@ function slugify(label: string) {
   return label.toLowerCase().replace(/\s+/g, '-');
 }
 
-function navOverviewCopy(label: string) {
+function navOverviewCopy(label: CanonicalMenuLabel | null | undefined) {
   switch (label) {
     case 'Company':
       return {
@@ -131,6 +143,10 @@ function canonicalMenuLabel(item: NavMenuItem) {
   if (label === 'resources' || href === ROUTES.resources) return 'Resources';
 
   return null;
+}
+
+function defaultLinkByCanonical(label: CanonicalMenuLabel) {
+  return navLinks.find((link) => link.canonicalLabel === label) ?? null;
 }
 
 function getNavIcon(label: string) {
@@ -186,23 +202,24 @@ function getNavIcon(label: string) {
 }
 
 function mergeMenuWithDefaults(items: NavMenuItem[]): NavLink[] {
-  const overrides = new Map<string, NavMenuItem>();
-  for (const item of items) {
-    const canonical = canonicalMenuLabel(item);
-    if (canonical && !overrides.has(canonical)) {
-      overrides.set(canonical, item);
-    }
-  }
+  const resolved = items
+    .map((item, index) => {
+      const canonical = canonicalMenuLabel(item);
+      const defaultLink = canonical ? defaultLinkByCanonical(canonical) : null;
+      const label = item.label.trim() || defaultLink?.label || 'Untitled';
+      const href = item.href.trim() || defaultLink?.href || ROUTES.home;
 
-  return navLinks.map((link) => {
-    const override = overrides.get(link.label);
-    if (!override) return link;
+      return {
+        id: canonical ? `${canonical.toLowerCase()}-${index}` : `${slugify(label)}-${index}`,
+        label,
+        href,
+        dropdown: defaultLink?.dropdown,
+        canonicalLabel: canonical,
+      } satisfies NavLink;
+    })
+    .filter((item) => item.label && item.href);
 
-    return {
-      ...link,
-      href: override.href || link.href,
-    };
-  });
+  return resolved.length ? resolved : navLinks;
 }
 
 export default function Navbar({
@@ -406,7 +423,7 @@ export default function Navbar({
                   if (!link.dropdown?.length) {
                     return (
                       <Link
-                        key={link.label}
+                        key={link.id}
                         href={link.href}
                         className={styles.mobileLink}
                         onClick={closeMobileMenu}
@@ -415,9 +432,9 @@ export default function Navbar({
                       </Link>
                     );
                   }
-                  const overview = navOverviewCopy(link.label);
+                  const overview = navOverviewCopy(link.canonicalLabel);
                   return (
-                    <details key={link.label} className={styles.mobileDisclosure}>
+                    <details key={link.id} className={styles.mobileDisclosure}>
                       <summary>
                         <span>{link.label}</span>
                         <ChevronDown size={18} className={styles.mobileDisclosureChevron} aria-hidden />
@@ -530,16 +547,16 @@ export default function Navbar({
           {/* Desktop links */}
           <div className={styles.navLinks} role="menubar">
             {resolvedLinks.map((link) => {
-              const dropdownSlug = slugify(link.label);
-              const hasDropdown = Boolean(link.dropdown);
-              const overview = navOverviewCopy(link.label);
+              const dropdownSlug = slugify(link.id);
+              const hasDropdown = Boolean(link.dropdown?.length);
+              const overview = navOverviewCopy(link.canonicalLabel);
 
               return (
                 <div
-                  key={link.label}
-                  className={`${styles.navItem} ${activeDropdown === link.label ? styles.navItemOpen : ''}`}
-                  data-dropdown-root={hasDropdown ? link.label : undefined}
-                  onMouseEnter={() => hasDropdown && setActiveDropdown(link.label)}
+                  key={link.id}
+                  className={`${styles.navItem} ${activeDropdown === link.id ? styles.navItemOpen : ''}`}
+                  data-dropdown-root={hasDropdown ? link.id : undefined}
+                  onMouseEnter={() => hasDropdown && setActiveDropdown(link.id)}
                   onMouseLeave={() => hasDropdown && closeDropdown()}
                 >
                   {hasDropdown ? (
@@ -549,12 +566,12 @@ export default function Navbar({
                       role="menuitem"
                       id={`nav-trigger-${dropdownSlug}`}
                       aria-haspopup="true"
-                      aria-expanded={activeDropdown === link.label}
+                      aria-expanded={activeDropdown === link.id}
                       aria-controls={`nav-menu-${dropdownSlug}`}
                       onClick={() =>
-                        setActiveDropdown((d) => (d === link.label ? null : link.label))
+                        setActiveDropdown((d) => (d === link.id ? null : link.id))
                       }
-                      onFocus={() => setActiveDropdown(link.label)}
+                      onFocus={() => setActiveDropdown(link.id)}
                     >
                       {link.label}
                       <ChevronDown size={14} className={styles.chevron} aria-hidden="true" />
@@ -565,7 +582,7 @@ export default function Navbar({
                     </Link>
                   )}
 
-                  {hasDropdown && activeDropdown === link.label && (
+                  {hasDropdown && activeDropdown === link.id && (
                     <div className={styles.dropdownShell} role="presentation">
                       <div
                         id={`nav-menu-${dropdownSlug}`}

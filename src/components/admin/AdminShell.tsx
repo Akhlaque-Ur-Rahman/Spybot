@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import type { LucideIcon } from 'lucide-react';
 import {
+  BookOpen,
   CloudUpload,
   FileText,
   History,
@@ -23,6 +24,7 @@ import styles from './AdminShell.module.css';
 
 const links: { href: string; label: string; Icon: LucideIcon }[] = [
   { href: '/admin', label: 'Overview', Icon: LayoutDashboard },
+  { href: '/admin/guide', label: 'Guide', Icon: BookOpen },
   { href: '/admin/content', label: 'Content', Icon: FileText },
   { href: '/admin/media', label: 'Media', Icon: ImageIcon },
   { href: '/admin/navigation', label: 'Navigation', Icon: Menu },

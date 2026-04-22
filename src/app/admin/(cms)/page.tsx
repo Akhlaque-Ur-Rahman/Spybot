@@ -110,6 +110,9 @@ export default async function AdminDashboardPage() {
       <div className={pageStyles.card}>
         <h2 className={pageStyles.cardTitle}>Quick actions</h2>
         <div className={pageStyles.quickActions}>
+          <Link href="/admin/guide" className={`${pageStyles.btn} ${pageStyles.btnSecondary} ${pageStyles.link}`}>
+            CMS guide
+          </Link>
           <Link href="/admin/content" className={`${pageStyles.btn} ${pageStyles.link}`}>
             Content
           </Link>
