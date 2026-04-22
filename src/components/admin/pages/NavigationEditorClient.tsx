@@ -7,9 +7,20 @@ import { TextField } from '@/components/admin/fields';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
 import { logAdminClientError } from '@/lib/admin/user-facing-errors';
+import type { HeaderDropdownConfig, HeaderDropdownGroupKey } from '@/lib/cms/types';
 
 export type NavItemRow = { id: string; label: string; href: string; description: string | null };
 export type MenuRow = { id: string; key: string; items: NavItemRow[] };
+type GroupItemRow = { label: string; href: string; description: string };
+type GroupState = Record<HeaderDropdownGroupKey, GroupItemRow[]>;
+const GROUP_KEYS: HeaderDropdownGroupKey[] = ['company', 'industries', 'solution', 'resources'];
+
+function groupLabel(group: HeaderDropdownGroupKey) {
+  if (group === 'company') return 'Company';
+  if (group === 'industries') return 'Industries';
+  if (group === 'solution') return 'Solution';
+  return 'Resources';
+}
 
 function menuSummary(key: string) {
   if (key === 'header-main') {
@@ -38,7 +49,13 @@ function menuSummary(key: string) {
   };
 }
 
-export default function NavigationEditorClient({ menus }: { menus: MenuRow[] }) {
+export default function NavigationEditorClient({
+  menus,
+  dropdowns,
+}: {
+  menus: MenuRow[];
+  dropdowns: HeaderDropdownConfig;
+}) {
   const router = useRouter();
   const { fetchJson } = useAdminApi();
   const { push } = useToast();
@@ -53,6 +70,29 @@ export default function NavigationEditorClient({ menus }: { menus: MenuRow[] }) 
     }))
   );
   const [savingMenu, setSavingMenu] = useState<string | null>(null);
+  const [groupState, setGroupState] = useState<GroupState>(() => ({
+    company: (dropdowns.company ?? []).map((i) => ({
+      label: i.label,
+      href: i.href,
+      description: i.description ?? '',
+    })),
+    industries: (dropdowns.industries ?? []).map((i) => ({
+      label: i.label,
+      href: i.href,
+      description: i.description ?? '',
+    })),
+    solution: (dropdowns.solution ?? []).map((i) => ({
+      label: i.label,
+      href: i.href,
+      description: i.description ?? '',
+    })),
+    resources: (dropdowns.resources ?? []).map((i) => ({
+      label: i.label,
+      href: i.href,
+      description: i.description ?? '',
+    })),
+  }));
+  const [savingDropdowns, setSavingDropdowns] = useState(false);
 
   function updateItem(menuIdx: number, itemIdx: number, patch: Partial<{ label: string; href: string; description: string }>) {
     setState((prev) => {
@@ -122,6 +162,84 @@ export default function NavigationEditorClient({ menus }: { menus: MenuRow[] }) 
     }
   }
 
+  function updateGroupItem(
+    group: HeaderDropdownGroupKey,
+    itemIdx: number,
+    patch: Partial<GroupItemRow>
+  ) {
+    setGroupState((prev) => {
+      const items = [...prev[group]];
+      items[itemIdx] = { ...items[itemIdx], ...patch };
+      return { ...prev, [group]: items };
+    });
+  }
+
+  function moveGroupItem(group: HeaderDropdownGroupKey, itemIdx: number, delta: number) {
+    setGroupState((prev) => {
+      const items = [...prev[group]];
+      const target = itemIdx + delta;
+      if (target < 0 || target >= items.length) return prev;
+      const tmp = items[itemIdx];
+      items[itemIdx] = items[target]!;
+      items[target] = tmp!;
+      return { ...prev, [group]: items };
+    });
+  }
+
+  function addGroupItem(group: HeaderDropdownGroupKey) {
+    setGroupState((prev) => ({
+      ...prev,
+      [group]: [...prev[group], { label: 'New link', href: '/', description: '' }],
+    }));
+  }
+
+  function removeGroupItem(group: HeaderDropdownGroupKey, itemIdx: number) {
+    setGroupState((prev) => ({
+      ...prev,
+      [group]: prev[group].filter((_, i) => i !== itemIdx),
+    }));
+  }
+
+  async function saveDropdowns() {
+    setSavingDropdowns(true);
+    try {
+      await fetchJson('/api/admin/navigation', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          dropdowns: {
+            company: groupState.company.map((i) => ({
+              label: i.label,
+              href: i.href,
+              description: i.description || undefined,
+            })),
+            industries: groupState.industries.map((i) => ({
+              label: i.label,
+              href: i.href,
+              description: i.description || undefined,
+            })),
+            solution: groupState.solution.map((i) => ({
+              label: i.label,
+              href: i.href,
+              description: i.description || undefined,
+            })),
+            resources: groupState.resources.map((i) => ({
+              label: i.label,
+              href: i.href,
+              description: i.description || undefined,
+            })),
+          },
+        }),
+      });
+      push('Dropdown links saved', 'success');
+      router.refresh();
+    } catch (e) {
+      logAdminClientError('NavigationEditorClient.saveDropdowns', e);
+      push(e instanceof Error ? e.message : 'We could not save dropdown links.', 'error');
+    } finally {
+      setSavingDropdowns(false);
+    }
+  }
+
   return (
     <div>
       {state.map((menu, menuIdx) => (
@@ -172,6 +290,82 @@ export default function NavigationEditorClient({ menus }: { menus: MenuRow[] }) 
           </ul>
         </section>
       ))}
+      <section className={pageStyles.card}>
+        <h3 className={pageStyles.cardTitle}>Dropdown groups</h3>
+        <p className={pageStyles.lead} style={{ marginBottom: 12 }}>
+          Manage links inside Company, Industries, Solution, and Resources dropdowns.
+        </p>
+        <button
+          type="button"
+          className={pageStyles.btn}
+          disabled={savingDropdowns}
+          onClick={() => void saveDropdowns()}
+        >
+          {savingDropdowns ? 'Saving…' : 'Save dropdowns'}
+        </button>
+        <div style={{ marginTop: 16, display: 'grid', gap: 16 }}>
+          {GROUP_KEYS.map((group) => (
+            <div key={group} className={pageStyles.listItem}>
+              <div className={pageStyles.row}>
+                <h4 style={{ margin: 0 }}>{groupLabel(group)}</h4>
+                <button
+                  type="button"
+                  className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+                  onClick={() => addGroupItem(group)}
+                >
+                  Add item
+                </button>
+              </div>
+              <ul className={pageStyles.list}>
+                {groupState[group].map((item, itemIdx) => (
+                  <li key={`${group}-${itemIdx}`} className={pageStyles.listItem}>
+                    <div className={pageStyles.row}>
+                      <button
+                        type="button"
+                        className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+                        onClick={() => moveGroupItem(group, itemIdx, -1)}
+                      >
+                        Up
+                      </button>
+                      <button
+                        type="button"
+                        className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+                        onClick={() => moveGroupItem(group, itemIdx, 1)}
+                      >
+                        Down
+                      </button>
+                      <button
+                        type="button"
+                        className={`${pageStyles.btn} ${pageStyles.btnDanger}`}
+                        onClick={() => removeGroupItem(group, itemIdx)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <div style={{ marginTop: 8, display: 'grid', gap: 8 }}>
+                      <TextField
+                        label="Label"
+                        value={item.label}
+                        onChange={(v) => updateGroupItem(group, itemIdx, { label: v })}
+                      />
+                      <TextField
+                        label="Href"
+                        value={item.href}
+                        onChange={(v) => updateGroupItem(group, itemIdx, { href: v })}
+                      />
+                      <TextField
+                        label="Description"
+                        value={item.description}
+                        onChange={(v) => updateGroupItem(group, itemIdx, { description: v })}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

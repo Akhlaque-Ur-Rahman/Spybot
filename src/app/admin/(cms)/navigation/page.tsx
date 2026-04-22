@@ -2,12 +2,16 @@ import Link from 'next/link';
 import NavigationEditorClient, { type MenuRow } from '@/components/admin/pages/NavigationEditorClient';
 import EmptyState from '@/components/admin/EmptyState';
 import pageStyles from '@/components/admin/adminPage.module.css';
+import { getHeaderDropdownConfig } from '@/lib/cms/service';
 import { prisma } from '@/lib/db/prisma';
 
 export default async function AdminNavigationPage() {
-  const menus = await prisma.navigationMenu.findMany({
-    include: { items: { orderBy: { position: 'asc' } } },
-  });
+  const [menus, dropdowns] = await Promise.all([
+    prisma.navigationMenu.findMany({
+      include: { items: { orderBy: { position: 'asc' } } },
+    }),
+    getHeaderDropdownConfig(),
+  ]);
 
   const rows: MenuRow[] = menus.map((m) => ({
     id: m.id,
@@ -34,7 +38,13 @@ export default async function AdminNavigationPage() {
       {rows.length === 0 ? (
         <EmptyState title="No menus" description="Run the database seed to create the default header menu." />
       ) : (
-        <NavigationEditorClient key={rows.map((m) => `${m.id}-${m.items.length}`).join('|')} menus={rows} />
+        <NavigationEditorClient
+          key={`${rows.map((m) => `${m.id}-${m.items.length}`).join('|')}:${Object.values(dropdowns)
+            .map((items) => items.length)
+            .join('-')}`}
+          menus={rows}
+          dropdowns={dropdowns}
+        />
       )}
     </>
   );

@@ -14,6 +14,7 @@ import {
   resourceNavItems,
   solutionNavItems,
 } from '@/site';
+import { computeOverflowStartIndex } from '@/lib/cms/navigation-utils';
 import {
   BadgeCheck,
   BookOpen,
@@ -38,7 +39,7 @@ import {
   Wallet,
   X,
 } from 'lucide-react';
-import type { NavMenuItem } from '@/lib/cms/types';
+import type { HeaderDropdownConfig, NavMenuItem } from '@/lib/cms/types';
 
 type NavDropdownItem = {
   label: string;
@@ -48,6 +49,30 @@ type NavDropdownItem = {
 };
 
 type CanonicalMenuLabel = 'Company' | 'Industries' | 'Solution' | 'Resources';
+type CanonicalMenuGroupKey = 'company' | 'industries' | 'solution' | 'resources';
+
+function toDropdownItems(items: ReadonlyArray<{ label: string; href: string; desc?: string }>): NavDropdownItem[] {
+  return items.map((item) => ({
+    label: item.label,
+    href: item.href,
+    desc: item.desc ?? '',
+    icon: getNavIcon(item.label),
+  }));
+}
+
+const defaultDropdownByCanonical: Record<CanonicalMenuLabel, NavDropdownItem[]> = {
+  Company: toDropdownItems(companyNavItems),
+  Industries: toDropdownItems(industryNavItems),
+  Solution: toDropdownItems(solutionNavItems),
+  Resources: toDropdownItems(resourceNavItems),
+};
+
+function canonicalLabelToGroupKey(label: CanonicalMenuLabel): CanonicalMenuGroupKey {
+  if (label === 'Company') return 'company';
+  if (label === 'Industries') return 'industries';
+  if (label === 'Solution') return 'solution';
+  return 'resources';
+}
 
 type NavLink = {
   id: string;
@@ -62,40 +87,28 @@ const navLinks: NavLink[] = [
     id: 'company',
     label: 'Company',
     href: ROUTES.home,
-    dropdown: companyNavItems.map((item) => ({
-      ...item,
-      icon: getNavIcon(item.label),
-    })),
+    dropdown: defaultDropdownByCanonical.Company,
     canonicalLabel: 'Company',
   },
   {
     id: 'industries',
     label: 'Industries',
     href: ROUTES.industries,
-    dropdown: industryNavItems.map((item) => ({
-      ...item,
-      icon: getNavIcon(item.label),
-    })),
+    dropdown: defaultDropdownByCanonical.Industries,
     canonicalLabel: 'Industries',
   },
   {
     id: 'solution',
     label: 'Solution',
     href: ROUTES.solutions,
-    dropdown: solutionNavItems.map((item) => ({
-      ...item,
-      icon: getNavIcon(item.label),
-    })),
+    dropdown: defaultDropdownByCanonical.Solution,
     canonicalLabel: 'Solution',
   },
   {
     id: 'resources',
     label: 'Resources',
     href: ROUTES.resources,
-    dropdown: resourceNavItems.map((item) => ({
-      ...item,
-      icon: getNavIcon(item.label),
-    })),
+    dropdown: defaultDropdownByCanonical.Resources,
     canonicalLabel: 'Resources',
   },
 ];
@@ -147,6 +160,26 @@ function canonicalMenuLabel(item: NavMenuItem) {
 
 function defaultLinkByCanonical(label: CanonicalMenuLabel) {
   return navLinks.find((link) => link.canonicalLabel === label) ?? null;
+}
+
+function resolveDropdownItems(
+  canonical: CanonicalMenuLabel | null,
+  dropdownConfig?: HeaderDropdownConfig
+): NavDropdownItem[] | undefined {
+  if (!canonical) return undefined;
+  const defaults = defaultDropdownByCanonical[canonical];
+  if (!dropdownConfig) return defaults;
+  const group = dropdownConfig[canonicalLabelToGroupKey(canonical)];
+  if (!group?.length) return defaults;
+  const parsed = group
+    .map((item) => ({
+      label: item.label.trim(),
+      href: item.href.trim(),
+      desc: (item.description ?? '').trim(),
+    }))
+    .filter((item) => item.label && item.href)
+    .map((item) => ({ ...item, icon: getNavIcon(item.label) }));
+  return parsed.length ? parsed : defaults;
 }
 
 function getNavIcon(label: string) {
@@ -201,7 +234,7 @@ function getNavIcon(label: string) {
   }
 }
 
-function mergeMenuWithDefaults(items: NavMenuItem[]): NavLink[] {
+function mergeMenuWithDefaults(items: NavMenuItem[], dropdownConfig?: HeaderDropdownConfig): NavLink[] {
   const resolved = items
     .map((item, index) => {
       const canonical = canonicalMenuLabel(item);
@@ -213,7 +246,7 @@ function mergeMenuWithDefaults(items: NavMenuItem[]): NavLink[] {
         id: canonical ? `${canonical.toLowerCase()}-${index}` : `${slugify(label)}-${index}`,
         label,
         href,
-        dropdown: defaultLink?.dropdown,
+        dropdown: resolveDropdownItems(canonical, dropdownConfig),
         canonicalLabel: canonical,
       } satisfies NavLink;
     })
@@ -225,11 +258,15 @@ function mergeMenuWithDefaults(items: NavMenuItem[]): NavLink[] {
 export default function Navbar({
   menuItems,
   utilityMenuItems,
+  dropdownConfig,
+  enableOverflow = true,
   primaryCtaHref = CTA_LINKS.demo,
   primaryCtaText = 'Book a Demo',
 }: {
   menuItems?: NavMenuItem[];
   utilityMenuItems?: NavMenuItem[];
+  dropdownConfig?: HeaderDropdownConfig;
+  enableOverflow?: boolean;
   primaryCtaHref?: string;
   primaryCtaText?: string;
 }) {
@@ -242,10 +279,23 @@ export default function Navbar({
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const navLinksRef = useRef<HTMLDivElement>(null);
+  const linkRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const hadMobileOpen = useRef(false);
   const prevPathname = useRef<string | null>(null);
+  const [overflowStartIdx, setOverflowStartIdx] = useState<number | null>(null);
+  const reserveMoreWidth = 92;
 
-  const resolvedLinks: NavLink[] = menuItems?.length ? mergeMenuWithDefaults(menuItems) : navLinks;
+  const resolvedLinks: NavLink[] = menuItems?.length ? mergeMenuWithDefaults(menuItems, dropdownConfig) : navLinks;
+  const visibleLinks = !enableOverflow || overflowStartIdx === null ? resolvedLinks : resolvedLinks.slice(0, overflowStartIdx);
+  const overflowLinks = !enableOverflow || overflowStartIdx === null ? [] : resolvedLinks.slice(overflowStartIdx);
+  const hasOverflow = overflowLinks.length > 0;
+  const moreDropdownItems: NavDropdownItem[] = overflowLinks.map((link) => ({
+    label: link.label,
+    href: link.href,
+    desc: '',
+    icon: <Layers key={`more-${link.id}`} size={18} strokeWidth={1.5} />,
+  }));
 
   const closeDropdown = useCallback(() => setActiveDropdown(null), []);
 
@@ -258,6 +308,43 @@ export default function Navbar({
   useEffect(() => {
     queueMicrotask(() => setMounted(true));
   }, []);
+
+  useEffect(() => {
+    const measure = () => {
+      const container = navLinksRef.current;
+      if (!container) {
+        setOverflowStartIdx(null);
+        return;
+      }
+      if (!enableOverflow) {
+        setOverflowStartIdx(null);
+        return;
+      }
+      const desktopOnly = window.matchMedia('(min-width: 769px)').matches;
+      if (!desktopOnly) {
+        setOverflowStartIdx(null);
+        return;
+      }
+      const widths = resolvedLinks.map((link) => linkRefs.current[link.id]?.offsetWidth ?? 0);
+      if (widths.some((w) => w <= 0)) return;
+
+      const availableWidth = container.clientWidth;
+      setOverflowStartIdx(computeOverflowStartIndex(widths, availableWidth, reserveMoreWidth));
+    };
+
+    const timeout = window.setTimeout(measure, 0);
+    const onResize = () => measure();
+    window.addEventListener('resize', onResize);
+
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => measure()) : null;
+    if (ro && navLinksRef.current) ro.observe(navLinksRef.current);
+
+    return () => {
+      window.clearTimeout(timeout);
+      window.removeEventListener('resize', onResize);
+      ro?.disconnect();
+    };
+  }, [resolvedLinks, enableOverflow]);
 
   useEffect(() => {
     if (!mobileOpen) {
@@ -545,8 +632,8 @@ export default function Navbar({
           </Link>
 
           {/* Desktop links */}
-          <div className={styles.navLinks} role="menubar">
-            {resolvedLinks.map((link) => {
+          <div ref={navLinksRef} className={styles.navLinks} role="menubar">
+            {visibleLinks.map((link) => {
               const dropdownSlug = slugify(link.id);
               const hasDropdown = Boolean(link.dropdown?.length);
               const overview = navOverviewCopy(link.canonicalLabel);
@@ -554,6 +641,9 @@ export default function Navbar({
               return (
                 <div
                   key={link.id}
+                  ref={(el) => {
+                    linkRefs.current[link.id] = el;
+                  }}
                   className={`${styles.navItem} ${activeDropdown === link.id ? styles.navItemOpen : ''}`}
                   data-dropdown-root={hasDropdown ? link.id : undefined}
                   onMouseEnter={() => hasDropdown && setActiveDropdown(link.id)}
@@ -628,6 +718,62 @@ export default function Navbar({
                 </div>
               );
             })}
+            {hasOverflow ? (
+              <div
+                ref={(el) => {
+                  linkRefs.current.more = el;
+                }}
+                className={`${styles.navItem} ${activeDropdown === 'more' ? styles.navItemOpen : ''}`}
+                data-dropdown-root="more"
+                onMouseEnter={() => setActiveDropdown('more')}
+                onMouseLeave={closeDropdown}
+              >
+                <button
+                  type="button"
+                  className={styles.navLink}
+                  role="menuitem"
+                  id="nav-trigger-more"
+                  aria-haspopup="true"
+                  aria-expanded={activeDropdown === 'more'}
+                  aria-controls="nav-menu-more"
+                  onClick={() => setActiveDropdown((d) => (d === 'more' ? null : 'more'))}
+                  onFocus={() => setActiveDropdown('more')}
+                >
+                  More
+                  <ChevronDown size={14} className={styles.chevron} aria-hidden="true" />
+                </button>
+                {activeDropdown === 'more' ? (
+                  <div className={styles.dropdownShell} role="presentation">
+                    <div
+                      id="nav-menu-more"
+                      className={styles.dropdown}
+                      role="menu"
+                      aria-label="More submenu"
+                      aria-labelledby="nav-trigger-more"
+                    >
+                      <div className={styles.dropdownGrid}>
+                        {moreDropdownItems.map((item) => (
+                          <Link
+                            key={`${item.label}-${item.href}`}
+                            href={item.href}
+                            className={styles.dropdownItem}
+                            role="menuitem"
+                            onClick={closeDropdown}
+                          >
+                            <span className={styles.dropdownIcon} aria-hidden="true">
+                              {item.icon}
+                            </span>
+                            <div>
+                              <div className={styles.dropdownLabel}>{item.label}</div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
           {/* CTA buttons */}

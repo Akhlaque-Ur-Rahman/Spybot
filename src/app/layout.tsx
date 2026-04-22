@@ -6,6 +6,7 @@ import AppShell from '@/components/AppShell';
 import { buildRootJsonLd } from '@/lib/cms/site-jsonld';
 import {
   getFooterMenu,
+  getHeaderDropdownConfig,
   getGlobalSettings,
   getHeaderMenu,
   getHeaderUtilityMenu,
@@ -85,9 +86,11 @@ export async function generateMetadata(): Promise<Metadata> {
 const themeScript = `(function(){try{document.documentElement.classList.add('js');var t=localStorage.getItem('spybot-theme');var r=t==='light'?'light':t==='dark'?'dark':window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',r);}catch(e){}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [headerMenu, headerUtilityMenu, footerMenu, globalSettings, site] = await Promise.all([
+  const enableNavEnhancements = process.env.NEXT_PUBLIC_NAV_ENHANCED !== '0';
+  const [headerMenu, headerUtilityMenu, headerDropdownConfig, footerMenu, globalSettings, site] = await Promise.all([
     getHeaderMenu(),
     getHeaderUtilityMenu(),
+    getHeaderDropdownConfig(),
     getFooterMenu(),
     getGlobalSettings<{ primaryCtaHref?: string; primaryCtaText?: string; siteName?: string; supportEmail?: string }>(),
     getSiteRuntimeConfig(),
@@ -107,6 +110,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <AppShell
               headerMenu={headerMenu}
               headerUtilityMenu={headerUtilityMenu}
+              headerDropdownConfig={enableNavEnhancements ? headerDropdownConfig : undefined}
+              enableNavEnhancements={enableNavEnhancements}
               footerMenu={footerMenu}
               primaryCtaHref={globalSettings.primaryCtaHref}
               primaryCtaText={globalSettings.primaryCtaText}

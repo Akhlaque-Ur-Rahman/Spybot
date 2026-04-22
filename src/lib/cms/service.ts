@@ -1,11 +1,13 @@
 import { prisma } from '@/lib/db/prisma';
 import { unstable_cache } from 'next/cache';
+import { normalizeHeaderDropdownConfig } from '@/lib/cms/navigation-utils';
 import { getFooterColumnsSetting } from '@/lib/cms/page-registry';
 import { mergeSiteRuntimeConfig } from '@/lib/cms/site-runtime-config';
 import type { SiteRuntimeConfig } from '@/lib/cms/site-runtime-config';
-import type { CmsPage, NavMenuItem } from '@/lib/cms/types';
+import type { CmsPage, HeaderDropdownConfig, NavMenuItem } from '@/lib/cms/types';
 
 const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
+const HEADER_DROPDOWNS_KEY = 'header-dropdowns';
 
 async function withCmsFallback<T>(fallback: T, loader: () => Promise<T>): Promise<T> {
   if (!hasDatabaseUrl) return fallback;
@@ -143,6 +145,26 @@ export async function getHeaderUtilityMenu(): Promise<NavMenuItem[]> {
       }),
     ['cms-header-utility-menu'],
     { revalidate: 60, tags: ['cms-header-utility-menu'] }
+  )();
+}
+
+export async function getHeaderDropdownConfig(): Promise<HeaderDropdownConfig> {
+  return unstable_cache(
+    () =>
+      withCmsFallback(
+        {
+          company: [],
+          industries: [],
+          solution: [],
+          resources: [],
+        } satisfies HeaderDropdownConfig,
+        async () => {
+          const row = await prisma.siteSetting.findUnique({ where: { key: HEADER_DROPDOWNS_KEY } });
+          return normalizeHeaderDropdownConfig(row?.valueJson);
+        }
+      ),
+    ['cms-header-dropdowns'],
+    { revalidate: 60, tags: ['cms-header-dropdowns'] }
   )();
 }
 

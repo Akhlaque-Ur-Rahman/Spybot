@@ -55,10 +55,28 @@ const navItemSchema = z.object({
   description: z.union([z.string().max(500), z.null()]).optional(),
 });
 
-export const adminNavigationPatchSchema = z.object({
+const adminNavigationMenuPatchSchema = z.object({
   key: z.string().min(1).max(100).trim(),
   items: z.array(navItemSchema).max(200),
 });
+
+const dropdownGroupItemsSchema = z.array(navItemSchema).max(200);
+
+const headerDropdownsSchema = z.object({
+  company: dropdownGroupItemsSchema,
+  industries: dropdownGroupItemsSchema,
+  solution: dropdownGroupItemsSchema,
+  resources: dropdownGroupItemsSchema,
+});
+
+const adminNavigationDropdownsPatchSchema = z.object({
+  dropdowns: headerDropdownsSchema,
+});
+
+export const adminNavigationPatchSchema = z.union([
+  adminNavigationMenuPatchSchema,
+  adminNavigationDropdownsPatchSchema,
+]);
 
 const footerLinkSchema = z.object({
   label: z.string().min(1).max(300).trim(),

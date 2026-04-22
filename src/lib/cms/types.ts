@@ -29,3 +29,7 @@ export type NavMenuItem = {
   href: string;
   description?: string | null;
 };
+
+export type HeaderDropdownGroupKey = 'company' | 'industries' | 'solution' | 'resources';
+
+export type HeaderDropdownConfig = Record<HeaderDropdownGroupKey, NavMenuItem[]>;

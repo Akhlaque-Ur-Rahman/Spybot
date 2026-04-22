@@ -6,13 +6,15 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PageEntranceOverlay from '@/components/PageEntranceOverlay';
 import SciFiLoaderCanvas from '@/components/loaders/SciFiLoaderCanvas';
-import type { NavMenuItem } from '@/lib/cms/types';
+import type { HeaderDropdownConfig, NavMenuItem } from '@/lib/cms/types';
 import shellStyles from './AppShell.module.css';
 
 type AppShellProps = {
   children: React.ReactNode;
   headerMenu: NavMenuItem[];
   headerUtilityMenu?: NavMenuItem[];
+  headerDropdownConfig?: HeaderDropdownConfig;
+  enableNavEnhancements?: boolean;
   footerMenu: Record<string, NavMenuItem[]>;
   primaryCtaHref?: string;
   primaryCtaText?: string;
@@ -38,6 +40,8 @@ export default function AppShell({
   children,
   headerMenu,
   headerUtilityMenu,
+  headerDropdownConfig,
+  enableNavEnhancements,
   footerMenu,
   primaryCtaHref,
   primaryCtaText,
@@ -91,6 +95,8 @@ export default function AppShell({
         <Navbar
           menuItems={headerMenu}
           utilityMenuItems={headerUtilityMenu}
+          dropdownConfig={headerDropdownConfig}
+          enableOverflow={enableNavEnhancements}
           primaryCtaHref={primaryCtaHref}
           primaryCtaText={primaryCtaText}
         />
