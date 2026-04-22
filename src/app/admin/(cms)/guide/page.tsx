@@ -1,7 +1,13 @@
 import Link from 'next/link';
 import pageStyles from '@/components/admin/adminPage.module.css';
 
-const sections = [
+type GuideSection = {
+  title: string;
+  href?: string;
+  points: readonly string[];
+};
+
+const sections: readonly GuideSection[] = [
   {
     title: 'Recommended workflow',
     points: [
@@ -108,7 +114,7 @@ const sections = [
       'Use it to verify changes after publishing or access updates.',
     ],
   },
-] as const;
+];
 
 export default function AdminGuidePage() {
   return (
