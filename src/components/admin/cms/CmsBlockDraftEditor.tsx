@@ -18,6 +18,7 @@ import type { CmsIconName } from '@/lib/cms/icon-map';
 import { cmsIconNames } from '@/lib/cms/icon-map';
 import type { MediaClipMeta } from '@/lib/site-media';
 import { MEDIA_CLIPS } from '@/lib/site-media';
+import { SHOWCASE_ICON_KEYS, type ShowcaseIconKey } from '@/lib/solution-showcase-data';
 import styles from '@/components/admin/fields.module.css';
 
 type Props = {
@@ -893,6 +894,161 @@ function EditorDecisionFlow({ value, onChange }: Props) {
   );
 }
 
+function showcaseIconValue(v: unknown): ShowcaseIconKey {
+  const s = str(v, 'fileText');
+  return SHOWCASE_ICON_KEYS.includes(s as ShowcaseIconKey) ? (s as ShowcaseIconKey) : 'fileText';
+}
+
+function EditorSolutionShowcase({ value, onChange }: Props) {
+  const o = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+  const patchRoot = (p: Record<string, unknown>) => onChange({ ...o, ...p });
+  const verticals = Array.isArray(o.verticals) ? o.verticals : [];
+  const patchVerticals = (next: unknown[]) => patchRoot({ verticals: next });
+  const iconOptions = SHOWCASE_ICON_KEYS.map((k) => ({ value: k, label: k }));
+
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <TextField label="Title" value={str(o.title)} onChange={(title) => patchRoot({ title })} />
+      <TextField
+        label="Title gradient (optional)"
+        value={str(o.titleGradient)}
+        onChange={(titleGradient) => patchRoot({ titleGradient })}
+      />
+      <TextAreaField label="Subtitle" value={str(o.subtitle)} onChange={(subtitle) => patchRoot({ subtitle })} rows={3} />
+      <LinkFields label="Primary CTA" value={link(o.primaryCta)} onChange={(primaryCta) => patchRoot({ primaryCta })} />
+      <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patchRoot({ secondaryCta })} />
+
+      <div className={styles.repeatToolbar}>
+        <strong>Tabs</strong>
+        <button
+          type="button"
+          className={styles.btnSmall}
+          onClick={() =>
+            patchVerticals([
+              ...verticals,
+              {
+                id: `tab_${Date.now()}`,
+                label: 'New tab',
+                panelTitle: '',
+                panelDescription: '',
+                cards: [{ icon: 'fileText', title: '', description: '' }],
+              },
+            ])
+          }
+        >
+          Add tab
+        </button>
+      </div>
+
+      {verticals.map((raw, vi) => {
+        const vert = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
+        const cards = Array.isArray(vert.cards) ? vert.cards : [];
+        const patchCards = (nextCards: unknown[]) => {
+          const next = [...verticals];
+          next[vi] = { ...vert, cards: nextCards };
+          patchVerticals(next);
+        };
+
+        return (
+          <RepeatItemShell
+            key={vi}
+            title={`Tab: ${str(vert.label) || str(vert.id) || String(vi + 1)}`}
+            index={vi}
+            onRemove={() => patchVerticals(verticals.filter((_, j) => j !== vi))}
+          >
+            <div className={styles.fieldGrid2}>
+              <TextField
+                label="Tab id"
+                value={str(vert.id)}
+                onChange={(id) => {
+                  const next = [...verticals];
+                  next[vi] = { ...vert, id };
+                  patchVerticals(next);
+                }}
+              />
+              <TextField
+                label="Tab label"
+                value={str(vert.label)}
+                onChange={(label) => {
+                  const next = [...verticals];
+                  next[vi] = { ...vert, label };
+                  patchVerticals(next);
+                }}
+              />
+            </div>
+            <TextField
+              label="Panel title"
+              value={str(vert.panelTitle)}
+              onChange={(panelTitle) => {
+                const next = [...verticals];
+                next[vi] = { ...vert, panelTitle };
+                patchVerticals(next);
+              }}
+            />
+            <TextAreaField
+              label="Panel description"
+              value={str(vert.panelDescription)}
+              onChange={(panelDescription) => {
+                const next = [...verticals];
+                next[vi] = { ...vert, panelDescription };
+                patchVerticals(next);
+              }}
+              rows={2}
+            />
+
+            <div className={styles.repeatToolbar}>
+              <span>Cards</span>
+              <button
+                type="button"
+                className={styles.btnSmall}
+                onClick={() => patchCards([...cards, { icon: 'fileText', title: '', description: '' }])}
+              >
+                Add card
+              </button>
+            </div>
+            {cards.map((craw, ci) => {
+              const card = craw && typeof craw === 'object' && !Array.isArray(craw) ? (craw as Record<string, unknown>) : {};
+              return (
+                <RepeatItemShell key={ci} title="Card" index={ci} onRemove={() => patchCards(cards.filter((_, j) => j !== ci))}>
+                  <SelectField
+                    label="Icon"
+                    value={showcaseIconValue(card.icon)}
+                    options={iconOptions}
+                    onChange={(icon) => {
+                      const nc = [...cards];
+                      nc[ci] = { ...card, icon };
+                      patchCards(nc);
+                    }}
+                  />
+                  <TextField
+                    label="Title"
+                    value={str(card.title)}
+                    onChange={(title) => {
+                      const nc = [...cards];
+                      nc[ci] = { ...card, title };
+                      patchCards(nc);
+                    }}
+                  />
+                  <TextAreaField
+                    label="Description"
+                    value={str(card.description)}
+                    onChange={(description) => {
+                      const nc = [...cards];
+                      nc[ci] = { ...card, description };
+                      patchCards(nc);
+                    }}
+                    rows={2}
+                  />
+                </RepeatItemShell>
+              );
+            })}
+          </RepeatItemShell>
+        );
+      })}
+    </div>
+  );
+}
+
 function EditorDemoSection({ value, onChange }: Props) {
   const o = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
   const valuePoints = Array.isArray(o.valuePoints) ? o.valuePoints : [];
@@ -991,6 +1147,7 @@ const REGISTRY: Record<string, (p: Props) => ReactNode> = {
   pageHeader: EditorPageHeader,
   coverageCarousel: EditorCoverageCarousel,
   directoryGrid: EditorDirectoryGrid,
+  solutionShowcase: EditorSolutionShowcase,
   sliderSection: EditorSliderSection,
   utilityCtaBand: EditorUtilityCtaBand,
   faqAccordion: EditorFaqAccordion,

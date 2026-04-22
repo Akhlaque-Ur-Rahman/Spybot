@@ -1,25 +1,13 @@
 import { z } from 'zod';
 import { validateCmsRichTextField } from '@/lib/cms/rich-text';
 import { isCmsBlockType, type CmsBlockType } from '@/lib/cms/page-registry';
+import { SHOWCASE_ICON_KEYS } from '@/lib/solution-showcase-data';
 
 const draftObject = z.record(z.string(), z.unknown());
 
 type Refine = (o: Record<string, unknown>) => string | null;
 
-const SOLUTION_SHOWCASE_ICONS = new Set([
-  'fileText',
-  'badgeCheck',
-  'creditCard',
-  'landmark',
-  'building2',
-  'scanFace',
-  'video',
-  'penLine',
-  'shield',
-  'userCheck',
-  'briefcase',
-  'banknote',
-]);
+const showcaseIconSet = new Set<string>(SHOWCASE_ICON_KEYS);
 
 function validateEachRichField(items: unknown, key: 'desc' | 'description'): string | null {
   if (!Array.isArray(items)) return null;
@@ -100,7 +88,7 @@ const refinements: Record<CmsBlockType, Refine> = {
       for (const card of v.cards) {
         if (!card || typeof card !== 'object' || Array.isArray(card)) return 'solutionShowcase: invalid card';
         const c = card as Record<string, unknown>;
-        if (typeof c.icon !== 'string' || !SOLUTION_SHOWCASE_ICONS.has(c.icon)) {
+        if (typeof c.icon !== 'string' || !showcaseIconSet.has(c.icon)) {
           return 'solutionShowcase: card.icon must be a known icon key';
         }
         if (typeof c.title !== 'string' || !c.title.trim()) return 'solutionShowcase: card.title required';

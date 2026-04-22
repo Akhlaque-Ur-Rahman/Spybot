@@ -22,6 +22,22 @@ export type ShowcaseIconKey =
   | 'briefcase'
   | 'banknote';
 
+/** Keys accepted by {@link SolutionShowcase} and CMS draft validation. */
+export const SHOWCASE_ICON_KEYS: readonly ShowcaseIconKey[] = [
+  'fileText',
+  'badgeCheck',
+  'creditCard',
+  'landmark',
+  'building2',
+  'scanFace',
+  'video',
+  'penLine',
+  'shield',
+  'userCheck',
+  'briefcase',
+  'banknote',
+];
+
 export type ShowcaseCard = {
   icon: ShowcaseIconKey;
   title: string;
