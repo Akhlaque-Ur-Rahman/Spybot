@@ -5,6 +5,7 @@ import {
   buildMediaListWhere,
   parseMediaListQuery,
 } from '@/lib/admin/media-list-query';
+import { buildMediaUsageMap } from '@/lib/admin/media-usage';
 import { prisma } from '@/lib/db/prisma';
 
 type SearchParamsInput = Record<string, string | string[] | undefined> | Promise<Record<string, string | string[] | undefined>>;
@@ -30,6 +31,7 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
     skip,
     take: parsed.perPage,
   });
+  const usageByUrl = await buildMediaUsageMap(assets.map((a) => a.url));
 
   const listQuery = { ...parsed, page };
   const rows: AssetRow[] = assets.map((a) => ({
@@ -40,6 +42,8 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
     mimeType: a.mimeType,
     referenceKey: a.referenceKey,
     createdAt: a.createdAt.toISOString(),
+    usageCount: usageByUrl.get(a.url)?.count ?? 0,
+    usagePreview: usageByUrl.get(a.url)?.items ?? [],
   }));
 
   return (

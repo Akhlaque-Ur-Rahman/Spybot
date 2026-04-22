@@ -132,6 +132,29 @@ export default function ContentPageEditor({
     setSectionOpen(loadSectionOpen(page.key));
   }, [page.key]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash.replace(/^#/, '');
+    if (!hash) return;
+    let targetSectionKey: string | null = null;
+    if (hash.startsWith('section-')) {
+      targetSectionKey = decodeURIComponent(hash.slice('section-'.length));
+    } else if (hash.startsWith('block-')) {
+      const rest = hash.slice('block-'.length);
+      const dash = rest.indexOf('-');
+      if (dash > 0) targetSectionKey = decodeURIComponent(rest.slice(0, dash));
+    }
+    if (!targetSectionKey) return;
+    const section = page.sections.find((s) => s.key === targetSectionKey);
+    if (!section) return;
+    setSectionOpen((prev) => {
+      if (prev[section.id]) return prev;
+      const next = { ...prev, [section.id]: true };
+      persistSectionOpen(page.key, next);
+      return next;
+    });
+  }, [page.key, page.sections]);
+
   const allBlockIds = useMemo(() => page.sections.flatMap((s) => s.blocks.map((b) => b.id)), [page.sections]);
 
   const metaDirty = title !== page.title || slug !== page.slug;
@@ -613,6 +636,7 @@ export default function ContentPageEditor({
       {page.sections.map((section) => (
         <details
           key={section.id}
+          id={`section-${encodeURIComponent(section.key)}`}
           className={pageStyles.card}
           open={sectionOpen[section.id] ?? false}
           onToggle={(e) => {
@@ -644,6 +668,7 @@ export default function ContentPageEditor({
                 return (
                   <div
                     key={block.id}
+                    id={`block-${encodeURIComponent(section.key)}-${encodeURIComponent(block.key)}`}
                     style={{
                       marginBottom: 24,
                       paddingBottom: 16,

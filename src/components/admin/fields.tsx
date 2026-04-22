@@ -168,6 +168,16 @@ export function CardLinkFields({
 }
 
 const mediaClipKeys = Object.keys(MEDIA_CLIPS) as Array<keyof typeof MEDIA_CLIPS>;
+type MediaAssetOption = { id: string; url: string; mimeType: string | null };
+
+function mediaKind(mimeType: string | null, url: string): 'video' | 'image' | 'other' {
+  const mime = mimeType?.toLowerCase() ?? '';
+  if (mime.startsWith('video/')) return 'video';
+  if (mime.startsWith('image/')) return 'image';
+  if (/\.(mp4|webm|mov)$/i.test(url)) return 'video';
+  if (/\.(png|jpe?g|gif|webp|svg)$/i.test(url)) return 'image';
+  return 'other';
+}
 
 export function MediaClipFields({
   label,
@@ -186,6 +196,32 @@ export function MediaClipFields({
       MEDIA_CLIPS[k].description === value.description,
   );
   const preset = matchedKey ?? '';
+  const [assetOptions, setAssetOptions] = useState<MediaAssetOption[]>([]);
+  const [assetError, setAssetError] = useState<string | null>(null);
+  const srcKind = mediaKind(null, value.src);
+  const videoOptions = assetOptions.filter((row) => mediaKind(row.mimeType, row.url) === 'video');
+  const imageOptions = assetOptions.filter((row) => mediaKind(row.mimeType, row.url) === 'image');
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadAssets() {
+      try {
+        const res = await fetch('/api/admin/media?per=100');
+        if (!res.ok) throw new Error('Failed to fetch media assets');
+        const data = (await res.json()) as { assets?: MediaAssetOption[] };
+        if (!mounted) return;
+        setAssetOptions(Array.isArray(data.assets) ? data.assets : []);
+        setAssetError(null);
+      } catch {
+        if (!mounted) return;
+        setAssetError('Media library unavailable');
+      }
+    }
+    void loadAssets();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <fieldset className={styles.label} style={{ border: 'none', padding: 0, margin: 0 }}>
@@ -211,6 +247,26 @@ export function MediaClipFields({
       </label>
       <div className={styles.fieldGrid2} style={{ marginTop: 12 }}>
         <TextField label="Video src" value={value.src} onChange={(src) => onChange({ ...value, src })} />
+        <label className={styles.label}>
+          <span>From library (video)</span>
+          <select
+            className={styles.select}
+            value=""
+            onChange={(event) => {
+              const url = event.target.value;
+              if (!url) return;
+              onChange({ ...value, src: url });
+              event.target.value = '';
+            }}
+          >
+            <option value="">{videoOptions.length ? 'Select a video asset' : 'No video assets yet'}</option>
+            {videoOptions.map((asset) => (
+              <option key={asset.id} value={asset.url}>
+                {asset.url}
+              </option>
+            ))}
+          </select>
+        </label>
         <TextField
           label="Poster"
           value={value.poster ?? ''}
@@ -218,9 +274,31 @@ export function MediaClipFields({
             onChange({ ...value, ...(poster.trim() === '' ? { poster: undefined } : { poster }) })
           }
         />
+        <label className={styles.label}>
+          <span>From library (poster)</span>
+          <select
+            className={styles.select}
+            value=""
+            onChange={(event) => {
+              const url = event.target.value;
+              if (!url) return;
+              onChange({ ...value, poster: url });
+              event.target.value = '';
+            }}
+          >
+            <option value="">{imageOptions.length ? 'Select an image asset' : 'No image assets yet'}</option>
+            {imageOptions.map((asset) => (
+              <option key={asset.id} value={asset.url}>
+                {asset.url}
+              </option>
+            ))}
+          </select>
+        </label>
         <TextField label="Title" value={value.title} onChange={(title) => onChange({ ...value, title })} />
         <TextField label="Description" value={value.description} onChange={(description) => onChange({ ...value, description })} />
       </div>
+      {srcKind !== 'video' ? <p className={styles.label}>Current source is not a video URL.</p> : null}
+      {assetError ? <p className={styles.label}>{assetError}</p> : null}
     </fieldset>
   );
 }

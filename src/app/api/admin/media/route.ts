@@ -8,6 +8,7 @@ import {
   buildMediaListWhere,
   parseMediaListQuery,
 } from '@/lib/admin/media-list-query';
+import { inferMimeTypeFromPath, isAllowedMediaMimeType, normalizeMediaTags } from '@/lib/admin/media-ingest';
 import { prisma } from '@/lib/db/prisma';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 
@@ -52,9 +53,28 @@ export async function POST(request: NextRequest) {
   const parsed = await readValidatedJson(request, adminMediaPostSchema);
   if (!parsed.ok) return parsed.response;
   const body = parsed.data;
+  const normalizedUrl = body.url.trim();
+  const normalizedAlt = body.alt?.trim() ? body.alt.trim() : null;
+  const normalizedTags = normalizeMediaTags(body.tags);
+  const guessedMime = inferMimeTypeFromPath(normalizedUrl);
+  const explicitMime = body.mimeType?.trim() ? body.mimeType.trim().toLowerCase() : null;
+  const resolvedMime = explicitMime ?? guessedMime;
+  if (resolvedMime && !isAllowedMediaMimeType(resolvedMime)) {
+    return NextResponse.json({ error: 'Unsupported media type. Use image/video/audio or PDF URLs.' }, { status: 400 });
+  }
+
+  const existing = await prisma.mediaAsset.findFirst({ where: { url: normalizedUrl } });
+  if (existing) {
+    return NextResponse.json({ asset: existing, duplicate: true });
+  }
 
   const asset = await prisma.mediaAsset.create({
-    data: { url: body.url, alt: body.alt ?? null, tags: body.tags ?? [], mimeType: body.mimeType ?? null },
+    data: {
+      url: normalizedUrl,
+      alt: normalizedAlt,
+      tags: normalizedTags,
+      mimeType: resolvedMime ?? null,
+    },
   });
   return NextResponse.json({ asset }, { status: 201 });
 }

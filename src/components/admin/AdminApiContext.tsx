@@ -23,7 +23,9 @@ export function AdminApiProvider({
       async fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
         const headers = new Headers(init?.headers);
         if (csrfToken) headers.set('x-csrf-token', csrfToken);
-        if (!headers.has('Content-Type') && init?.body) {
+        const isFormDataBody =
+          typeof FormData !== 'undefined' && init?.body instanceof FormData;
+        if (!headers.has('Content-Type') && init?.body && !isFormDataBody) {
           headers.set('Content-Type', 'application/json');
         }
         const res = await fetch(url, {

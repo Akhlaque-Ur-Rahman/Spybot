@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { TextField } from '@/components/admin/fields';
 import { useToast } from '@/components/admin/Toast';
@@ -25,6 +25,8 @@ export type AssetRow = {
   mimeType: string | null;
   referenceKey: string | null;
   createdAt: string;
+  usageCount: number;
+  usagePreview: Array<{ label: string; href: string }>;
 };
 
 const SORT_LABELS: Record<MediaSort, string> = {
@@ -97,7 +99,11 @@ export default function MediaLibraryClient({
   const [url, setUrl] = useState('');
   const [alt, setAlt] = useState('');
   const [tags, setTags] = useState('');
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const uploadInputRef = useRef<HTMLInputElement | null>(null);
+  const [syncing, setSyncing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   async function addAsset() {
     if (!url.trim()) {
@@ -130,6 +136,48 @@ export default function MediaLibraryClient({
     }
   }
 
+  async function uploadAsset() {
+    if (!uploadFile) {
+      push('Select a file first', 'error');
+      return;
+    }
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.set('file', uploadFile);
+      if (alt.trim()) form.set('alt', alt.trim());
+      if (tags.trim()) form.set('tags', tags.trim());
+      await fetchJson('/api/admin/media/upload', { method: 'POST', body: form });
+      push('File uploaded', 'success');
+      setUploadFile(null);
+      if (uploadInputRef.current) uploadInputRef.current.value = '';
+      setAlt('');
+      setTags('');
+      router.refresh();
+    } catch (e) {
+      logAdminClientError('MediaLibraryClient.uploadAsset', e);
+      push(e instanceof Error ? e.message : 'We could not upload this file.', 'error');
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function syncPublicMedia() {
+    setSyncing(true);
+    try {
+      const res = await fetchJson<{ imported: number; skipped: number; total: number }>('/api/admin/media/sync', {
+        method: 'POST',
+      });
+      push(`Synced media: ${res.imported} imported, ${res.skipped} skipped`, 'success');
+      router.refresh();
+    } catch (e) {
+      logAdminClientError('MediaLibraryClient.syncPublicMedia', e);
+      push(e instanceof Error ? e.message : 'Sync failed.', 'error');
+    } finally {
+      setSyncing(false);
+    }
+  }
+
   const filterFormKey = `${listQuery.q}|${listQuery.tag}|${listQuery.mime}|${listQuery.ref}|${listQuery.perPage}`;
 
   return (
@@ -146,6 +194,33 @@ export default function MediaLibraryClient({
         <button type="button" className={pageStyles.btn} style={{ marginTop: 12 }} disabled={loading} onClick={addAsset}>
           {loading ? 'Adding…' : 'Add asset'}
         </button>
+      </div>
+      <div className={pageStyles.card}>
+        <h3 className={pageStyles.cardTitle}>Upload file</h3>
+        <label className={pageStyles.lead} style={{ display: 'grid', gap: 8, margin: 0 }}>
+          File
+          <input
+            ref={uploadInputRef}
+            className={pageStyles.input}
+            type="file"
+            accept="image/*,video/*,audio/*,.pdf"
+            onChange={(event) => setUploadFile(event.target.files?.[0] ?? null)}
+          />
+        </label>
+        <div style={{ marginTop: 8 }}>
+          <TextField label="Alt text" value={alt} onChange={setAlt} />
+        </div>
+        <div style={{ marginTop: 8 }}>
+          <TextField label="Tags" value={tags} onChange={setTags} />
+        </div>
+        <div className={pageStyles.row} style={{ marginTop: 12, marginBottom: 0 }}>
+          <button type="button" className={pageStyles.btn} disabled={uploading} onClick={uploadAsset}>
+            {uploading ? 'Uploading…' : 'Upload file'}
+          </button>
+          <button type="button" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`} disabled={syncing} onClick={syncPublicMedia}>
+            {syncing ? 'Syncing…' : 'Sync public/media'}
+          </button>
+        </div>
       </div>
 
       {emptyLibrary ? (
@@ -244,6 +319,7 @@ export default function MediaLibraryClient({
                       <th scope="col">Tags</th>
                       <th scope="col">MIME</th>
                       <th scope="col">Reference</th>
+                      <th scope="col">Usage</th>
                       <th scope="col">Added</th>
                     </tr>
                   </thead>
@@ -281,6 +357,26 @@ export default function MediaLibraryClient({
                         <td>{a.mimeType ?? '—'}</td>
                         <td>
                           {a.referenceKey ? <code className={pageStyles.mono}>{a.referenceKey}</code> : '—'}
+                        </td>
+                        <td style={{ minWidth: 180 }}>
+                          {a.usageCount > 0 ? (
+                            <div style={{ display: 'grid', gap: 4 }}>
+                              <strong>{a.usageCount} section{a.usageCount === 1 ? '' : 's'}</strong>
+                              <div className={pageStyles.mono}>
+                                {a.usagePreview.map((item, idx) => (
+                                  <span key={item.href}>
+                                    {idx > 0 ? ', ' : ''}
+                                    <Link href={item.href} className={pageStyles.link}>
+                                      {item.label}
+                                    </Link>
+                                  </span>
+                                ))}
+                                {a.usageCount > a.usagePreview.length ? ` +${a.usageCount - a.usagePreview.length} more` : ''}
+                              </div>
+                            </div>
+                          ) : (
+                            'Unused'
+                          )}
                         </td>
                         <td>{formatAdded(a.createdAt)}</td>
                       </tr>
