@@ -5,7 +5,7 @@ import { SmoothScrollProvider } from '@/context/SmoothScrollProvider';
 import AppShell from '@/components/AppShell';
 import { buildRootJsonLd } from '@/lib/cms/site-jsonld';
 import {
-  getFooterMenu,
+  getFooterSettings,
   getHeaderDropdownConfig,
   getGlobalSettings,
   getHeaderMenu,
@@ -87,11 +87,11 @@ const themeScript = `(function(){try{document.documentElement.classList.add('js'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const enableNavEnhancements = process.env.NEXT_PUBLIC_NAV_ENHANCED !== '0';
-  const [headerMenu, headerUtilityMenu, headerDropdownConfig, footerMenu, globalSettings, site] = await Promise.all([
+  const [headerMenu, headerUtilityMenu, headerDropdownConfig, footerSettings, globalSettings, site] = await Promise.all([
     getHeaderMenu(),
     getHeaderUtilityMenu(),
     getHeaderDropdownConfig(),
-    getFooterMenu(),
+    getFooterSettings(),
     getGlobalSettings<{ primaryCtaHref?: string; primaryCtaText?: string; siteName?: string; supportEmail?: string }>(),
     getSiteRuntimeConfig(),
   ]);
@@ -112,7 +112,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               headerUtilityMenu={headerUtilityMenu}
               headerDropdownConfig={enableNavEnhancements ? headerDropdownConfig : undefined}
               enableNavEnhancements={enableNavEnhancements}
-              footerMenu={footerMenu}
+              footerSettings={footerSettings}
               primaryCtaHref={globalSettings.primaryCtaHref}
               primaryCtaText={globalSettings.primaryCtaText}
             >

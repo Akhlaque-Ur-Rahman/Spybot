@@ -1,19 +1,22 @@
 import FooterEditorClient from '@/components/admin/pages/FooterEditorClient';
 import pageStyles from '@/components/admin/adminPage.module.css';
-import { getFooterColumnsSetting } from '@/lib/cms/page-registry';
+import { normalizeFooterSettings } from '@/lib/cms/footer-settings';
 import { prisma } from '@/lib/db/prisma';
 import type { NavMenuItem } from '@/lib/cms/types';
 
 export default async function AdminFooterPage() {
-  const row = await prisma.siteSetting.findUnique({ where: { key: 'footer-columns' } });
-  const columns =
-    (row?.valueJson as Record<string, NavMenuItem[]> | undefined) ?? getFooterColumnsSetting();
+  const [configRow, columnsRow] = await Promise.all([
+    prisma.siteSetting.findUnique({ where: { key: 'footer-config' } }),
+    prisma.siteSetting.findUnique({ where: { key: 'footer-columns' } }),
+  ]);
+  const legacyColumns = (columnsRow?.valueJson as Record<string, NavMenuItem[]> | undefined) ?? null;
+  const footer = normalizeFooterSettings(configRow?.valueJson, legacyColumns);
 
   return (
     <>
       <h1 className={pageStyles.pageTitle}>Footer</h1>
-      <p className={pageStyles.lead}>Column headings and links for the public footer.</p>
-      <FooterEditorClient columns={columns} />
+      <p className={pageStyles.lead}>Manage all footer content.</p>
+      <FooterEditorClient footer={footer} />
     </>
   );
 }

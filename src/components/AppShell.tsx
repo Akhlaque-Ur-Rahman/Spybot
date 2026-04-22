@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import PageEntranceOverlay from '@/components/PageEntranceOverlay';
 import SciFiLoaderCanvas from '@/components/loaders/SciFiLoaderCanvas';
 import type { HeaderDropdownConfig, NavMenuItem } from '@/lib/cms/types';
+import type { CmsFooterSettings } from '@/lib/cms/footer-settings';
 import shellStyles from './AppShell.module.css';
 
 type AppShellProps = {
@@ -15,7 +16,7 @@ type AppShellProps = {
   headerUtilityMenu?: NavMenuItem[];
   headerDropdownConfig?: HeaderDropdownConfig;
   enableNavEnhancements?: boolean;
-  footerMenu: Record<string, NavMenuItem[]>;
+  footerSettings: CmsFooterSettings;
   primaryCtaHref?: string;
   primaryCtaText?: string;
 };
@@ -42,7 +43,7 @@ export default function AppShell({
   headerUtilityMenu,
   headerDropdownConfig,
   enableNavEnhancements,
-  footerMenu,
+  footerSettings,
   primaryCtaHref,
   primaryCtaText,
 }: AppShellProps) {
@@ -105,7 +106,7 @@ export default function AppShell({
         >
           {children}
         </div>
-        <Footer cmsColumns={footerMenu} />
+        <Footer cmsFooter={footerSettings} />
       </div>
       {routeLoader ? (
         <div className={shellStyles.routeLoaderDock} aria-hidden>

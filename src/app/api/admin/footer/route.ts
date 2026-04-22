@@ -5,20 +5,25 @@ import { adminFooterPatchSchema } from '@/lib/api/admin-body-schemas';
 import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
-import { getFooterColumnsSetting } from '@/lib/cms/page-registry';
 import { prisma } from '@/lib/db/prisma';
 import type { NavMenuItem } from '@/lib/cms/types';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
+import { normalizeFooterSettings } from '@/lib/cms/footer-settings';
 
-const FOOTER_KEY = 'footer-columns';
+const FOOTER_CONFIG_KEY = 'footer-config';
+const FOOTER_COLUMNS_KEY = 'footer-columns';
 
 export async function GET() {
   const auth = await requireApiRole();
   if (auth.error) return auth.error;
 
-  const row = await prisma.siteSetting.findUnique({ where: { key: FOOTER_KEY } });
-  const columns = (row?.valueJson as Record<string, NavMenuItem[]> | undefined) ?? getFooterColumnsSetting();
-  return NextResponse.json({ columns });
+  const [configRow, columnsRow] = await Promise.all([
+    prisma.siteSetting.findUnique({ where: { key: FOOTER_CONFIG_KEY } }),
+    prisma.siteSetting.findUnique({ where: { key: FOOTER_COLUMNS_KEY } }),
+  ]);
+  const legacyColumns = (columnsRow?.valueJson as Record<string, NavMenuItem[]> | undefined) ?? null;
+  const settings = normalizeFooterSettings(configRow?.valueJson, legacyColumns);
+  return NextResponse.json(settings);
 }
 
 export async function PATCH(request: NextRequest) {
@@ -34,24 +39,36 @@ export async function PATCH(request: NextRequest) {
   if (!parsed.ok) return parsed.response;
   const body = parsed.data;
 
-  const before = await prisma.siteSetting.findUnique({ where: { key: FOOTER_KEY } });
+  const [beforeConfig, legacyColumnsRow] = await Promise.all([
+    prisma.siteSetting.findUnique({ where: { key: FOOTER_CONFIG_KEY } }),
+    prisma.siteSetting.findUnique({ where: { key: FOOTER_COLUMNS_KEY } }),
+  ]);
+  const legacyColumns = (legacyColumnsRow?.valueJson as Record<string, NavMenuItem[]> | undefined) ?? null;
+  const current = normalizeFooterSettings(beforeConfig?.valueJson, legacyColumns);
+  const merged = {
+    ...current,
+    ...body,
+    companyDetails: body.companyDetails ? { ...current.companyDetails, ...body.companyDetails } : current.companyDetails,
+    credit: body.credit ? { ...current.credit, ...body.credit } : current.credit,
+  };
 
   const row = await prisma.siteSetting.upsert({
-    where: { key: FOOTER_KEY },
-    update: { valueJson: body.columns as object },
-    create: { key: FOOTER_KEY, valueJson: body.columns as object },
+    where: { key: FOOTER_CONFIG_KEY },
+    update: { valueJson: merged as object },
+    create: { key: FOOTER_CONFIG_KEY, valueJson: merged as object },
   });
 
   await createAuditLog({
     actorId: auth.session.user.id,
-    action: 'footer.update_columns',
+    action: 'footer.update',
     entityType: 'siteSetting',
-    entityId: FOOTER_KEY,
-    beforeJson: before ?? undefined,
+    entityId: FOOTER_CONFIG_KEY,
+    beforeJson: beforeConfig ?? undefined,
     afterJson: row,
   });
 
   revalidateTag('cms-footer-menu', 'max');
+  revalidateTag('cms-footer-config', 'max');
 
-  return NextResponse.json({ ok: true, columns: row.valueJson });
+  return NextResponse.json({ ok: true, footer: row.valueJson });
 }

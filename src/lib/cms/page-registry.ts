@@ -1,7 +1,8 @@
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import type { MediaClipMeta } from '@/lib/site-media';
 import { MEDIA_CLIPS } from '@/lib/site-media';
-import { CTA_LINKS, ROUTES, footerColumns, industryNavItems, solutionNavItems } from '@/site';
+import { CTA_LINKS, ROUTES, industryNavItems, solutionNavItems } from '@/site';
+import { getDefaultFooterSettings } from '@/lib/cms/footer-settings';
 import type { CmsIconName } from '@/lib/cms/icon-map';
 import { buildMarketingDetailRegistryPages } from '@/lib/cms/marketing-detail-registry';
 import { getSolutionShowcaseDraft, type SolutionShowcaseData } from '@/lib/solution-showcase-data';
@@ -1400,10 +1401,5 @@ export function getCmsRegistryPageByKey(key: string) {
 }
 
 export function getFooterColumnsSetting() {
-  return Object.fromEntries(
-    Object.entries(footerColumns).map(([heading, links]) => [
-      heading,
-      links.map((link) => ({ label: link.label, href: link.href })),
-    ])
-  );
+  return getDefaultFooterSettings().columns;
 }

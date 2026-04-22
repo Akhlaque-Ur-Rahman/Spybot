@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { unstable_cache } from 'next/cache';
 import { normalizeHeaderDropdownConfig } from '@/lib/cms/navigation-utils';
+import { normalizeFooterSettings, type CmsFooterSettings } from '@/lib/cms/footer-settings';
 import { getFooterColumnsSetting } from '@/lib/cms/page-registry';
 import { mergeSiteRuntimeConfig } from '@/lib/cms/site-runtime-config';
 import type { SiteRuntimeConfig } from '@/lib/cms/site-runtime-config';
@@ -178,6 +179,22 @@ export async function getFooterMenu(): Promise<Record<string, NavMenuItem[]>> {
     }),
     ['cms-footer-menu'],
     { revalidate: 120, tags: ['cms-footer-menu'] }
+  )();
+}
+
+export async function getFooterSettings(): Promise<CmsFooterSettings> {
+  return unstable_cache(
+    () =>
+      withCmsFallback(normalizeFooterSettings(null), async () => {
+        const [configRow, columnsRow] = await Promise.all([
+          prisma.siteSetting.findUnique({ where: { key: 'footer-config' } }),
+          prisma.siteSetting.findUnique({ where: { key: 'footer-columns' } }),
+        ]);
+        const legacyColumns = (columnsRow?.valueJson as Record<string, NavMenuItem[]> | undefined) ?? null;
+        return normalizeFooterSettings(configRow?.valueJson, legacyColumns);
+      }),
+    ['cms-footer-config'],
+    { revalidate: 120, tags: ['cms-footer-config', 'cms-footer-menu'] }
   )();
 }
 

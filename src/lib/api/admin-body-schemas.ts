@@ -84,11 +84,30 @@ const footerLinkSchema = z.object({
   description: z.union([z.string().max(500), z.null()]).optional(),
 });
 
+const footerCompanyDetailsSchema = z.object({
+  legalName: z.string().min(1).max(500).trim(),
+  addressLines: z.array(z.string().min(1).max(500).trim()).min(1).max(10),
+  phone: z.string().min(1).max(100).trim(),
+  cin: z.string().min(1).max(100).trim(),
+  certifications: z.array(z.string().min(1).max(200).trim()).max(20),
+});
+
+const footerCreditSchema = z.object({
+  prefix: z.string().min(1).max(200).trim(),
+  linkLabel: z.string().min(1).max(200).trim(),
+  href: z.string().min(1).max(2048).trim(),
+});
+
 export const adminFooterPatchSchema = z.object({
   columns: z
     .record(z.string().max(200), z.array(footerLinkSchema).max(50))
-    .refine((o) => Object.keys(o).length <= 40, 'Too many footer columns'),
-});
+    .refine((o) => Object.keys(o).length <= 40, 'Too many footer columns')
+    .optional(),
+  socialLinks: z.array(footerLinkSchema).max(20).optional(),
+  companyDetails: footerCompanyDetailsSchema.optional(),
+  trustItems: z.array(z.string().min(1).max(200).trim()).max(20).optional(),
+  credit: footerCreditSchema.optional(),
+}).refine((value) => Object.keys(value).length > 0, 'At least one footer field is required');
 
 export const adminFormsPatchSchema = z.object({
   id: z.string().cuid(),

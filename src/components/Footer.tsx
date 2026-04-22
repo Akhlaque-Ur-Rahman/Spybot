@@ -4,27 +4,13 @@ import Link from 'next/link';
 import { Building2, Heart, MapPin, Phone } from 'lucide-react';
 import styles from './Footer.module.css';
 import { MEDIA_FOOTER_BG, MEDIA_FOOTER_BRAND_LOGO } from '@/lib/site-media';
-import { footerColumns, socialLinks, ROUTES } from '@/site';
+import { ROUTES } from '@/site';
 import type { NavMenuItem } from '@/lib/cms/types';
+import { getDefaultFooterSettings, type CmsFooterSettings } from '@/lib/cms/footer-settings';
 
 const expectedFooterColumns = ['Company', 'Industries', 'Solution', 'Resources'] as const;
 
-const companyDetails = {
-  legalName: 'SpyBot Verifacts Services Private Limited',
-  addressLines: ['#404, 4th Floor, G.V Mall', 'Boring Road, Patna-800001'],
-  phone: '7870295295',
-  cin: 'U80200BR2023PTC065755',
-  certifications: ['ISO 27001:2022', 'ISO 9001:2015'],
-} as const;
-
-/** Single footer trust line (compact copy, no duplicate ISO blocks) */
-const trustLineParts = [
-  'SOC 2 Type II',
-  ...companyDetails.certifications,
-  'UIDAI Certified',
-] as const;
-
-const EDUNEX_HREF = 'https://edunexservices.in/';
+const defaultFooter = getDefaultFooterSettings();
 
 function normalizeHeading(value: string) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, ' ');
@@ -45,7 +31,7 @@ function canonicalFooterHeading(heading: string) {
 
 function resolveFooterColumns(columns?: Record<string, NavMenuItem[]>) {
   const resolved = Object.fromEntries(
-    expectedFooterColumns.map((heading) => [heading, [...footerColumns[heading]]]),
+    expectedFooterColumns.map((heading) => [heading, [...defaultFooter.columns[heading]]]),
   ) as Record<(typeof expectedFooterColumns)[number], NavMenuItem[]>;
 
   if (!columns) return resolved;
@@ -103,11 +89,15 @@ function socialIcon(label: string): ReactNode {
 }
 
 export default function Footer({
-  cmsColumns,
+  cmsFooter,
 }: {
-  cmsColumns?: Record<string, NavMenuItem[]>;
+  cmsFooter?: CmsFooterSettings;
 }) {
-  const columns: Record<string, readonly NavMenuItem[]> = resolveFooterColumns(cmsColumns);
+  const columns: Record<string, readonly NavMenuItem[]> = resolveFooterColumns(cmsFooter?.columns);
+  const companyDetails = cmsFooter?.companyDetails ?? defaultFooter.companyDetails;
+  const trustLineParts = cmsFooter?.trustItems?.length ? cmsFooter.trustItems : defaultFooter.trustItems;
+  const social = cmsFooter?.socialLinks?.length ? cmsFooter.socialLinks : defaultFooter.socialLinks;
+  const credit = cmsFooter?.credit ?? defaultFooter.credit;
 
   return (
     <footer
@@ -174,7 +164,7 @@ export default function Footer({
               <div className={styles.followRow}>
                 <h3 className={styles.sectionTitle}>Follow Us</h3>
                 <div className={styles.socials}>
-                  {socialLinks.map((s) => (
+                  {social.map((s) => (
                     <a
                       key={s.label}
                       href={s.href}
@@ -227,12 +217,12 @@ export default function Footer({
               © {new Date().getFullYear()} {companyDetails.legalName}. All rights reserved.
             </p>
             <p className={styles.credit}>
-              Design with Love{' '}
+              {credit.prefix}{' '}
               <Heart className={styles.creditHeart} size={14} strokeWidth={2} aria-hidden />
               {' '}
               by{' '}
-              <a href={EDUNEX_HREF} className={styles.creditLink} target="_blank" rel="noreferrer">
-                EduNex
+              <a href={credit.href} className={styles.creditLink} target="_blank" rel="noreferrer">
+                {credit.linkLabel}
               </a>
             </p>
           </div>
