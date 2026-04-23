@@ -66,29 +66,31 @@ export default function AdminShell({
           className={`${styles.sidebar} ${drawerOpen ? styles.sidebarOpen : ''}`}
         >
           <h1 className={styles.brand}>SpyBot CMS</h1>
-          <nav className={styles.nav} aria-label="CMS sections">
-            {links.map((link) => {
-              const active =
-                link.href === '/admin'
-                  ? pathname === '/admin'
-                  : pathname === link.href || pathname.startsWith(`${link.href}/`);
-              const Icon = link.Icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  title={link.label}
-                  className={`${styles.navLink} ${active ? styles.navLinkActive : ''}`}
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  <span className={styles.navIcon} aria-hidden="true">
-                    <Icon {...iconProps} />
-                  </span>
-                  <span className={styles.navLabel}>{link.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
+          <div className={styles.sidebarBody}>
+            <nav className={styles.nav} aria-label="CMS sections">
+              {links.map((link) => {
+                const active =
+                  link.href === '/admin'
+                    ? pathname === '/admin'
+                    : pathname === link.href || pathname.startsWith(`${link.href}/`);
+                const Icon = link.Icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    title={link.label}
+                    className={`${styles.navLink} ${active ? styles.navLinkActive : ''}`}
+                    onClick={() => setDrawerOpen(false)}
+                  >
+                    <span className={styles.navIcon} aria-hidden="true">
+                      <Icon {...iconProps} />
+                    </span>
+                    <span className={styles.navLabel}>{link.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
           <div className={styles.sidebarFooter}>
             <span className={styles.userEmail}>{session?.user?.email ?? '—'}</span>
             <span className={styles.roleBadge}>{session?.user?.role ?? '—'}</span>
