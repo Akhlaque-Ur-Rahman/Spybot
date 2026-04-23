@@ -65,7 +65,7 @@ export default function AdminShell({
           id="cms-sidebar"
           className={`${styles.sidebar} ${drawerOpen ? styles.sidebarOpen : ''}`}
         >
-          <p className={styles.brand}>SpyBot CMS</p>
+          <h1 className={styles.brand}>SpyBot CMS</h1>
           <div className={styles.sidebarBody}>
             <nav className={styles.nav} aria-label="CMS sections">
               {links.map((link) => {
