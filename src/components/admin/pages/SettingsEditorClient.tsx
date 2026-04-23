@@ -53,7 +53,7 @@ export default function SettingsEditorClient({ settings }: { settings: SettingRo
     <div>
       {settings.map((s) => (
         <article key={s.id} className={pageStyles.card}>
-          <h3 className={pageStyles.cardTitle}>{s.key}</h3>
+          <h4 className={pageStyles.cardTitle}>{s.key}</h4>
           <TextAreaField
             label="Data"
             value={textByKey[s.key] ?? '{}'}

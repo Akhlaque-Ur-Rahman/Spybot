@@ -114,7 +114,7 @@ export default function Lifecycle({
                   {step.icon}
                 </div>
                 <div className={styles.stepNum}>{step.num}</div>
-                <h3 className={styles.stepTitle}>{step.title}</h3>
+                <h4 className={styles.stepTitle}>{step.title}</h4>
                 <div className={styles.stepDesc}>
                   <TruncatedReadMore
                     value={step.desc}
@@ -140,7 +140,7 @@ export default function Lifecycle({
               </div>
               {i < stepCount - 1 && <div className={styles.arrowLine} aria-hidden="true"><div className={styles.arrow} /></div>}
               <div className={styles.stepBlockNum}>{step.num}</div>
-              <h3 className={styles.stepBlockTitle}>{step.title}</h3>
+              <h4 className={styles.stepBlockTitle}>{step.title}</h4>
               <div className={styles.stepBlockDesc}>
                 <TruncatedReadMore
                   value={step.desc}

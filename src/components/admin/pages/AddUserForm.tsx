@@ -53,7 +53,7 @@ export default function AddUserForm() {
 
   return (
     <div className={pageStyles.card} style={{ marginBottom: 'var(--space-6)', maxWidth: 520 }}>
-      <h3 className={pageStyles.cardTitle}>New user</h3>
+      <h4 className={pageStyles.cardTitle}>New user</h4>
       <label className={pageStyles.contentToolbarField}>
         Email
         <input

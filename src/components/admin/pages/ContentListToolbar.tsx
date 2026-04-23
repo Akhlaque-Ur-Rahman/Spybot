@@ -124,7 +124,7 @@ export default function ContentListToolbar() {
       {open ? (
         <div className={pageStyles.contentToolbarForm}>
           <div className={pageStyles.card}>
-            <h3 className={pageStyles.cardTitle}>Create page</h3>
+            <h4 className={pageStyles.cardTitle}>Create page</h4>
             <label className={pageStyles.contentToolbarField}>
               Title
               <input className={pageStyles.input} value={title} onChange={(e) => setTitle(e.target.value)} autoComplete="off" />

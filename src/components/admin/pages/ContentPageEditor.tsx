@@ -506,7 +506,7 @@ export default function ContentPageEditor({
       </div>
 
       <div className={pageStyles.card}>
-        <h3 className={pageStyles.cardTitle}>Page details</h3>
+        <h4 className={pageStyles.cardTitle}>Page details</h4>
         <label className={pageStyles.lead} style={{ display: 'grid', gap: 6, marginBottom: 12 }}>
           Title
           <input className={pageStyles.input} value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -554,14 +554,14 @@ export default function ContentPageEditor({
       </div>
 
       <div className={pageStyles.card}>
-        <h3 className={pageStyles.cardTitle}>SEO</h3>
+        <h4 className={pageStyles.cardTitle}>SEO</h4>
         <p className={pageStyles.lead} style={{ marginTop: 0 }}>
           Edit from <Link href="/admin/seo">SEO</Link>
         </p>
       </div>
 
       <div className={pageStyles.card}>
-        <h3 className={pageStyles.cardTitle}>Sections</h3>
+        <h4 className={pageStyles.cardTitle}>Sections</h4>
         <p className={pageStyles.lead} style={{ marginTop: 0 }}>
           Reorder or add sections.
         </p>

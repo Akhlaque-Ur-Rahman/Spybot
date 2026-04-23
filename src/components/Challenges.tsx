@@ -164,7 +164,7 @@ export default function Challenges({
               >
                 {c.icon}
               </div>
-              <h3 className={styles.cardTitle}>{c.title}</h3>
+              <h4 className={styles.cardTitle}>{c.title}</h4>
               <div className={`${styles.cardDesc} ${richTextStyles.prose}`}>{renderCmsRichText(c.desc)}</div>
               <div className={styles.cardAccent} style={{ background: toneStyles[c.tone].accent as string }} aria-hidden="true" />
             </div>

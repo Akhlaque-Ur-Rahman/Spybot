@@ -81,7 +81,7 @@ export default function SolutionShowcase({ data }: { data: SolutionShowcaseData 
           aria-labelledby={`${tabsId}-${active.id}`}
         >
           <div className={styles.panelBand}>
-            <h3 className={styles.panelTitle}>{active.panelTitle}</h3>
+            <h4 className={styles.panelTitle}>{active.panelTitle}</h4>
             <p className={styles.panelDesc}>{active.panelDescription}</p>
           </div>
 

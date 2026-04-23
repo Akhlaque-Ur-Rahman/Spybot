@@ -439,7 +439,7 @@ export default function FintechLandingPage({
                 <span className={styles.whyIcon} aria-hidden="true">
                   {item.icon}
                 </span>
-                <h3>{item.title}</h3>
+                <h4>{item.title}</h4>
                 <p>{item.description}</p>
               </article>
             ))}
@@ -470,7 +470,7 @@ export default function FintechLandingPage({
 
           <div className={styles.lanesBody}>
             <aside className={styles.lanesSidebar} data-anim-inview>
-              <h3>{activeVertical.panelTitle}</h3>
+              <h4>{activeVertical.panelTitle}</h4>
               <p>{activeVertical.panelDescription}</p>
               <div className={styles.lanesActions}>
                 <Link href={lanesData.primaryCta?.href ?? fallbackLanesData.primaryCta.href} className="btn btn-primary btn-sm">
@@ -553,7 +553,7 @@ export default function FintechLandingPage({
             {spotlight.map((card) => (
               <Link key={card.title} href={card.href} className={styles.spotlightCard} data-anim-inview>
                 <span className={styles.spotlightBadge}>{card.badge}</span>
-                <h3>{card.title}</h3>
+                <h4>{card.title}</h4>
                 <p>{card.description}</p>
                 <span className={styles.spotlightCta}>{card.cta} →</span>
                 <div className={styles.spotlightMiniVisual} aria-hidden="true">
@@ -621,7 +621,7 @@ export default function FintechLandingPage({
           <div className={styles.apiKeyPanel}>
             <div className={styles.apiKeyPanelGlow} aria-hidden="true" />
             <form className={styles.apiKeyForm} onSubmit={(e) => e.preventDefault()}>
-              <h3>{apiKey.formTitle}</h3>
+              <h4>{apiKey.formTitle}</h4>
               <p>{apiKey.formDescription}</p>
               <div className={styles.apiKeyGrid}>
                 {apiKey.fields.slice(0, 4).map((field) => (

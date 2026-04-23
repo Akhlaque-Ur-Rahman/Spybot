@@ -132,7 +132,7 @@ export default function PublishQueueClient({
 
   return (
     <div>
-      <h3 className={pageStyles.cardTitle}>Draft pages</h3>
+      <h4 className={pageStyles.cardTitle}>Draft pages</h4>
       {drafts.length === 0 ? (
         <p className={pageStyles.lead}>No drafts.</p>
       ) : (
@@ -181,9 +181,9 @@ export default function PublishQueueClient({
         </ul>
       )}
 
-      <h3 className={pageStyles.cardTitle} style={{ marginTop: 32 }}>
+      <h4 className={pageStyles.cardTitle} style={{ marginTop: 32 }}>
         Published pages
-      </h3>
+      </h4>
       {published.length === 0 ? (
         <p className={pageStyles.lead}>No published pages.</p>
       ) : (
@@ -196,9 +196,9 @@ export default function PublishQueueClient({
         </ul>
       )}
 
-      <h3 className={pageStyles.cardTitle} style={{ marginTop: 32 }}>
+      <h4 className={pageStyles.cardTitle} style={{ marginTop: 32 }}>
         Recent versions
-      </h3>
+      </h4>
       {versions.length === 0 ? (
         <p className={pageStyles.lead}>No versions recorded yet.</p>
       ) : (

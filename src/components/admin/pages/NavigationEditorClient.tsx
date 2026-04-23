@@ -288,7 +288,7 @@ export default function NavigationEditorClient({
     <div>
       {state.map((menu, menuIdx) => (
         <section key={menu.key} className={pageStyles.card}>
-          <h3 className={pageStyles.cardTitle}>{menuSummary(menu.key).title}</h3>
+          <h4 className={pageStyles.cardTitle}>{menuSummary(menu.key).title}</h4>
           <p className={pageStyles.lead} style={{ marginBottom: 8 }}>
             {menuSummary(menu.key).description}
           </p>
@@ -332,7 +332,7 @@ export default function NavigationEditorClient({
         </section>
       ))}
       <section className={pageStyles.card}>
-        <h3 className={pageStyles.cardTitle}>Dropdown groups</h3>
+        <h4 className={pageStyles.cardTitle}>Dropdown groups</h4>
         <p className={pageStyles.lead} style={{ marginBottom: 12 }}>Edit dropdown links.</p>
         <button
           type="button"

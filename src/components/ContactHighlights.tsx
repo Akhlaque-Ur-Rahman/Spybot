@@ -61,7 +61,7 @@ export default function ContactHighlights({
               <span className={styles.icon} aria-hidden="true">
                 {it.icon}
               </span>
-              <h3 className={styles.title}>{it.title}</h3>
+              <h4 className={styles.title}>{it.title}</h4>
               <div className={`${styles.desc} ${richTextStyles.prose}`}>{renderCmsRichText(it.desc)}</div>
             </li>
           ))}

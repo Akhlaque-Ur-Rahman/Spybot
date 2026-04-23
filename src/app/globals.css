@@ -105,10 +105,10 @@
   --heading-h2: 50px;
   --heading-h3: 28px;
   --heading-h4: 20px;
-  --text-body-lg: 22px;
-  --text-body: 18px;
-  --text-body-sm: 16px;
-  --text-xs: 14px;
+  --text-body-lg: 18px;
+  --text-body: 16px;
+  --text-body-sm: 14px;
+  --text-xs: 12px;
 
   /* Spacing */
   --space-1: 4px;
@@ -220,10 +220,10 @@ html {
     --heading-h2: 34px;
     --heading-h3: 24px;
     --heading-h4: 18px;
-    --text-body-lg: 18px;
-    --text-body: 16px;
-    --text-body-sm: 15px;
-    --text-xs: 13px;
+    --text-body-lg: 16px;
+    --text-body: 15px;
+    --text-body-sm: 13px;
+    --text-xs: 12px;
   }
 }
 

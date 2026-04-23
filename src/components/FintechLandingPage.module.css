@@ -184,7 +184,7 @@
   text-transform: uppercase;
 }
 
-.spotlightCard h3 {
+.spotlightCard h4 {
   margin: 0.15rem 0 0;
   color: #eaf3ff;
   font-size: 1.02rem;
@@ -428,7 +428,7 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.apiKeyForm h3 {
+.apiKeyForm h4 {
   margin: 0;
   color: var(--color-text-primary);
   font-size: 1.03rem;
@@ -535,7 +535,7 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.whyCard h3 {
+.whyCard h4 {
   margin: 0.75rem 0 0.42rem;
   font-size: 1.06rem;
   color: var(--color-text-primary);
@@ -606,7 +606,7 @@
   align-items: start;
 }
 
-.lanesSidebar h3 {
+.lanesSidebar h4 {
   margin: 0 0 0.42rem;
   color: var(--color-text-primary);
   line-height: 1.15;
@@ -667,6 +667,82 @@
   color: rgba(231, 236, 251, 0.88);
   font-size: 0.74rem;
   line-height: 1.5;
+}
+
+:global(html[data-theme='light']) .lanesSection {
+  background:
+    radial-gradient(800px 250px at 20% -20%, rgba(var(--color-primary-rgb), 0.1), transparent 60%),
+    linear-gradient(180deg, var(--color-surface-raised), var(--color-bg));
+}
+
+:global(html[data-theme='light']) .lanesHeader {
+  border-bottom-color: var(--color-border);
+}
+
+:global(html[data-theme='light']) .lanesPill {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+:global(html[data-theme='light']) .lanesPillActive {
+  background: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+  color: #ffffff;
+}
+
+:global(html[data-theme='light']) .apiIcon {
+  color: var(--color-primary-700);
+  background:
+    radial-gradient(circle at 25% 25%, rgba(var(--color-primary-rgb), 0.22), transparent 58%),
+    rgba(var(--color-primary-rgb), 0.08);
+  border-color: rgba(var(--color-primary-rgb), 0.25);
+}
+
+:global(html[data-theme='light']) .apiCard p {
+  color: var(--color-text-secondary);
+}
+
+:global(html[data-theme='light']) .spotlightSection {
+  background:
+    radial-gradient(1200px 440px at 10% -20%, rgba(var(--color-primary-rgb), 0.1), transparent 62%),
+    linear-gradient(180deg, var(--color-surface-raised), var(--color-bg));
+}
+
+:global(html[data-theme='light']) .spotlightCard {
+  border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-primary-300) 22%);
+  background:
+    radial-gradient(130% 90% at 0% 0%, rgba(var(--color-primary-rgb), 0.14), transparent 60%),
+    linear-gradient(165deg, rgba(var(--color-primary-rgb), 0.04), rgba(255, 255, 255, 0.75));
+}
+
+:global(html[data-theme='light']) .spotlightCard h4 {
+  color: var(--color-text-primary);
+}
+
+:global(html[data-theme='light']) .spotlightCard p {
+  color: var(--color-text-secondary);
+}
+
+:global(html[data-theme='light']) .spotlightBadge {
+  color: var(--color-primary-700);
+  background: rgba(var(--color-primary-rgb), 0.1);
+}
+
+:global(html[data-theme='light']) .spotlightCta {
+  color: var(--color-primary-600);
+}
+
+:global(html[data-theme='light']) .ctaBannerSection {
+  background:
+    radial-gradient(900px 300px at 10% -10%, rgba(var(--color-primary-rgb), 0.12), transparent 60%),
+    radial-gradient(700px 280px at 100% 120%, rgba(var(--color-tertiary-rgb), 0.1), transparent 60%),
+    linear-gradient(135deg, var(--color-surface-raised), var(--color-bg));
+  border-block-color: var(--color-border);
+}
+
+:global(html[data-theme='light']) .ctaBannerCopy h2 {
+  color: var(--color-text-primary);
 }
 
 @media (max-width: 960px) {

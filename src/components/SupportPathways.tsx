@@ -76,7 +76,7 @@ export default function SupportPathways({
               <div className={styles.icon} aria-hidden="true">
                 {p.icon}
               </div>
-              <h3 className={styles.title}>{p.title}</h3>
+              <h4 className={styles.title}>{p.title}</h4>
               <div className={`${styles.desc} ${richTextStyles.prose}`}>{renderCmsRichText(p.desc)}</div>
               <Link href={p.action.href} className={styles.link}>
                 {p.action.label} →

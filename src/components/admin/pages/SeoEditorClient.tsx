@@ -50,7 +50,7 @@ export default function SeoEditorClient({ pages }: { pages: SeoRow[] }) {
     <div>
       {pages.map((p) => (
         <article key={p.key} className={pageStyles.card}>
-          <h3 className={pageStyles.cardTitle}>{p.title}</h3>
+          <h4 className={pageStyles.cardTitle}>{p.title}</h4>
           <p className={pageStyles.muted} style={{ marginTop: 0 }}>
             {p.key}
           </p>

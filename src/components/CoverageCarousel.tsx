@@ -41,7 +41,7 @@ export default function CoverageCarousel({ items = defaultCoverageItems, label =
 
             return (
               <li key={`${item.title}-${i}`} className={`${styles.card} ${resolvedCardDesign}`}>
-                <h3 className={styles.cardTitle}>{item.title}</h3>
+                <h4 className={styles.cardTitle}>{item.title}</h4>
                 {showDesc ? (
                   <div className={styles.cardBody}>
                     <TruncatedReadMore

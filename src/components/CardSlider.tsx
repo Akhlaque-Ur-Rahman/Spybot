@@ -31,7 +31,7 @@ export default function CardSlider({ items, ariaLabel = 'Featured items' }: Prop
     <div className={styles.root} role="region" aria-roledescription="carousel" aria-label={ariaLabel}>
       <div className={styles.card}>
         {item.tag && <span className={styles.tag}>{item.tag}</span>}
-        <h3 className={styles.title}>{item.title}</h3>
+        <h4 className={styles.title}>{item.title}</h4>
         <div className={`${styles.desc} ${richTextStyles.prose}`}>{renderCmsRichText(item.desc)}</div>
       </div>
       <div className={styles.controls}>

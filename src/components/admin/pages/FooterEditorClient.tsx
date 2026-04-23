@@ -159,7 +159,7 @@ export default function FooterEditorClient({ footer }: { footer: CmsFooterSettin
       </div>
       <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
         <div className={pageStyles.card} style={{ boxShadow: 'none', border: '1px solid var(--color-border)' }}>
-          <h3 className={pageStyles.cardTitle}>Company details</h3>
+          <h4 className={pageStyles.cardTitle}>Company details</h4>
           <div style={{ display: 'grid', gap: 8 }}>
             <TextField label="Legal name" value={legalName} onChange={setLegalName} />
             <TextAreaField label="Address lines (one per line)" value={addressLinesText} onChange={setAddressLinesText} rows={4} />
@@ -171,7 +171,7 @@ export default function FooterEditorClient({ footer }: { footer: CmsFooterSettin
         </div>
 
         <div className={pageStyles.card} style={{ boxShadow: 'none', border: '1px solid var(--color-border)' }}>
-          <h3 className={pageStyles.cardTitle}>Social links</h3>
+          <h4 className={pageStyles.cardTitle}>Social links</h4>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {socialLinks.map((link, linkIdx) => (
               <li key={`social-${linkIdx}`} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid var(--color-border)' }}>
@@ -193,7 +193,7 @@ export default function FooterEditorClient({ footer }: { footer: CmsFooterSettin
         </div>
 
         <div className={pageStyles.card} style={{ boxShadow: 'none', border: '1px solid var(--color-border)' }}>
-          <h3 className={pageStyles.cardTitle}>Credit</h3>
+          <h4 className={pageStyles.cardTitle}>Credit</h4>
           <div style={{ display: 'grid', gap: 8 }}>
             <TextField label="Prefix" value={creditPrefix} onChange={setCreditPrefix} />
             <TextField label="Link label" value={creditLabel} onChange={setCreditLabel} />

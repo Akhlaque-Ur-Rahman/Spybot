@@ -1,5 +1,5 @@
 .section {
-  padding: var(--space-10) 0 var(--space-18);
+  padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(3.5rem, 8vw, 5.5rem);
   background: transparent;
 }
 
@@ -75,4 +75,38 @@
 .ghost:hover {
   border-color: #fff;
   transform: translateY(-1px);
+}
+
+:global(html[data-theme='light']) .inner {
+  border-color: color-mix(in srgb, var(--color-border) 74%, var(--color-primary-300) 26%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary-100) 68%, white),
+    color-mix(in srgb, var(--color-primary-200) 54%, white)
+  );
+  box-shadow: 0 16px 30px rgba(11, 114, 204, 0.14);
+}
+
+:global(html[data-theme='light']) .title {
+  color: var(--color-secondary-700);
+}
+
+:global(html[data-theme='light']) .desc {
+  color: var(--color-secondary-500);
+}
+
+:global(html[data-theme='light']) .ghost {
+  color: var(--color-secondary-700);
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(15, 23, 42, 0.2);
+}
+
+:global(html[data-theme='light']) .ghost:hover {
+  border-color: rgba(15, 23, 42, 0.36);
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: var(--space-8) 0 var(--space-12);
+  }
 }

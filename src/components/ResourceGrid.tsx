@@ -69,7 +69,7 @@ export default function ResourceGrid({
                 <span className={styles.icon} aria-hidden="true">
                   <FileText size={20} strokeWidth={1.5} />
                 </span>
-                <h3 className={styles.title}>{t.title}</h3>
+                <h4 className={styles.title}>{t.title}</h4>
                 <div className={`${styles.desc} ${richTextStyles.prose}`}>{renderCmsRichText(t.desc)}</div>
                 <span className={styles.cta}>Read more →</span>
               </Link>

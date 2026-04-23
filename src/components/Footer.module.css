@@ -95,7 +95,7 @@
   font-family: var(--font-display);
   font-size: 0.8125rem;
   font-weight: 700;
-  color: #facc15;
+  color: var(--color-tertiary-300);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -116,9 +116,9 @@
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  color: #facc15;
-  background: rgba(250, 204, 21, 0.08);
-  border: 1px solid rgba(250, 204, 21, 0.18);
+  color: var(--color-tertiary-300);
+  background: rgba(var(--color-tertiary-rgb), 0.14);
+  border: 1px solid rgba(var(--color-tertiary-rgb), 0.26);
   flex-shrink: 0;
 }
 .legalName {
@@ -170,9 +170,9 @@
   background: rgba(255, 255, 255, 0.04);
 }
 .infoLink:hover {
-  color: #facc15;
-  border-color: rgba(250, 204, 21, 0.28);
-  background: rgba(250, 204, 21, 0.08);
+  color: var(--color-tertiary-300);
+  border-color: rgba(var(--color-tertiary-rgb), 0.34);
+  background: rgba(var(--color-tertiary-rgb), 0.12);
 }
 .metaPill {
   width: fit-content;
@@ -202,9 +202,9 @@
   transition: transform 0.2s ease, color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 .socialButton:hover {
-  color: #facc15;
-  background: rgba(250, 204, 21, 0.08);
-  border-color: rgba(250, 204, 21, 0.28);
+  color: var(--color-tertiary-300);
+  background: rgba(var(--color-tertiary-rgb), 0.12);
+  border-color: rgba(var(--color-tertiary-rgb), 0.34);
   transform: translateY(-1px);
 }
 .socialSvg {
@@ -223,7 +223,7 @@
   font-size: 0.8125rem;
   letter-spacing: 0.04em;
   font-weight: 700;
-  color: #facc15;
+  color: var(--color-tertiary-300);
   margin-bottom: var(--space-2);
 }
 .linkCol ul {

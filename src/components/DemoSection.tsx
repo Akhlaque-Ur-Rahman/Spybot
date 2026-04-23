@@ -174,7 +174,7 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
           <div className={styles.formCard}>
             {status === 'idle' && (
               <form ref={formRef} onSubmit={handleSubmit} className={styles.form} aria-label="Demo Request Form">
-                <h3 className={styles.formTitle}>{content?.formTitle ?? 'Book a Demo'}</h3>
+                <h4 className={styles.formTitle}>{content?.formTitle ?? 'Book a Demo'}</h4>
                 <div className={styles.formGrid}>
                   {resolvedFields.map((f) => (
                     <div key={f.id} className={styles.formGroup}>
@@ -205,7 +205,7 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
             {status === 'verifying' && (
               <div className={styles.loadingState} role="status">
                 <div className={styles.spinner} aria-hidden="true" />
-                <h3 className={styles.formTitle} style={{ marginTop: '20px' }}>{content?.loadingTitle ?? 'Provisioning Sandbox...'}</h3>
+                <h4 className={styles.formTitle} style={{ marginTop: '20px' }}>{content?.loadingTitle ?? 'Provisioning Sandbox...'}</h4>
                 <pre className={styles.mockTerminal}>
                   <code>{fakeLog}</code>
                 </pre>
@@ -217,7 +217,7 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
                 <div className={styles.successIcon} aria-hidden="true" style={{ color: 'var(--color-tertiary-400)' }}>
                   <CheckCircle2 size={48} strokeWidth={1.5} />
                 </div>
-                <h3 className={styles.successTitle}>{content?.successTitle ?? 'Environment Ready!'}</h3>
+                <h4 className={styles.successTitle}>{content?.successTitle ?? 'Environment Ready!'}</h4>
                 <div className={`${styles.successText} ${richTextStyles.prose}`}>
                   {renderCmsRichText(
                     content?.successText ??

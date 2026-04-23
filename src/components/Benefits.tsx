@@ -123,7 +123,7 @@ export default function Benefits({
               <div className={styles.cardTop}>
                 <span className={styles.cardIcon} aria-hidden="true">{b.icon}</span>
               </div>
-              <h3 className={styles.cardTitle}>{b.title}</h3>
+              <h4 className={styles.cardTitle}>{b.title}</h4>
               <div className={styles.cardDesc}>
                 <TruncatedReadMore
                   value={b.desc}

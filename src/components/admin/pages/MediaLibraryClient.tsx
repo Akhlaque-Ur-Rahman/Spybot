@@ -183,7 +183,7 @@ export default function MediaLibraryClient({
   return (
     <div>
       <div className={pageStyles.card}>
-        <h3 className={pageStyles.cardTitle}>Add asset</h3>
+        <h4 className={pageStyles.cardTitle}>Add asset</h4>
         <TextField label="URL" value={url} onChange={setUrl} />
         <div style={{ marginTop: 8 }}>
           <TextField label="Alt text" value={alt} onChange={setAlt} />
@@ -196,7 +196,7 @@ export default function MediaLibraryClient({
         </button>
       </div>
       <div className={pageStyles.card}>
-        <h3 className={pageStyles.cardTitle}>Upload file</h3>
+        <h4 className={pageStyles.cardTitle}>Upload file</h4>
         <label className={pageStyles.lead} style={{ display: 'grid', gap: 8, margin: 0 }}>
           File
           <input
@@ -228,7 +228,7 @@ export default function MediaLibraryClient({
       ) : (
         <>
           <div className={pageStyles.card}>
-            <h3 className={pageStyles.cardTitle}>Filters</h3>
+            <h4 className={pageStyles.cardTitle}>Filters</h4>
             <form key={filterFormKey} action={pathname} method="get" className={pageStyles.row} style={{ alignItems: 'flex-end', marginBottom: 0 }}>
               <input type="hidden" name="page" value="1" />
               <input type="hidden" name="sort" value={listQuery.sort} />
@@ -280,7 +280,7 @@ export default function MediaLibraryClient({
           </div>
 
           <div className={pageStyles.card}>
-            <h3 className={pageStyles.cardTitle}>Sort</h3>
+            <h4 className={pageStyles.cardTitle}>Sort</h4>
             <div className={pageStyles.row} style={{ marginBottom: 0 }}>
               {MEDIA_SORT_VALUES.map((sort) => {
                 const active = listQuery.sort === sort;
