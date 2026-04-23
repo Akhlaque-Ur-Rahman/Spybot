@@ -90,7 +90,7 @@
 }
 .heroBadge { width: fit-content; }
 .headline {
-  font-size: clamp(2rem, 5vw, 3.875rem);
+  font-size: var(--heading-h1-fluid);
   line-height: 1.1;
   letter-spacing: 0.04em;
   font-family: var(--font-display);
