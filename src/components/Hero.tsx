@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import Image, { type ImageLoader } from 'next/image';
 import styles from './Hero.module.css';
 import richTextStyles from '@/components/CmsRichText.module.css';
 import { Rocket } from 'lucide-react';
@@ -10,6 +11,7 @@ import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 const heroClip = MEDIA_CLIPS.homeHero;
+const passthroughLoader: ImageLoader = ({ src }) => src;
 
 const stats = [
   { value: '99.99%', label: 'Uptime SLA' },
@@ -70,10 +72,7 @@ export function HeroSection({ content }: { content?: HeroContent }) {
   const resolvedThreats = content?.threats ?? threats;
 
   useEffect(() => {
-    if (!isVideoSource) {
-      setFramePosterUrl(null);
-      return;
-    }
+    if (!isVideoSource) return;
     const v = videoRef.current;
     if (!v) return;
     v.muted = true;
@@ -91,9 +90,6 @@ export function HeroSection({ content }: { content?: HeroContent }) {
     };
 
     if (staticPoster) {
-      queueMicrotask(() => {
-        setFramePosterUrl(null);
-      });
       play();
       return () => revoke();
     }
@@ -140,7 +136,6 @@ export function HeroSection({ content }: { content?: HeroContent }) {
     return () => {
       v.removeEventListener('loadeddata', onLoadedData);
       revoke();
-      setFramePosterUrl(null);
     };
   }, [isVideoSource, staticPoster, resolvedClip.src]);
 
@@ -226,7 +221,15 @@ export function HeroSection({ content }: { content?: HeroContent }) {
             <source src={resolvedClip.src} type={heroVideoType} />
           </video>
         ) : isImageSource ? (
-          <img src={resolvedClip.src} alt={resolvedClip.title} className={styles.heroVideo} />
+          <Image
+            loader={passthroughLoader}
+            unoptimized
+            src={resolvedClip.src}
+            alt={resolvedClip.title}
+            className={styles.heroVideo}
+            fill
+            sizes="100vw"
+          />
         ) : null}
         <div className={styles.heroScrim} />
       </div>

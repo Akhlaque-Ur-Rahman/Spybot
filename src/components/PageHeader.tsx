@@ -1,8 +1,10 @@
 import styles from './PageHeader.module.css';
+import Image, { type ImageLoader } from 'next/image';
 import ViewportVideo from './ViewportVideo';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
 import { mediaEncodingFormat, mediaSourceKind, type MediaClipMeta } from '@/lib/site-media';
+const passthroughLoader: ImageLoader = ({ src }) => src;
 
 interface PageHeaderProps {
   label: string;
@@ -69,7 +71,15 @@ export default function PageHeader({
                   type={mediaType}
                 />
               ) : mediaKind === 'image' ? (
-                <img className={styles.mediaVideo} src={media.src} alt={media.title} loading="lazy" />
+                <Image
+                  loader={passthroughLoader}
+                  unoptimized
+                  className={styles.mediaVideo}
+                  src={media.src}
+                  alt={media.title}
+                  width={1280}
+                  height={800}
+                />
               ) : null}
               <figcaption className={styles.mediaCaption}>
                 <strong>{media.title}</strong>
