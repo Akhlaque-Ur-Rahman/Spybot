@@ -2,7 +2,7 @@ import { Prisma, UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminContentSyncPostSchema } from '@/lib/api/admin-body-schemas';
 import { readValidatedJson } from '@/lib/api/json-request';
-import { requireApiRole } from '@/lib/api/admin';
+import { requireApiCapability, requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { syncCmsRegistry } from '@/lib/cms/registry-sync';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
@@ -17,7 +17,7 @@ function publicMessageForSyncFailure(error: unknown): string {
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimitError = applyRateLimit(request, 20);
+  const rateLimitError = await applyRateLimit(request, 20);
   if (rateLimitError) return rateLimitError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;
@@ -28,6 +28,10 @@ export async function POST(request: NextRequest) {
   try {
     const parsed = await readValidatedJson(request, adminContentSyncPostSchema);
     if (!parsed.ok) return parsed.response;
+    if (parsed.data.allowDestructive) {
+      const destructiveAuth = await requireApiCapability('content.syncDestructive');
+      if (destructiveAuth.error) return destructiveAuth.error;
+    }
 
     const result = await syncCmsRegistry({
       dryRun: parsed.data.dryRun ?? false,

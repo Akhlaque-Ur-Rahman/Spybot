@@ -90,13 +90,13 @@
 }
 .heroBadge { width: fit-content; }
 .headline {
-  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  font-size: clamp(2rem, 5vw, 3.875rem);
   line-height: 1.1;
   letter-spacing: 0.04em;
   font-family: var(--font-display);
 }
 .subheadline {
-  font-size: var(--text-body-lg);
+  font-size: clamp(1rem, 2.2vw, 1.125rem);
   color: var(--color-text-secondary);
   line-height: 1.7;
   max-width: 540px;

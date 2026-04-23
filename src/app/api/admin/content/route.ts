@@ -11,20 +11,32 @@ import { validatePublicCmsSlugInput } from '@/lib/cms/slug-validation';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 
 export async function GET(request: NextRequest) {
-  const rateLimitError = applyRateLimit(request, 240);
+  const rateLimitError = await applyRateLimit(request, 240);
   if (rateLimitError) return rateLimitError;
   const auth = await requireApiRole();
   if (auth.error) return auth.error;
+  const pageParam = Number(request.nextUrl.searchParams.get('page') ?? '1');
+  const perParam = Number(request.nextUrl.searchParams.get('perPage') ?? '25');
+  const page = Number.isFinite(pageParam) ? Math.max(1, Math.floor(pageParam)) : 1;
+  const perPage = Number.isFinite(perParam) ? Math.min(100, Math.max(1, Math.floor(perParam))) : 25;
+  const includeTree = request.nextUrl.searchParams.get('includeTree') !== '0';
+  const skip = (page - 1) * perPage;
 
-  const pages = await prisma.page.findMany({
-    include: { sections: { include: { blocks: true }, orderBy: { position: 'asc' } } },
-    orderBy: { updatedAt: 'desc' },
-  });
-  return NextResponse.json({ pages });
+  const [total, pages] = await Promise.all([
+    prisma.page.count(),
+    prisma.page.findMany({
+      ...(includeTree ? { include: { sections: { include: { blocks: true }, orderBy: { position: 'asc' } } } } : {}),
+      orderBy: { updatedAt: 'desc' },
+      skip,
+      take: perPage,
+    }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  return NextResponse.json({ pages, total, page, perPage, totalPages, includeTree });
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimitError = applyRateLimit(request, 30);
+  const rateLimitError = await applyRateLimit(request, 30);
   if (rateLimitError) return rateLimitError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;

@@ -20,6 +20,7 @@ import type { MediaClipMeta } from '@/lib/site-media';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 import { SHOWCASE_ICON_KEYS, type ShowcaseIconKey } from '@/lib/solution-showcase-data';
 import styles from '@/components/admin/fields.module.css';
+import { CMS_BLOCK_CONTRACTS } from '@/lib/cms/block-contracts';
 
 type Props = {
   blockType: string;
@@ -1162,7 +1163,12 @@ const REGISTRY: Record<string, (p: Props) => ReactNode> = {
   demoSection: EditorDemoSection,
 };
 
-export const CMS_TYPED_BLOCK_TYPES = new Set(Object.keys(REGISTRY));
+export const CMS_TYPED_BLOCK_TYPES = new Set(
+  Object.entries(CMS_BLOCK_CONTRACTS)
+    .filter(([, contract]) => contract.visualEditor === 'typed')
+    .map(([type]) => type)
+    .filter((type) => Object.prototype.hasOwnProperty.call(REGISTRY, type)),
+);
 
 export function CmsBlockDraftEditor(props: Props) {
   const Editor = REGISTRY[props.blockType];

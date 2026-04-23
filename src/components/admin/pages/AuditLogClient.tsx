@@ -13,6 +13,8 @@ export type AuditRow = {
   entityId: string;
   createdAt: string;
   metadataJson: unknown;
+  beforeJson?: unknown;
+  afterJson?: unknown;
   actor: { email: string; name: string | null } | null;
 };
 
@@ -21,6 +23,23 @@ function summarizeMetadata(value: unknown): string {
   const raw = JSON.stringify(value);
   if (raw.length <= 220) return raw;
   return `${raw.slice(0, 220)}...`;
+}
+
+function summarizeChange(beforeValue: unknown, afterValue: unknown): string {
+  const before = beforeValue && typeof beforeValue === 'object' && !Array.isArray(beforeValue)
+    ? (beforeValue as Record<string, unknown>)
+    : {};
+  const after = afterValue && typeof afterValue === 'object' && !Array.isArray(afterValue)
+    ? (afterValue as Record<string, unknown>)
+    : {};
+  const keys = new Set([...Object.keys(before), ...Object.keys(after)]);
+  const changed: string[] = [];
+  for (const key of keys) {
+    if (JSON.stringify(before[key]) !== JSON.stringify(after[key])) changed.push(key);
+    if (changed.length >= 4) break;
+  }
+  if (changed.length === 0) return 'No field-level diff';
+  return changed.length >= 4 ? `${changed.join(', ')}, ...` : changed.join(', ');
 }
 
 export default function AuditLogClient({ initialLogs, initialTotal }: { initialLogs: AuditRow[]; initialTotal: number }) {
@@ -46,7 +65,7 @@ export default function AuditLogClient({ initialLogs, initialTotal }: { initialL
       setOffset((o) => o + res.logs.length);
     } catch (e) {
       logAdminClientError('AuditLogClient.loadMore', e);
-      push(e instanceof Error ? e.message : 'We could not load more activity.', 'error');
+      push(e instanceof Error ? e.message : 'Could not load more activity. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
@@ -64,6 +83,7 @@ export default function AuditLogClient({ initialLogs, initialTotal }: { initialL
             <th>Actor</th>
             <th>Action</th>
             <th>Entity</th>
+            <th>Change</th>
             <th>Meta</th>
           </tr>
         </thead>
@@ -76,6 +96,7 @@ export default function AuditLogClient({ initialLogs, initialTotal }: { initialL
               <td>
                 {log.entityType}:{log.entityId}
               </td>
+              <td className={pageStyles.mono}>{summarizeChange(log.beforeJson, log.afterJson)}</td>
               <td className={pageStyles.mono}>
                 {summarizeMetadata(log.metadataJson)}
               </td>

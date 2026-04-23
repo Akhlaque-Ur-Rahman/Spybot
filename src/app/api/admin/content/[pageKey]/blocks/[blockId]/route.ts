@@ -12,7 +12,7 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ pageKey: string; blockId: string }> }
 ) {
-  const rateLimitError = applyRateLimit(request, 40);
+  const rateLimitError = await applyRateLimit(request, 40);
   if (rateLimitError) return rateLimitError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;

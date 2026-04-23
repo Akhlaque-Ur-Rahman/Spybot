@@ -11,7 +11,44 @@ function cleanupLimiter(now: number) {
   }
 }
 
-export function applyRateLimit(
+async function applyDistributedRateLimit(
+  key: string,
+  max: number,
+  windowMs: number,
+): Promise<{ limited: boolean; retryAfterSec: number } | null> {
+  const redisUrl = process.env.CMS_RATE_LIMIT_REDIS_URL?.trim();
+  const redisToken = process.env.CMS_RATE_LIMIT_REDIS_TOKEN?.trim();
+  if (!redisUrl || !redisToken) return null;
+
+  try {
+    const response = await fetch(`${redisUrl}/pipeline`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${redisToken}`,
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+      body: JSON.stringify([
+        ['INCR', key],
+        ['PTTL', key],
+        ['PEXPIRE', key, String(windowMs), 'NX'],
+      ]),
+    });
+    if (!response.ok) return null;
+    const payload = (await response.json()) as Array<{ result?: unknown }>;
+    const count = Number(payload?.[0]?.result ?? 0);
+    const ttlRaw = Number(payload?.[1]?.result ?? windowMs);
+    const ttlMs = Number.isFinite(ttlRaw) && ttlRaw > 0 ? ttlRaw : windowMs;
+    return {
+      limited: count > max,
+      retryAfterSec: Math.max(1, Math.ceil(ttlMs / 1000)),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function applyRateLimit(
   request: NextRequest,
   max = 60,
   windowMs = 60_000,
@@ -22,6 +59,16 @@ export function applyRateLimit(
   const method = request.method.toUpperCase();
   const key = `${scope}:${method}:${route}:${ip}`;
   const now = Date.now();
+
+  const distributed = await applyDistributedRateLimit(`rl:${key}`, max, windowMs);
+  if (distributed) {
+    if (!distributed.limited) return null;
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(distributed.retryAfterSec) } },
+    );
+  }
+
   cleanupLimiter(now);
   const current = limiter.get(key);
 

@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { applyRateLimit } from '@/lib/security/request-guards';
 
 export async function GET(request: NextRequest) {
-  const rateLimitError = applyRateLimit(request, 240);
+  const rateLimitError = await applyRateLimit(request, 240);
   if (rateLimitError) return rateLimitError;
   const auth = await requireApiRole();
   if (auth.error) return auth.error;

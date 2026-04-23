@@ -23,7 +23,7 @@ export default function AddUserForm() {
   async function submit() {
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !password) {
-      push('Email and password are required', 'error');
+      push('Please enter email and password.', 'error');
       return;
     }
     setLoading(true);
@@ -37,7 +37,7 @@ export default function AddUserForm() {
           role,
         }),
       });
-      push('User created', 'success');
+      push('User added.', 'success');
       setEmail('');
       setPassword('');
       setName('');
@@ -45,7 +45,7 @@ export default function AddUserForm() {
       router.refresh();
     } catch (e) {
       logAdminClientError('AddUserForm.submit', e);
-      push(e instanceof Error ? e.message : 'We could not create this user.', 'error');
+      push(e instanceof Error ? e.message : 'Could not add user. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

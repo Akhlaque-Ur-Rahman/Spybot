@@ -21,7 +21,7 @@ async function walkFiles(root: string, dir = root): Promise<string[]> {
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimitError = applyRateLimit(request, 8);
+  const rateLimitError = await applyRateLimit(request, 8);
   if (rateLimitError) return rateLimitError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;

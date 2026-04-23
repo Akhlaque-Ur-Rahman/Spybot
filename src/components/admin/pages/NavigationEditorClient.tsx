@@ -36,27 +36,24 @@ function toGroupKey(value: string) {
 function menuSummary(key: string) {
   if (key === 'header-main') {
     return {
-      title: 'Primary site navigation',
-      description:
-        'This is the main public navbar. Item order, label, and URL are editable here.',
-      note:
-        'Company, Industries, Solution, and Resources keep their dropdown groups while the item still maps to that section. Any other item becomes a normal link.',
+      title: 'Main menu',
+      description: 'Edit top navigation links.',
+      note: 'Menu key: header-main',
     };
   }
 
   if (key === 'header-utility') {
     return {
-      title: 'Top utility bar',
-      description:
-        'These links appear in the slim bar above the main navbar.',
-      note: 'Utility links are simple links only and do not have dropdowns.',
+      title: 'Top bar',
+      description: 'Edit utility links.',
+      note: 'Menu key: header-utility',
     };
   }
 
   return {
     title: key,
-    description: 'Menu items in this group can be reordered and saved.',
-    note: 'Notes are stored in CMS but are not shown publicly.',
+    description: 'Edit menu links.',
+    note: `Menu key: ${key}`,
   };
 }
 
@@ -185,7 +182,7 @@ export default function NavigationEditorClient({
       router.refresh();
     } catch (e) {
       logAdminClientError('NavigationEditorClient.saveMenu', e, { menuKey: menu.key });
-      push(e instanceof Error ? e.message : 'We could not save navigation.', 'error');
+      push(e instanceof Error ? e.message : 'Could not save menu. Please try again.', 'error');
     } finally {
       setSavingMenu(null);
     }
@@ -281,7 +278,7 @@ export default function NavigationEditorClient({
       router.refresh();
     } catch (e) {
       logAdminClientError('NavigationEditorClient.saveDropdowns', e);
-      push(e instanceof Error ? e.message : 'We could not save dropdown links.', 'error');
+      push(e instanceof Error ? e.message : 'Could not save dropdown links. Please try again.', 'error');
     } finally {
       setSavingDropdowns(false);
     }
@@ -292,9 +289,6 @@ export default function NavigationEditorClient({
       {state.map((menu, menuIdx) => (
         <section key={menu.key} className={pageStyles.card}>
           <h3 className={pageStyles.cardTitle}>{menuSummary(menu.key).title}</h3>
-          <p className={pageStyles.lead} style={{ marginBottom: 8 }}>
-            <strong>Menu key:</strong> {menu.key}
-          </p>
           <p className={pageStyles.lead} style={{ marginBottom: 8 }}>
             {menuSummary(menu.key).description}
           </p>
@@ -339,9 +333,7 @@ export default function NavigationEditorClient({
       ))}
       <section className={pageStyles.card}>
         <h3 className={pageStyles.cardTitle}>Dropdown groups</h3>
-        <p className={pageStyles.lead} style={{ marginBottom: 12 }}>
-          Manage links inside Company, Industries, Solution, and Resources dropdowns.
-        </p>
+        <p className={pageStyles.lead} style={{ marginBottom: 12 }}>Edit dropdown links.</p>
         <button
           type="button"
           className={pageStyles.btn}

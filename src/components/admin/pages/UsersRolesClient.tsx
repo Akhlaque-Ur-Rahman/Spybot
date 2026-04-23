@@ -26,11 +26,11 @@ export default function UsersRolesClient({ users }: { users: UserRow[] }) {
         method: 'PATCH',
         body: JSON.stringify({ id, role }),
       });
-      push('Role updated', 'success');
+      push('Role updated.', 'success');
       router.refresh();
     } catch (e) {
       logAdminClientError('UsersRolesClient.updateRole', e, { id });
-      push(e instanceof Error ? e.message : 'We could not update this role.', 'error');
+      push(e instanceof Error ? e.message : 'Could not update role. Please try again.', 'error');
     } finally {
       setSaving(null);
     }

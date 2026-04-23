@@ -27,7 +27,7 @@ export default async function AdminAuditPage() {
   return (
     <>
       <h1 className={pageStyles.pageTitle}>Audit Timeline</h1>
-      <p className={pageStyles.lead}>Immutable log of CMS actions with actor and metadata.</p>
+      <p className={pageStyles.lead}>View recent activity.</p>
       {rows.length === 0 ? (
         <EmptyState title="No audit entries" />
       ) : (

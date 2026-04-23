@@ -107,7 +107,7 @@ export default function MediaLibraryClient({
 
   async function addAsset() {
     if (!url.trim()) {
-      push('URL is required', 'error');
+      push('Please enter a URL.', 'error');
       return;
     }
     setLoading(true);
@@ -123,14 +123,14 @@ export default function MediaLibraryClient({
             .filter(Boolean),
         }),
       });
-      push('Asset added', 'success');
+      push('Media added.', 'success');
       setUrl('');
       setAlt('');
       setTags('');
       router.refresh();
     } catch (e) {
       logAdminClientError('MediaLibraryClient.addAsset', e);
-      push(e instanceof Error ? e.message : 'We could not add this asset.', 'error');
+      push(e instanceof Error ? e.message : 'Could not add media. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
@@ -138,7 +138,7 @@ export default function MediaLibraryClient({
 
   async function uploadAsset() {
     if (!uploadFile) {
-      push('Select a file first', 'error');
+      push('Please select a file first.', 'error');
       return;
     }
     setUploading(true);
@@ -148,7 +148,7 @@ export default function MediaLibraryClient({
       if (alt.trim()) form.set('alt', alt.trim());
       if (tags.trim()) form.set('tags', tags.trim());
       await fetchJson('/api/admin/media/upload', { method: 'POST', body: form });
-      push('File uploaded', 'success');
+      push('File uploaded.', 'success');
       setUploadFile(null);
       if (uploadInputRef.current) uploadInputRef.current.value = '';
       setAlt('');
@@ -156,7 +156,7 @@ export default function MediaLibraryClient({
       router.refresh();
     } catch (e) {
       logAdminClientError('MediaLibraryClient.uploadAsset', e);
-      push(e instanceof Error ? e.message : 'We could not upload this file.', 'error');
+      push(e instanceof Error ? e.message : 'Could not upload file. Please try again.', 'error');
     } finally {
       setUploading(false);
     }
@@ -168,11 +168,11 @@ export default function MediaLibraryClient({
       const res = await fetchJson<{ imported: number; skipped: number; total: number }>('/api/admin/media/sync', {
         method: 'POST',
       });
-      push(`Synced media: ${res.imported} imported, ${res.skipped} skipped`, 'success');
+      push(`Media sync complete: ${res.imported} added, ${res.skipped} skipped.`, 'success');
       router.refresh();
     } catch (e) {
       logAdminClientError('MediaLibraryClient.syncPublicMedia', e);
-      push(e instanceof Error ? e.message : 'Sync failed.', 'error');
+      push(e instanceof Error ? e.message : 'Could not sync media. Please try again.', 'error');
     } finally {
       setSyncing(false);
     }

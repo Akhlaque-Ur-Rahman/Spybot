@@ -73,10 +73,8 @@ export default async function AdminDashboardPage() {
 
   return (
     <>
-      <h1 className={pageStyles.pageTitle}>Dashboard Overview</h1>
-      <p className={pageStyles.lead}>
-        Snapshot of pages, forms, media, and recent changes. Shortcuts below open each area.
-      </p>
+      <h1 className={pageStyles.pageTitle}>Dashboard</h1>
+      <p className={pageStyles.lead}>Pages, forms, media, and recent updates.</p>
 
       <div className={pageStyles.kpiGrid} role="region" aria-label="Key metrics">
         <div className={pageStyles.kpiCard}>
@@ -110,9 +108,6 @@ export default async function AdminDashboardPage() {
       <div className={pageStyles.card}>
         <h2 className={pageStyles.cardTitle}>Quick actions</h2>
         <div className={pageStyles.quickActions}>
-          <Link href="/admin/guide" className={`${pageStyles.btn} ${pageStyles.btnSecondary} ${pageStyles.link}`}>
-            CMS guide
-          </Link>
           <Link href="/admin/content" className={`${pageStyles.btn} ${pageStyles.link}`}>
             Content
           </Link>
@@ -143,7 +138,7 @@ export default async function AdminDashboardPage() {
       {pagesTotal === 0 ? (
         <EmptyState
           title="No pages yet"
-          description="Create your first page from the Content section."
+          description="No pages added yet."
           action={
             <Link href="/admin/content" className={`${pageStyles.btn} ${pageStyles.link}`}>
               Go to Content

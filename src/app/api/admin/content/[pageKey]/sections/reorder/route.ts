@@ -11,7 +11,7 @@ export async function POST(
   request: NextRequest,
   context: { params: Promise<{ pageKey: string }> }
 ) {
-  const rateLimitError = applyRateLimit(request, 25);
+  const rateLimitError = await applyRateLimit(request, 25);
   if (rateLimitError) return rateLimitError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;

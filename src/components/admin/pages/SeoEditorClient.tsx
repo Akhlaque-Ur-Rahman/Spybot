@@ -36,11 +36,11 @@ export default function SeoEditorClient({ pages }: { pages: SeoRow[] }) {
           seoDescription: row.seoDescription || null,
         }),
       });
-      push('SEO saved', 'success');
+      push('SEO saved.', 'success');
       router.refresh();
     } catch (e) {
       logAdminClientError('SeoEditorClient.save', e, { pageKey });
-      push(e instanceof Error ? e.message : 'We could not save SEO for this page.', 'error');
+      push(e instanceof Error ? e.message : 'Could not save SEO. Please try again.', 'error');
     } finally {
       setSaving(null);
     }

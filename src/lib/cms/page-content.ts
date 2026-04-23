@@ -1,5 +1,6 @@
 import { draftMode } from 'next/headers';
 import { getCmsPageByKey, getCmsPageBySlug, normalizeCmsPageSlug } from '@/lib/cms/service';
+import { isCmsPreviewSessionActive } from '@/lib/cms/preview-session';
 import type { CmsPage } from '@/lib/cms/types';
 import {
   cmsRegistryPages,
@@ -206,7 +207,8 @@ export async function getManagedPageBySlug(slug: string): Promise<ManagedCmsPage
   if (!registryPage && !dbPage) return null;
 
   const mode = await draftMode();
-  const useDraft = mode.isEnabled;
+  const previewActive = await isCmsPreviewSessionActive();
+  const useDraft = mode.isEnabled && previewActive;
 
   if (!registryPage) {
     if (!dbPage) return null;

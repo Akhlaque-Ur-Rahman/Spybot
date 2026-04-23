@@ -46,7 +46,7 @@ export default function ContentListToolbar() {
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentListToolbar.createPage', e);
-      push(e instanceof Error ? e.message : 'We could not create the page. Please try again.', 'error');
+      push(e instanceof Error ? e.message : 'Could not create page. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
@@ -70,14 +70,14 @@ export default function ContentListToolbar() {
         destructiveChanges?: { sections: number; blocks: number };
       };
       if (!dryRunRes.ok) {
-        throw new Error(dryRunData.error || 'We could not import the default pages. Please try again.');
+        throw new Error(dryRunData.error || 'Could not import default pages. Please try again.');
       }
 
       const sections = dryRunData.destructiveChanges?.sections ?? 0;
       const blocks = dryRunData.destructiveChanges?.blocks ?? 0;
       if (sections > 0 || blocks > 0) {
         const shouldContinue = window.confirm(
-          `Importing default pages will remove ${sections} section${sections === 1 ? '' : 's'} and ${blocks} block${blocks === 1 ? '' : 's'} that are not in the site template. Continue?`
+          `Importing default pages will remove ${sections} section${sections === 1 ? '' : 's'} and ${blocks} block${blocks === 1 ? '' : 's'} that are not in the default layout. Continue?`
         );
         if (!shouldContinue) return;
       }
@@ -90,19 +90,19 @@ export default function ContentListToolbar() {
       push(
         createdCount > 0
           ? `Added ${createdCount} new page${createdCount === 1 ? '' : 's'} from the site template.`
-          : 'Default pages are already imported.',
+          : 'Default pages are already added.',
         'success',
       );
       if ((result.destructiveChanges.sections ?? 0) > 0 || (result.destructiveChanges.blocks ?? 0) > 0) {
         push(
-          `Sync also removed ${result.destructiveChanges.sections} section(s) and ${result.destructiveChanges.blocks} block(s) not present in registry.`,
+          `Also removed ${result.destructiveChanges.sections} section(s) and ${result.destructiveChanges.blocks} block(s) not in default layout.`,
           'success',
         );
       }
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentListToolbar.syncPages', e);
-      push(e instanceof Error ? e.message : 'We could not import the default pages. Please try again.', 'error');
+      push(e instanceof Error ? e.message : 'Could not import default pages. Please try again.', 'error');
     } finally {
       setSyncing(false);
     }

@@ -1,20 +1,20 @@
-import { Prisma, UserRole } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminPublishRollbackSchema } from '@/lib/api/admin-body-schemas';
 import { readValidatedJson } from '@/lib/api/json-request';
-import { requireApiRole } from '@/lib/api/admin';
+import { requireApiCapability } from '@/lib/api/admin';
 import { prisma } from '@/lib/db/prisma';
 import { isRichPublishSnapshot, type PublishSnapshot } from '@/app/api/admin/publish/snapshot-types';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 
 export async function POST(request: NextRequest) {
-  const rateLimitError = applyRateLimit(request, 15);
+  const rateLimitError = await applyRateLimit(request, 15);
   if (rateLimitError) return rateLimitError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;
 
-  const auth = await requireApiRole(UserRole.OWNER);
+  const auth = await requireApiCapability('publish.rollback');
   if (auth.error) return auth.error;
 
   const parsed = await readValidatedJson(request, adminPublishRollbackSchema);

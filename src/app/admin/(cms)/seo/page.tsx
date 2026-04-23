@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import SeoEditorClient, { type SeoRow } from '@/components/admin/pages/SeoEditorClient';
 import EmptyState from '@/components/admin/EmptyState';
 import pageStyles from '@/components/admin/adminPage.module.css';
@@ -19,15 +18,9 @@ export default async function AdminSeoPage() {
   return (
     <>
       <h1 className={pageStyles.pageTitle}>SEO Manager</h1>
-      <p className={pageStyles.lead}>
-        Set meta title and description per page. Page titles and on-page copy are edited under{' '}
-        <Link href="/admin/content" className={pageStyles.link}>
-          Content
-        </Link>
-        .
-      </p>
+      <p className={pageStyles.lead}>Update search title and description.</p>
       {rows.length === 0 ? (
-        <EmptyState title="No pages" description="Create pages under Content first." />
+        <EmptyState title="No pages" description="No pages available yet." />
       ) : (
         <SeoEditorClient pages={rows} />
       )}

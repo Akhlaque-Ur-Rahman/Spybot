@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import NavigationEditorClient, { type MenuRow } from '@/components/admin/pages/NavigationEditorClient';
 import EmptyState from '@/components/admin/EmptyState';
 import pageStyles from '@/components/admin/adminPage.module.css';
@@ -27,16 +26,9 @@ export default async function AdminNavigationPage() {
   return (
     <>
       <h1 className={pageStyles.pageTitle}>Navigation</h1>
-      <p className={pageStyles.lead}>
-        Manage the public header navigation. `header-main` is the primary navbar and `header-utility`
-        is the small top bar above it. See the{' '}
-        <Link href="/admin/guide" className={pageStyles.link}>
-          CMS guide
-        </Link>{' '}
-        for the full editing workflow.
-      </p>
+      <p className={pageStyles.lead}>Update menu links.</p>
       {rows.length === 0 ? (
-        <EmptyState title="No menus" description="Run the database seed to create the default header menu." />
+        <EmptyState title="No menus" description="No menu found yet." />
       ) : (
         <NavigationEditorClient
           key={`${rows.map((m) => `${m.id}-${m.items.length}`).join('|')}:${Object.values(dropdowns)

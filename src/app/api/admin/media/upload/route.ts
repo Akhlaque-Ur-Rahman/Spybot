@@ -33,7 +33,7 @@ async function nextAvailableFilePath(dir: string, baseStem: string, ext: string)
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimitError = applyRateLimit(request, 20);
+  const rateLimitError = await applyRateLimit(request, 20);
   if (rateLimitError) return rateLimitError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;

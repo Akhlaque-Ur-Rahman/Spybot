@@ -19,7 +19,7 @@ export default async function AdminUsersPage() {
   return (
     <>
       <h1 className={pageStyles.pageTitle}>User Access</h1>
-      <p className={pageStyles.lead}>Add CMS accounts and assign OWNER, EDITOR, or REVIEWER.</p>
+      <p className={pageStyles.lead}>Manage team access.</p>
       <AddUserForm />
       {rows.length === 0 ? (
         <EmptyState title="No users" />

@@ -10,6 +10,7 @@ import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
 import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 import { stableStringify } from '@/lib/cms/json-stable';
+import { getCmsBlockContract } from '@/lib/cms/block-contracts';
 import { CMS_BLOCK_TYPES, cmsBlockTypeLabel } from '@/lib/cms/page-registry';
 import { CMS_SECTION_TEMPLATES } from '@/lib/cms/section-templates';
 
@@ -152,6 +153,9 @@ export default function ContentPageEditor({
   const [jsonModeByBlock, setJsonModeByBlock] = useState<Record<string, boolean>>({});
   const [untypedDevJsonByBlock, setUntypedDevJsonByBlock] = useState<Record<string, boolean>>({});
   const [sectionOpen, setSectionOpen] = useState<Record<string, boolean>>({});
+  const [blockQuery, setBlockQuery] = useState('');
+  const [showDirtyOnly, setShowDirtyOnly] = useState(false);
+  const [showUnpublishedOnly, setShowUnpublishedOnly] = useState(false);
 
   useEffect(() => {
     setSectionOpen(loadSectionOpen(page.key));
@@ -214,6 +218,26 @@ export default function ContentPageEditor({
     return map;
   }, [page.sections]);
   const hasUnsaved = metaDirty || blocksDirty;
+  const normalizedBlockQuery = blockQuery.trim().toLowerCase();
+  const hasBlockFilters = showDirtyOnly || showUnpublishedOnly || normalizedBlockQuery.length > 0;
+
+  const visibleSections = useMemo(() => {
+    return page.sections
+      .map((section) => {
+        const blocks = section.blocks.filter((block) => {
+          const raw = draftText[block.id] ?? '{}';
+          const blockDirty = raw !== (initialDrafts[block.id] ?? '');
+          const pendingLive = draftDiffersFromLive(raw, block.liveJson);
+          if (showDirtyOnly && !blockDirty) return false;
+          if (showUnpublishedOnly && !pendingLive) return false;
+          if (!normalizedBlockQuery) return true;
+          const haystack = `${section.label} ${section.key} ${block.key} ${block.type} ${cmsBlockTypeLabel(block.type)}`.toLowerCase();
+          return haystack.includes(normalizedBlockQuery);
+        });
+        return { ...section, blocks };
+      })
+      .filter((section) => section.blocks.length > 0 || !hasBlockFilters);
+  }, [page.sections, draftText, initialDrafts, showDirtyOnly, showUnpublishedOnly, normalizedBlockQuery, hasBlockFilters]);
 
   useEffect(() => {
     if (!hasUnsaved) return;
@@ -245,7 +269,7 @@ export default function ContentPageEditor({
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentPageEditor.saveMeta', e);
-      push(e instanceof Error ? e.message : 'We could not save the page details.', 'error');
+      push(e instanceof Error ? e.message : 'Could not save page details. Please try again.', 'error');
     } finally {
       setSavingMeta(false);
     }
@@ -258,7 +282,7 @@ export default function ContentPageEditor({
       parsed = JSON.parse(raw) as unknown;
     } catch (err) {
       logAdminClientError('ContentPageEditor.saveBlock parse', err, { blockId });
-      push('This block could not be saved because the content format is invalid.', 'error');
+      push('Could not save this block. Please check the content and try again.', 'error');
       return;
     }
     setSavingBlock(blockId);
@@ -279,11 +303,11 @@ export default function ContentPageEditor({
       if (updatedAt) {
         setBlockVersions((prev) => ({ ...prev, [blockId]: updatedAt }));
       }
-      push('Saved', 'success');
+      push('Block saved.', 'success');
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentPageEditor.saveBlock', e, { blockId });
-      push(e instanceof Error ? e.message : 'We could not save this block.', 'error');
+      push(e instanceof Error ? e.message : 'Could not save this block. Please try again.', 'error');
     } finally {
       setSavingBlock(null);
     }
@@ -292,7 +316,7 @@ export default function ContentPageEditor({
   async function saveAllBlockDrafts() {
     const targets = allBlockIds.filter((id) => (draftText[id] ?? '') !== (initialDrafts[id] ?? ''));
     if (targets.length === 0) {
-      push('Everything is already saved.', 'success');
+      push('All changes are already saved.', 'success');
       return;
     }
     setSavingAll(true);
@@ -313,7 +337,7 @@ export default function ContentPageEditor({
           });
         } catch (err) {
           logAdminClientError('ContentPageEditor.saveAllBlockDrafts parse', err, { blockId });
-          push('One of the blocks could not be saved because the content format is invalid.', 'error');
+          push('One or more blocks could not be saved. Please check the content and try again.', 'error');
           return;
         }
       }
@@ -337,7 +361,7 @@ export default function ContentPageEditor({
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentPageEditor.saveAllBlockDrafts', e);
-      push(e instanceof Error ? e.message : 'We could not save all blocks.', 'error');
+      push(e instanceof Error ? e.message : 'Could not save all blocks. Please try again.', 'error');
     } finally {
       setSavingAll(false);
     }
@@ -350,29 +374,22 @@ export default function ContentPageEditor({
         body: JSON.stringify({ pageKey: page.key, note: 'Preflight from content editor' }),
       });
       if (!preflight.report.ok) {
-        const first = preflight.report.errors[0];
-        const location =
-          first?.sectionKey && first?.blockKey
-            ? ` (${first.sectionKey}/${first.blockKey})`
-            : first?.sectionKey
-              ? ` (${first.sectionKey})`
-              : '';
-        push(`${first?.message ?? 'Publish preflight failed'}${location}`, 'error');
+        push('This page is not ready to publish yet. Please review and try again.', 'error');
         return;
       }
       if (preflight.report.warnings.length > 0) {
-        push(`Preflight warning: ${preflight.report.warnings[0]!.message}`, 'error');
+        push('Please review this page once before publishing.', 'error');
       }
 
       await fetchJson<{ ok: boolean }>('/api/admin/publish', {
         method: 'POST',
         body: JSON.stringify({ pageKey: page.key, note: 'Published from CMS' }),
       });
-      push('Published', 'success');
+      push('Page published.', 'success');
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentPageEditor.publishPage', e);
-      push(e instanceof Error ? e.message : 'We could not publish this page.', 'error');
+      push(e instanceof Error ? e.message : 'Could not publish this page. Please try again.', 'error');
     }
   }
 
@@ -384,11 +401,11 @@ export default function ContentPageEditor({
         body: JSON.stringify({ status: 'draft', expectedUpdatedAt: pageVersion }),
       });
       if (result.page?.updatedAt) setPageVersion(result.page.updatedAt);
-      push('This page is a draft again. Visitors keep seeing the last published version until you publish.', 'success');
+      push('Page moved back to draft.', 'success');
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentPageEditor.unpublishPage', e);
-      push(e instanceof Error ? e.message : 'We could not update the page status.', 'error');
+      push(e instanceof Error ? e.message : 'Could not update page status. Please try again.', 'error');
     } finally {
       setUnpublishing(false);
     }
@@ -401,12 +418,12 @@ export default function ContentPageEditor({
         `/api/admin/content/${encodeURIComponent(page.key)}/duplicate`,
         { method: 'POST', body: JSON.stringify({}) },
       );
-      push('Page duplicated', 'success');
+      push('Page duplicated.', 'success');
       router.push(`/admin/content/${encodeURIComponent(res.page.key)}`);
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentPageEditor.duplicatePage', e);
-      push(e instanceof Error ? e.message : 'We could not duplicate this page.', 'error');
+      push(e instanceof Error ? e.message : 'Could not duplicate this page. Please try again.', 'error');
     } finally {
       setDuplicatingPage(false);
     }
@@ -418,12 +435,12 @@ export default function ContentPageEditor({
     setDeletingPage(true);
     try {
       await fetchJson(`/api/admin/content/${encodeURIComponent(page.key)}`, { method: 'DELETE' });
-      push('Page removed', 'success');
+      push('Page removed.', 'success');
       router.push('/admin/content');
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentPageEditor.deletePage', e);
-      push(e instanceof Error ? e.message : 'We could not remove this page.', 'error');
+      push(e instanceof Error ? e.message : 'Could not remove this page. Please try again.', 'error');
     } finally {
       setDeletingPage(false);
     }
@@ -440,7 +457,7 @@ export default function ContentPageEditor({
       window.location.assign(target);
     } catch (e) {
       logAdminClientError('ContentPageEditor.openPreview', e);
-      push(e instanceof Error ? e.message : 'We could not open preview.', 'error');
+      push(e instanceof Error ? e.message : 'Could not open preview. Please try again.', 'error');
     }
   }
 
@@ -465,7 +482,7 @@ export default function ContentPageEditor({
           </span>
         ) : null}
         <button type="button" className={`${pageStyles.btn} ${pageStyles.btnSecondary}`} onClick={() => void openPreview()}>
-          Preview draft
+          Preview
         </button>
         <button
           type="button"
@@ -473,10 +490,10 @@ export default function ContentPageEditor({
           disabled={duplicatingPage}
           onClick={() => void duplicatePage()}
         >
-          {duplicatingPage ? 'Duplicating…' : 'Duplicate page'}
+          {duplicatingPage ? 'Copying…' : 'Duplicate page'}
         </button>
         <button type="button" className={pageStyles.btn} onClick={() => void publishPage()}>
-          Publish page
+          Publish
         </button>
         <button
           type="button"
@@ -484,7 +501,7 @@ export default function ContentPageEditor({
           disabled={savingAll || !blocksDirty}
           onClick={() => void saveAllBlockDrafts()}
         >
-          {savingAll ? 'Saving…' : 'Save all changes'}
+          {savingAll ? 'Saving…' : 'Save all'}
         </button>
       </div>
 
@@ -495,15 +512,15 @@ export default function ContentPageEditor({
           <input className={pageStyles.input} value={title} onChange={(e) => setTitle(e.target.value)} />
         </label>
         <label className={pageStyles.lead} style={{ display: 'grid', gap: 6, marginBottom: 12 }}>
-          Page address (URL path)
+          Page address
           <input className={pageStyles.input} value={slug} onChange={(e) => setSlug(e.target.value)} />
         </label>
         <div className={pageStyles.lead} style={{ marginBottom: 12 }}>
-          <strong>What visitors see</strong>
+          <strong>Live status</strong>
           <p style={{ margin: '6px 0 0' }}>
             {page.status === 'published' ? (
               <>
-                Published — visitors see this page title, SEO settings, and the content you last published.{' '}
+                Live on site.{' '}
                 <button
                   type="button"
                   className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
@@ -511,19 +528,16 @@ export default function ContentPageEditor({
                   disabled={unpublishing}
                   onClick={() => void unpublishPage()}
                 >
-                  {unpublishing ? 'Updating…' : 'Return to draft'}
+                  {unpublishing ? 'Updating…' : 'Move to draft'}
                 </button>
               </>
             ) : (
-              <>
-                Draft — your edits are saved here; visitors still see the last published version until you use{' '}
-                <strong>Publish page</strong>.
-              </>
+              <>Draft mode. Publish when ready.</>
             )}
           </p>
         </div>
         <button type="button" className={pageStyles.btn} disabled={savingMeta || !metaDirty} onClick={() => void saveMeta()}>
-          {savingMeta ? 'Saving…' : 'Save page details'}
+          {savingMeta ? 'Saving…' : 'Save details'}
         </button>
         {deletable ? (
           <div style={{ marginTop: 'var(--space-4)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-border-subtle)' }}>
@@ -542,15 +556,38 @@ export default function ContentPageEditor({
       <div className={pageStyles.card}>
         <h3 className={pageStyles.cardTitle}>SEO</h3>
         <p className={pageStyles.lead} style={{ marginTop: 0 }}>
-          Meta title and description: <Link href="/admin/seo">SEO manager</Link>
+          Edit from <Link href="/admin/seo">SEO</Link>
         </p>
       </div>
 
       <div className={pageStyles.card}>
         <h3 className={pageStyles.cardTitle}>Sections</h3>
         <p className={pageStyles.lead} style={{ marginTop: 0 }}>
-          Reorder sections or add a section.
+          Reorder or add sections.
         </p>
+        <div className={pageStyles.row} style={{ marginBottom: 12 }}>
+          <label className={pageStyles.lead} style={{ display: 'grid', gap: 6, minWidth: 240, margin: 0 }}>
+            Search blocks
+            <input
+              className={pageStyles.input}
+              value={blockQuery}
+              onChange={(e) => setBlockQuery(e.target.value)}
+              placeholder="Search block or section"
+            />
+          </label>
+          <label className={pageStyles.lead} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, margin: 0 }}>
+            <input type="checkbox" checked={showDirtyOnly} onChange={(e) => setShowDirtyOnly(e.target.checked)} />
+            Unsaved only
+          </label>
+          <label className={pageStyles.lead} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, margin: 0 }}>
+            <input
+              type="checkbox"
+              checked={showUnpublishedOnly}
+              onChange={(e) => setShowUnpublishedOnly(e.target.checked)}
+            />
+            Not published only
+          </label>
+        </div>
         <ol style={{ paddingLeft: 18, marginBottom: 16 }}>
           {sectionKeys.map((key, idx) => (
             <li key={key} style={{ marginBottom: 8 }}>
@@ -579,7 +616,7 @@ export default function ContentPageEditor({
                         router.refresh();
                       } catch (e) {
                         logAdminClientError('ContentPageEditor.reorderSection', e);
-                        push(e instanceof Error ? e.message : 'We could not save the new order.', 'error');
+                        push(e instanceof Error ? e.message : 'Could not save order. Please try again.', 'error');
                         setSectionKeys([...page.sections].sort((a, b) => a.position - b.position).map((s) => s.key));
                       }
                     })();
@@ -606,7 +643,7 @@ export default function ContentPageEditor({
                         router.refresh();
                       } catch (e) {
                         logAdminClientError('ContentPageEditor.reorderSection', e);
-                        push(e instanceof Error ? e.message : 'We could not save the new order.', 'error');
+                        push(e instanceof Error ? e.message : 'Could not save order. Please try again.', 'error');
                         setSectionKeys([...page.sections].sort((a, b) => a.position - b.position).map((s) => s.key));
                       }
                     })();
@@ -624,7 +661,7 @@ export default function ContentPageEditor({
         {addOpen ? (
           <div style={{ marginTop: 16, display: 'grid', gap: 10 }}>
             <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
-              Starter template
+              Template
               <select
                 className={pageStyles.input}
                 value={newSectionTemplateId}
@@ -650,15 +687,15 @@ export default function ContentPageEditor({
               </select>
             </label>
             <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
-              Section code (short id)
+              Section code
               <input className={pageStyles.input} value={newSectionKey} onChange={(e) => setNewSectionKey(e.target.value)} />
             </label>
             <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
-              Section name (shown in the editor)
+              Section name
               <input className={pageStyles.input} value={newSectionLabel} onChange={(e) => setNewSectionLabel(e.target.value)} />
             </label>
             <label className={pageStyles.lead} style={{ display: 'grid', gap: 6 }}>
-              First block type
+              Block type
               <select
                 className={pageStyles.input}
                 value={newSectionBlockType}
@@ -712,20 +749,20 @@ export default function ContentPageEditor({
                     router.refresh();
                   } catch (e) {
                     logAdminClientError('ContentPageEditor.addSection', e);
-                    push(e instanceof Error ? e.message : 'We could not add that section.', 'error');
+                    push(e instanceof Error ? e.message : 'Could not add section. Please try again.', 'error');
                   } finally {
                     setAddingSection(false);
                   }
                 })()
               }
             >
-              {addingSection ? 'Adding…' : 'Create section'}
+              {addingSection ? 'Adding…' : 'Add section'}
             </button>
           </div>
         ) : null}
       </div>
 
-      {page.sections.map((section) => (
+      {visibleSections.map((section) => (
         <details
           key={section.id}
           id={`section-${encodeURIComponent(section.key)}`}
@@ -748,9 +785,12 @@ export default function ContentPageEditor({
           </summary>
           <div style={{ marginTop: 'var(--space-3)' }}>
             {section.blocks.length === 0 ? (
-              <p className={pageStyles.lead}>No blocks in this section.</p>
+              <p className={pageStyles.lead}>No blocks.</p>
             ) : (
               section.blocks.map((block) => {
+                const contract = CMS_BLOCK_TYPES.includes(block.type as (typeof CMS_BLOCK_TYPES)[number])
+                  ? getCmsBlockContract(block.type as (typeof CMS_BLOCK_TYPES)[number])
+                  : null;
                 const typed = CMS_TYPED_BLOCK_TYPES.has(block.type);
                 const jsonMode = jsonModeByBlock[block.id] ?? false;
                 const parsed = parseDraftText(draftText[block.id] ?? '{}');
@@ -772,6 +812,11 @@ export default function ContentPageEditor({
                       <span className={pageStyles.muted} style={{ marginLeft: 8 }}>
                         · {block.key}
                       </span>
+                      {contract ? (
+                        <span className={pageStyles.muted} style={{ marginLeft: 8 }}>
+                          · schema v{contract.schemaVersion}
+                        </span>
+                      ) : null}
                       {blockDirty ? (
                         <span className={`${pageStyles.badge} ${pageStyles.badgeDraft}`} style={{ marginLeft: 8 }}>
                           Unsaved changes
@@ -786,7 +831,7 @@ export default function ContentPageEditor({
                     {typed ? (
                       <div style={{ marginBottom: 12 }}>
                         <ToggleField
-                          label="Edit as raw JSON (advanced)"
+                          label="Edit advanced format"
                           checked={jsonMode}
                           onChange={(checked) => setJsonModeByBlock((prev) => ({ ...prev, [block.id]: checked }))}
                         />
@@ -794,10 +839,10 @@ export default function ContentPageEditor({
                     ) : (
                       <div style={{ marginBottom: 12 }}>
                         <p className={pageStyles.lead} style={{ marginTop: 0 }}>
-                          No visual editor for this block.
+                          Standard editor is not available for this block.
                         </p>
                         <ToggleField
-                          label="Show developer editor (technical format)"
+                          label="Show advanced format"
                           checked={untypedDevJsonByBlock[block.id] ?? false}
                           onChange={(checked) =>
                             setUntypedDevJsonByBlock((prev) => ({ ...prev, [block.id]: checked }))
@@ -814,7 +859,7 @@ export default function ContentPageEditor({
                     ) : null}
                     {typed && jsonMode ? (
                       <TextAreaField
-                        label="Technical format"
+                        label="Advanced format"
                         value={draftText[block.id] ?? '{}'}
                         onChange={(v) => setDraftText((prev) => ({ ...prev, [block.id]: v }))}
                         rows={14}
@@ -822,7 +867,7 @@ export default function ContentPageEditor({
                     ) : null}
                     {!typed && (untypedDevJsonByBlock[block.id] ?? false) ? (
                       <TextAreaField
-                        label="Technical format"
+                        label="Advanced format"
                         value={draftText[block.id] ?? '{}'}
                         onChange={(v) => setDraftText((prev) => ({ ...prev, [block.id]: v }))}
                         rows={14}
@@ -844,6 +889,13 @@ export default function ContentPageEditor({
           </div>
         </details>
       ))}
+      {visibleSections.length === 0 ? (
+        <div className={pageStyles.card}>
+          <p className={pageStyles.lead} style={{ margin: 0 }}>
+            Koi block current filters ko match nahi kar raha.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

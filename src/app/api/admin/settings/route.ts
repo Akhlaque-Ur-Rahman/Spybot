@@ -16,7 +16,7 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
-  const rateLimitError = applyRateLimit(request, 30);
+  const rateLimitError = await applyRateLimit(request, 30);
   if (rateLimitError) return rateLimitError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;

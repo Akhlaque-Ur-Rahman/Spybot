@@ -24,13 +24,14 @@
 
 .heroTitle {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4.8vw, 3.2rem);
+  font-size: clamp(2rem, 5vw, 3.875rem);
   line-height: 1.1;
   color: var(--color-text-primary);
   margin: 0 0 0.95rem;
 }
 
 .heroText {
+  font-size: clamp(1rem, 2.2vw, 1.125rem);
   color: var(--color-text-secondary);
   max-width: 56ch;
   margin: 0 0 0.95rem;

@@ -13,7 +13,7 @@ const schema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const rateLimitError = applyRateLimit(request, 15);
+  const rateLimitError = await applyRateLimit(request, 15);
   if (rateLimitError) return rateLimitError;
 
   const raw = await readJsonBody(request);

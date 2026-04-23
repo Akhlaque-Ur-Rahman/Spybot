@@ -21,12 +21,23 @@ export default async function AdminPublishPage() {
     publishedAt: v.publishedAt.toISOString(),
     page: v.page,
   }));
+  const lastPublishedAtByPage: Record<string, string> = {};
+  for (const row of versionRows) {
+    if (!lastPublishedAtByPage[row.page.key]) {
+      lastPublishedAtByPage[row.page.key] = row.publishedAt;
+    }
+  }
+  const draftRows = drafts.map((d) => ({
+    ...d,
+    updatedAt: d.updatedAt.toISOString(),
+    lastPublishedAt: lastPublishedAtByPage[d.key] ?? null,
+  }));
 
   return (
     <>
       <h1 className={pageStyles.pageTitle}>Publish Queue</h1>
-      <p className={pageStyles.lead}>Publish drafts and review recent versions. Rollback restores page title/status from a snapshot.</p>
-      <PublishQueueClient drafts={drafts} published={published} versions={versionRows} />
+      <p className={pageStyles.lead}>Review drafts and publish updates.</p>
+      <PublishQueueClient drafts={draftRows} published={published} versions={versionRows} />
     </>
   );
 }

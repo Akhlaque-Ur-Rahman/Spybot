@@ -32,11 +32,11 @@ export default function FormsInboxClient({ items }: { items: FormRow[] }) {
         method: 'PATCH',
         body: JSON.stringify({ id, status }),
       });
-      push('Status updated', 'success');
+      push('Status updated.', 'success');
       router.refresh();
     } catch (e) {
       logAdminClientError('FormsInboxClient.setStatus', e, { id });
-      push(e instanceof Error ? e.message : 'We could not update this submission.', 'error');
+      push(e instanceof Error ? e.message : 'Could not update this response. Please try again.', 'error');
     } finally {
       setSaving(null);
     }

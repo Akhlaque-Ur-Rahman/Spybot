@@ -17,9 +17,9 @@ export default async function AdminFormsPage() {
   return (
     <>
       <h1 className={pageStyles.pageTitle}>Forms Inbox</h1>
-      <p className={pageStyles.lead}>Review submissions, expand for full payload, and update workflow status.</p>
+      <p className={pageStyles.lead}>Review form responses.</p>
       {rows.length === 0 ? (
-        <EmptyState title="No submissions" description="Public form posts will appear here." />
+        <EmptyState title="No submissions" description="No responses yet." />
       ) : (
         <FormsInboxClient items={rows} />
       )}

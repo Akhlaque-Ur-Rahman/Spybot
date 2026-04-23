@@ -137,11 +137,11 @@ export default function FooterEditorClient({ footer }: { footer: CmsFooterSettin
           },
         }),
       });
-      push('Footer saved', 'success');
+      push('Footer saved.', 'success');
       router.refresh();
     } catch (e) {
       logAdminClientError('FooterEditorClient.save', e);
-      push(e instanceof Error ? e.message : 'We could not save the footer.', 'error');
+      push(e instanceof Error ? e.message : 'Could not save footer. Please try again.', 'error');
     } finally {
       setSaving(false);
     }

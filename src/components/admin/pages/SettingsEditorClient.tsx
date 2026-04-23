@@ -30,7 +30,7 @@ export default function SettingsEditorClient({ settings }: { settings: SettingRo
       valueJson = JSON.parse(raw) as unknown;
     } catch (err) {
       logAdminClientError('SettingsEditorClient.save parse', err, { key });
-      push('This text could not be read as valid data.', 'error');
+      push('Data format is not valid. Please check and try again.', 'error');
       return;
     }
     setSaving(key);
@@ -39,11 +39,11 @@ export default function SettingsEditorClient({ settings }: { settings: SettingRo
         method: 'PATCH',
         body: JSON.stringify({ key, valueJson }),
       });
-      push('Setting saved', 'success');
+      push('Setting saved.', 'success');
       router.refresh();
     } catch (e) {
       logAdminClientError('SettingsEditorClient.save', e, { key });
-      push(e instanceof Error ? e.message : 'We could not save this setting.', 'error');
+      push(e instanceof Error ? e.message : 'Could not save setting. Please try again.', 'error');
     } finally {
       setSaving(null);
     }
@@ -55,7 +55,7 @@ export default function SettingsEditorClient({ settings }: { settings: SettingRo
         <article key={s.id} className={pageStyles.card}>
           <h3 className={pageStyles.cardTitle}>{s.key}</h3>
           <TextAreaField
-            label="Technical format"
+            label="Data"
             value={textByKey[s.key] ?? '{}'}
             onChange={(v) => setTextByKey((p) => ({ ...p, [s.key]: v }))}
           />

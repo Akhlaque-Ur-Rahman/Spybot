@@ -8,7 +8,14 @@ import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
 import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
-type DraftPage = { id: string; key: string; title: string; status: string };
+type DraftPage = {
+  id: string;
+  key: string;
+  title: string;
+  status: string;
+  updatedAt: string;
+  lastPublishedAt: string | null;
+};
 type PubPage = { id: string; key: string; title: string; status: string };
 type VersionRow = {
   id: string;
@@ -47,6 +54,7 @@ export default function PublishQueueClient({
   const { fetchJson } = useAdminApi();
   const { push } = useToast();
   const [busy, setBusy] = useState<string | null>(null);
+  const [insights, setInsights] = useState<Record<string, PublishPreflightReport>>({});
 
   async function publish(pageKey: string) {
     setBusy(`pub-${pageKey}`);
@@ -56,29 +64,22 @@ export default function PublishQueueClient({
         body: JSON.stringify({ pageKey, note: 'Preflight from queue' }),
       });
       if (!preflight.report.ok) {
-        const first = preflight.report.errors[0];
-        const location =
-          first?.sectionKey && first?.blockKey
-            ? ` (${first.sectionKey}/${first.blockKey})`
-            : first?.sectionKey
-              ? ` (${first.sectionKey})`
-              : '';
-        push(`${first?.message ?? 'Publish preflight failed'}${location}`, 'error');
+        push('This page is not ready to publish yet. Please review and try again.', 'error');
         return;
       }
       if (preflight.report.warnings.length > 0) {
-        push(`Preflight warning: ${preflight.report.warnings[0]!.message}`, 'error');
+        push('Please review this page once before publishing.', 'error');
       }
 
       await fetchJson('/api/admin/publish', {
         method: 'POST',
         body: JSON.stringify({ pageKey, note: 'Published from queue' }),
       });
-      push('Published', 'success');
+      push('Page published.', 'success');
       router.refresh();
     } catch (e) {
       logAdminClientError('PublishQueueClient.publish', e);
-      push(e instanceof Error ? e.message : 'We could not publish this page.', 'error');
+      push(e instanceof Error ? e.message : 'Could not publish this page. Please try again.', 'error');
     } finally {
       setBusy(null);
     }
@@ -92,16 +93,38 @@ export default function PublishQueueClient({
         body: JSON.stringify({ pageId, version }),
       });
       if (res.scope === 'content_metadata_and_structure') {
-        push('Previous version restored (including section/block structure).', 'success');
+        push('Previous version restored.', 'success');
       } else if (res.scope === 'content_and_metadata') {
         push('Previous version restored.', 'success');
       } else {
-        push('Previous version restored (page details only).', 'success');
+        push('Previous version restored.', 'success');
       }
       router.refresh();
     } catch (e) {
       logAdminClientError('PublishQueueClient.rollback', e);
-      push(e instanceof Error ? e.message : 'We could not restore that version.', 'error');
+      push(e instanceof Error ? e.message : 'Could not restore this version. Please try again.', 'error');
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function analyzeDraft(pageKey: string) {
+    setBusy(`an-${pageKey}`);
+    try {
+      const preflight = await fetchJson<{ report: PublishPreflightReport }>('/api/admin/publish/preflight', {
+        method: 'POST',
+        body: JSON.stringify({ pageKey, note: 'Queue change insight' }),
+      });
+      setInsights((prev) => ({ ...prev, [pageKey]: preflight.report }));
+      push(
+        preflight.report.ok
+          ? `Review ready: ${preflight.report.dirtyBlocks} changed block(s).`
+          : 'This page still needs updates before publish.',
+        preflight.report.ok ? 'success' : 'error',
+      );
+    } catch (e) {
+      logAdminClientError('PublishQueueClient.analyzeDraft', e);
+      push(e instanceof Error ? e.message : 'Could not check this draft. Please try again.', 'error');
     } finally {
       setBusy(null);
     }
@@ -111,16 +134,39 @@ export default function PublishQueueClient({
     <div>
       <h3 className={pageStyles.cardTitle}>Draft pages</h3>
       {drafts.length === 0 ? (
-        <p className={pageStyles.lead}>No drafts in the queue.</p>
+        <p className={pageStyles.lead}>No drafts.</p>
       ) : (
         <ul className={pageStyles.list}>
           {drafts.map((p) => (
             <li key={p.id} className={pageStyles.listItem}>
               <strong>{p.title}</strong>
+              <p className={pageStyles.lead} style={{ marginBottom: 0 }}>
+                {p.lastPublishedAt
+                  ? `Last publish: ${new Date(p.lastPublishedAt).toLocaleString()}`
+                  : 'Not published yet'}
+                {' · '}
+                {p.lastPublishedAt && new Date(p.updatedAt) > new Date(p.lastPublishedAt)
+                  ? 'Changed since last publish'
+                  : 'No new changes'}
+              </p>
+              {insights[p.key] ? (
+                <p className={pageStyles.lead} style={{ marginTop: 6, marginBottom: 0 }}>
+                  {insights[p.key]!.dirtyBlocks} changed block(s), {insights[p.key]!.warnings.length} warning(s),{' '}
+                  {insights[p.key]!.errors.length} issue(s)
+                </p>
+              ) : null}
               <div className={pageStyles.row} style={{ marginTop: 8 }}>
                 <Link href={`/admin/content/${encodeURIComponent(p.key)}`} className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}>
-                  Edit in Content
+                  Open content
                 </Link>
+                <button
+                  type="button"
+                  className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+                  disabled={busy === `an-${p.key}`}
+                  onClick={() => analyzeDraft(p.key)}
+                >
+                  {busy === `an-${p.key}` ? 'Checking…' : 'Check changes'}
+                </button>
                 <button
                   type="button"
                   className={pageStyles.btn}

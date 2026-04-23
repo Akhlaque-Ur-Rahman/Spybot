@@ -31,12 +31,12 @@ export default async function AdminContentPage() {
   return (
     <>
       <h1 className={pageStyles.pageTitle}>Content Manager</h1>
-      <p className={pageStyles.lead}>Open a page to change text, images, and layout. Search and status filters help you find it.</p>
+      <p className={pageStyles.lead}>Manage page content.</p>
       <ContentListToolbar />
       {pages.length === 0 ? (
         <EmptyState
           title="No pages yet"
-          description="Use Import default pages above to add the standard pages, or create a new page with New page."
+          description="Add your first page."
         />
       ) : (
         <ContentPageListClient pages={rows} />

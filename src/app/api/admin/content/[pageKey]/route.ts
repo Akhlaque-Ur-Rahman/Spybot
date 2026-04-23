@@ -15,7 +15,7 @@ export async function GET(
   request: NextRequest,
   context: RouteContext<'/api/admin/content/[pageKey]'>
 ) {
-  const rateLimitError = applyRateLimit(request, 240);
+  const rateLimitError = await applyRateLimit(request, 240);
   if (rateLimitError) return rateLimitError;
   const auth = await requireApiRole();
   if (auth.error) return auth.error;
@@ -34,7 +34,7 @@ export async function PATCH(
   request: NextRequest,
   context: RouteContext<'/api/admin/content/[pageKey]'>
 ) {
-  const rateLimitError = applyRateLimit(request, 40);
+  const rateLimitError = await applyRateLimit(request, 40);
   if (rateLimitError) return rateLimitError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;
@@ -134,7 +134,7 @@ export async function DELETE(
   request: NextRequest,
   context: RouteContext<'/api/admin/content/[pageKey]'>
 ) {
-  const rateLimitError = applyRateLimit(request, 20);
+  const rateLimitError = await applyRateLimit(request, 20);
   if (rateLimitError) return rateLimitError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;

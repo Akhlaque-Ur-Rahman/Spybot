@@ -13,7 +13,7 @@ import { prisma } from '@/lib/db/prisma';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 
 export async function GET(request: NextRequest) {
-  const rateLimitError = applyRateLimit(request, 240);
+  const rateLimitError = await applyRateLimit(request, 240);
   if (rateLimitError) return rateLimitError;
   const auth = await requireApiRole();
   if (auth.error) return auth.error;
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimitError = applyRateLimit(request, 30);
+  const rateLimitError = await applyRateLimit(request, 30);
   if (rateLimitError) return rateLimitError;
   const csrfError = verifyCsrf(request);
   if (csrfError) return csrfError;

@@ -63,12 +63,12 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
         `/api/admin/content/${encodeURIComponent(row.key)}/duplicate`,
         { method: 'POST', body: JSON.stringify({}) },
       );
-      push('Page duplicated', 'success');
+      push('Page duplicated.', 'success');
       router.push(`/admin/content/${encodeURIComponent(res.page.key)}`);
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentPageListClient.duplicatePage', e);
-      push(e instanceof Error ? e.message : 'We could not duplicate this page.', 'error');
+      push(e instanceof Error ? e.message : 'Could not duplicate this page. Please try again.', 'error');
     } finally {
       setDuplicatingKey(null);
     }
@@ -86,11 +86,11 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
     setDeletingKey(row.key);
     try {
       await fetchJson(`/api/admin/content/${encodeURIComponent(row.key)}`, { method: 'DELETE' });
-      push('Page removed', 'success');
+      push('Page removed.', 'success');
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentPageListClient.deletePage', e);
-      push(e instanceof Error ? e.message : 'We could not remove this page.', 'error');
+      push(e instanceof Error ? e.message : 'Could not remove this page. Please try again.', 'error');
     } finally {
       setDeletingKey(null);
     }

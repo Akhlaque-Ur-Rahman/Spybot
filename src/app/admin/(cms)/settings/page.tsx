@@ -14,9 +14,9 @@ export default async function AdminSettingsPage() {
   return (
     <>
       <h1 className={pageStyles.pageTitle}>Global Settings</h1>
-      <p className={pageStyles.lead}>Edit site settings as JSON. Invalid JSON will be rejected on save.</p>
+      <p className={pageStyles.lead}>Manage site settings.</p>
       {rows.length === 0 ? (
-        <EmptyState title="No settings" description="Seed the database or create a setting via API." />
+        <EmptyState title="No settings" description="No settings found." />
       ) : (
         <SettingsEditorClient settings={rows} />
       )}
