@@ -19,6 +19,21 @@ type VersionRow = {
   page: { title: string; key: string };
 };
 
+type PublishPreflightIssue = {
+  severity: 'error' | 'warning';
+  message: string;
+  sectionKey?: string;
+  blockKey?: string;
+};
+
+type PublishPreflightReport = {
+  pageKey: string;
+  ok: boolean;
+  errors: PublishPreflightIssue[];
+  warnings: PublishPreflightIssue[];
+  dirtyBlocks: number;
+};
+
 export default function PublishQueueClient({
   drafts,
   published,
@@ -36,6 +51,25 @@ export default function PublishQueueClient({
   async function publish(pageKey: string) {
     setBusy(`pub-${pageKey}`);
     try {
+      const preflight = await fetchJson<{ report: PublishPreflightReport }>('/api/admin/publish/preflight', {
+        method: 'POST',
+        body: JSON.stringify({ pageKey, note: 'Preflight from queue' }),
+      });
+      if (!preflight.report.ok) {
+        const first = preflight.report.errors[0];
+        const location =
+          first?.sectionKey && first?.blockKey
+            ? ` (${first.sectionKey}/${first.blockKey})`
+            : first?.sectionKey
+              ? ` (${first.sectionKey})`
+              : '';
+        push(`${first?.message ?? 'Publish preflight failed'}${location}`, 'error');
+        return;
+      }
+      if (preflight.report.warnings.length > 0) {
+        push(`Preflight warning: ${preflight.report.warnings[0]!.message}`, 'error');
+      }
+
       await fetchJson('/api/admin/publish', {
         method: 'POST',
         body: JSON.stringify({ pageKey, note: 'Published from queue' }),
@@ -57,7 +91,9 @@ export default function PublishQueueClient({
         method: 'POST',
         body: JSON.stringify({ pageId, version }),
       });
-      if (res.scope === 'content_and_metadata') {
+      if (res.scope === 'content_metadata_and_structure') {
+        push('Previous version restored (including section/block structure).', 'success');
+      } else if (res.scope === 'content_and_metadata') {
         push('Previous version restored.', 'success');
       } else {
         push('Previous version restored (page details only).', 'success');

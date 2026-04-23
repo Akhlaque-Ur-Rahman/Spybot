@@ -1,23 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const limiter = new Map<string, { count: number; resetAt: number }>();
+let lastCleanupAt = 0;
 
-export function applyRateLimit(request: NextRequest, max = 60, windowMs = 60_000) {
+function cleanupLimiter(now: number) {
+  if (now - lastCleanupAt < 30_000) return;
+  lastCleanupAt = now;
+  for (const [key, slot] of limiter.entries()) {
+    if (slot.resetAt < now) limiter.delete(key);
+  }
+}
+
+export function applyRateLimit(
+  request: NextRequest,
+  max = 60,
+  windowMs = 60_000,
+  scope = 'default',
+) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';
+  const route = request.nextUrl.pathname;
+  const method = request.method.toUpperCase();
+  const key = `${scope}:${method}:${route}:${ip}`;
   const now = Date.now();
-  const current = limiter.get(ip);
+  cleanupLimiter(now);
+  const current = limiter.get(key);
 
   if (!current || current.resetAt < now) {
-    limiter.set(ip, { count: 1, resetAt: now + windowMs });
+    limiter.set(key, { count: 1, resetAt: now + windowMs });
     return null;
   }
 
   if (current.count >= max) {
-    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    const retryAfterSec = Math.max(1, Math.ceil((current.resetAt - now) / 1000));
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(retryAfterSec) } },
+    );
   }
 
   current.count += 1;
-  limiter.set(ip, current);
+  limiter.set(key, current);
   return null;
 }
 

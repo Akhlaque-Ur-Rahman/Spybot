@@ -41,11 +41,35 @@ export async function PATCH(
     return NextResponse.json({ error: valid.error }, { status: 400 });
   }
 
+  if (block.updatedAt.toISOString() !== body.expectedUpdatedAt) {
+    return NextResponse.json(
+      {
+        error: 'Your content data is out of date. Refresh this page and try again.',
+        blockId: block.id,
+        latestUpdatedAt: block.updatedAt.toISOString(),
+      },
+      { status: 409 }
+    );
+  }
+
   const before = { ...block };
-  const updated = await prisma.block.update({
-    where: { id: block.id },
+  const updateResult = await prisma.block.updateMany({
+    where: { id: block.id, updatedAt: block.updatedAt },
     data: { draftJson: body.draftJson as Prisma.InputJsonValue },
   });
+  if (updateResult.count === 0) {
+    const latest = await prisma.block.findUnique({ where: { id: block.id } });
+    return NextResponse.json(
+      {
+        error: 'Your content data is out of date. Refresh this page and try again.',
+        blockId: block.id,
+        latestUpdatedAt: latest?.updatedAt.toISOString(),
+      },
+      { status: 409 }
+    );
+  }
+  const updated = await prisma.block.findUnique({ where: { id: block.id } });
+  if (!updated) return NextResponse.json({ error: 'Block not found' }, { status: 404 });
 
   await createAuditLog({
     actorId: auth.session.user.id,

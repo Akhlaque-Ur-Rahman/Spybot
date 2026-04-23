@@ -12,6 +12,7 @@ export type SnapshotSection = {
   id: string;
   key: string;
   label: string;
+  position: number;
   blocks: SnapshotBlock[];
 };
 
@@ -20,6 +21,8 @@ export type PublishSnapshotPage = {
   title: string;
   slug: string;
   status: string;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
   sections: SnapshotSection[];
 };
 

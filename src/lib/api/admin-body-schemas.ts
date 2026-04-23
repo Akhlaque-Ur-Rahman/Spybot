@@ -26,6 +26,13 @@ export const adminPublishPreviewPostSchema = z.object({
   redirectTo: safeRelativePath,
 });
 
+export const adminContentSyncPostSchema = z
+  .object({
+    dryRun: z.boolean().optional(),
+    allowDestructive: z.boolean().optional(),
+  })
+  .strict();
+
 export const adminMediaPostSchema = z.object({
   url: z.string().min(1).max(2048).trim(),
   alt: z.union([z.string().max(500), z.null()]).optional(),
@@ -124,6 +131,7 @@ export const adminContentPatchSchema = z
     seoTitle: z.union([z.string().max(500), z.null()]).optional(),
     seoDescription: z.union([z.string().max(10000), z.null()]).optional(),
     status: z.literal('draft').optional(),
+    expectedUpdatedAt: z.string().datetime({ offset: true }).optional(),
   })
   .strict();
 
@@ -137,6 +145,7 @@ export const adminContentDuplicatePostSchema = z
 
 export const adminBlockDraftPatchSchema = z.object({
   draftJson: z.unknown(),
+  expectedUpdatedAt: z.string().datetime({ offset: true }),
 });
 
 export const adminBlockBatchPatchSchema = z.object({
@@ -145,6 +154,7 @@ export const adminBlockBatchPatchSchema = z.object({
       z.object({
         blockId: z.string().cuid(),
         draftJson: z.unknown(),
+        expectedUpdatedAt: z.string().datetime({ offset: true }),
       })
     )
     .min(1)

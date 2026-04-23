@@ -43,24 +43,66 @@ export async function PATCH(
     if (!found) {
       return NextResponse.json({ error: `Unknown block id: ${row.blockId}` }, { status: 400 });
     }
+    if (found.block.updatedAt.toISOString() !== row.expectedUpdatedAt) {
+      return NextResponse.json(
+        {
+          error: 'Your content data is out of date. Refresh this page and try again.',
+          blockId: row.blockId,
+          latestUpdatedAt: found.block.updatedAt.toISOString(),
+        },
+        { status: 409 }
+      );
+    }
     const v = validateBlockDraftJson(found.type, row.draftJson);
     if (!v.ok) {
       return NextResponse.json({ error: v.error, blockId: row.blockId }, { status: 400 });
     }
   }
 
-  const results = await prisma.$transaction(
-    updates.map((row) =>
-      prisma.block.update({
-        where: { id: row.blockId },
+  const results = await prisma.$transaction(async (tx) => {
+    const updatedBlocks: Array<{ id: string; updatedAt: Date }> = [];
+    for (const row of updates) {
+      const before = blockById.get(row.blockId)?.block;
+      if (!before) {
+        throw new Error(`Unknown block id: ${row.blockId}`);
+      }
+      const updated = await tx.block.updateMany({
+        where: { id: row.blockId, updatedAt: before.updatedAt },
         data: { draftJson: row.draftJson as Prisma.InputJsonValue },
-      }),
-    ),
-  );
+      });
+      if (updated.count === 0) {
+        const latest = await tx.block.findUnique({ where: { id: row.blockId } });
+        return {
+          conflict: {
+            blockId: row.blockId,
+            latestUpdatedAt: latest?.updatedAt.toISOString(),
+          },
+          blocks: [] as Array<{ id: string; updatedAt: Date }>,
+        };
+      }
+      const fresh = await tx.block.findUnique({
+        where: { id: row.blockId },
+        select: { id: true, updatedAt: true },
+      });
+      if (fresh) updatedBlocks.push(fresh);
+    }
+    return { conflict: null as null | { blockId: string; latestUpdatedAt?: string }, blocks: updatedBlocks };
+  });
+
+  if (results.conflict) {
+    return NextResponse.json(
+      {
+        error: 'Your content data is out of date. Refresh this page and try again.',
+        blockId: results.conflict.blockId,
+        latestUpdatedAt: results.conflict.latestUpdatedAt,
+      },
+      { status: 409 }
+    );
+  }
 
   for (let i = 0; i < updates.length; i++) {
     const row = updates[i]!;
-    const updated = results[i]!;
+    const updated = results.blocks[i]!;
     await createAuditLog({
       actorId: auth.session.user.id,
       action: 'content.update_block_draft',
@@ -71,5 +113,9 @@ export async function PATCH(
     });
   }
 
-  return NextResponse.json({ ok: true, updated: results.length });
+  return NextResponse.json({
+    ok: true,
+    updated: results.blocks.length,
+    blocks: results.blocks.map((b) => ({ id: b.id, updatedAt: b.updatedAt.toISOString() })),
+  });
 }

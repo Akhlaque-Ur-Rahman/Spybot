@@ -11,7 +11,7 @@ import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
 export default function ContentListToolbar() {
   const router = useRouter();
-  const { fetchJson } = useAdminApi();
+  const { fetchJson, csrfToken } = useAdminApi();
   const { push } = useToast();
   const [open, setOpen] = useState(false);
   const [key, setKey] = useState('');
@@ -55,9 +55,36 @@ export default function ContentListToolbar() {
   async function syncPages() {
     setSyncing(true);
     try {
-      const result = await fetchJson<{ createdPageKeys: string[] }>('/api/admin/content/sync', {
+      const headers = new Headers();
+      headers.set('Content-Type', 'application/json');
+      if (csrfToken) headers.set('x-csrf-token', csrfToken);
+
+      const dryRunRes = await fetch('/api/admin/content/sync', {
         method: 'POST',
-        body: JSON.stringify({}),
+        headers,
+        credentials: 'include',
+        body: JSON.stringify({ dryRun: true }),
+      });
+      const dryRunData = (await dryRunRes.json()) as {
+        error?: string;
+        destructiveChanges?: { sections: number; blocks: number };
+      };
+      if (!dryRunRes.ok) {
+        throw new Error(dryRunData.error || 'We could not import the default pages. Please try again.');
+      }
+
+      const sections = dryRunData.destructiveChanges?.sections ?? 0;
+      const blocks = dryRunData.destructiveChanges?.blocks ?? 0;
+      if (sections > 0 || blocks > 0) {
+        const shouldContinue = window.confirm(
+          `Importing default pages will remove ${sections} section${sections === 1 ? '' : 's'} and ${blocks} block${blocks === 1 ? '' : 's'} that are not in the site template. Continue?`
+        );
+        if (!shouldContinue) return;
+      }
+
+      const result = await fetchJson<{ createdPageKeys: string[]; destructiveChanges: { sections: number; blocks: number } }>('/api/admin/content/sync', {
+        method: 'POST',
+        body: JSON.stringify({ dryRun: false, allowDestructive: true }),
       });
       const createdCount = result.createdPageKeys.length;
       push(
@@ -66,6 +93,12 @@ export default function ContentListToolbar() {
           : 'Default pages are already imported.',
         'success',
       );
+      if ((result.destructiveChanges.sections ?? 0) > 0 || (result.destructiveChanges.blocks ?? 0) > 0) {
+        push(
+          `Sync also removed ${result.destructiveChanges.sections} section(s) and ${result.destructiveChanges.blocks} block(s) not present in registry.`,
+          'success',
+        );
+      }
       router.refresh();
     } catch (e) {
       logAdminClientError('ContentListToolbar.syncPages', e);

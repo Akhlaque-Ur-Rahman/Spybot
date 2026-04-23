@@ -7,6 +7,7 @@ import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { prisma } from '@/lib/db/prisma';
 import { notifyOps } from '@/lib/ops/notifications';
+import { runPublishPreflight } from '@/lib/cms/publish-preflight';
 import { applyRateLimit, verifyCsrf } from '@/lib/security/request-guards';
 import type { PublishSnapshot } from '@/app/api/admin/publish/snapshot-types';
 
@@ -38,6 +39,17 @@ export async function POST(request: NextRequest) {
   });
   if (!current) {
     return NextResponse.json({ error: 'Page not found' }, { status: 404 });
+  }
+
+  const preflight = runPublishPreflight(current);
+  if (!preflight.ok) {
+    return NextResponse.json(
+      {
+        error: 'Publish preflight failed',
+        report: preflight,
+      },
+      { status: 400 }
+    );
   }
 
   await prisma.$transaction(async (tx) => {
@@ -77,10 +89,13 @@ export async function POST(request: NextRequest) {
       title: page.title,
       slug: page.slug,
       status: page.status,
+      seoTitle: page.seoTitle,
+      seoDescription: page.seoDescription,
       sections: page.sections.map((section) => ({
         id: section.id,
         key: section.key,
         label: section.label,
+        position: section.position,
         blocks: section.blocks.map((block) => ({
           id: block.id,
           key: block.key,
@@ -119,5 +134,5 @@ export async function POST(request: NextRequest) {
     /* revalidate is best-effort */
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, preflight });
 }

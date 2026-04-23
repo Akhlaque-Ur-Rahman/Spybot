@@ -49,6 +49,17 @@ export async function PATCH(
   const body = parsed.data;
 
   const before = await prisma.page.findUnique({ where: { key: pageKey } });
+  if (!before) return NextResponse.json({ error: 'Page not found' }, { status: 404 });
+
+  if (body.expectedUpdatedAt && before.updatedAt.toISOString() !== body.expectedUpdatedAt) {
+    return NextResponse.json(
+      {
+        error: 'Your content data is out of date. Refresh this page and try again.',
+        latestUpdatedAt: before.updatedAt.toISOString(),
+      },
+      { status: 409 }
+    );
+  }
 
   const data: {
     title?: string;
@@ -79,10 +90,25 @@ export async function PATCH(
     return NextResponse.json({ error: 'No updatable fields' }, { status: 400 });
   }
 
-  const page = await prisma.page.update({
-    where: { key: pageKey },
+  const updateResult = await prisma.page.updateMany({
+    where: {
+      key: pageKey,
+      ...(body.expectedUpdatedAt ? { updatedAt: before.updatedAt } : {}),
+    },
     data,
   });
+  if (updateResult.count === 0) {
+    const latest = await prisma.page.findUnique({ where: { key: pageKey } });
+    return NextResponse.json(
+      {
+        error: 'Your content data is out of date. Refresh this page and try again.',
+        latestUpdatedAt: latest?.updatedAt.toISOString(),
+      },
+      { status: 409 }
+    );
+  }
+  const page = await prisma.page.findUnique({ where: { key: pageKey } });
+  if (!page) return NextResponse.json({ error: 'Page not found' }, { status: 404 });
 
   if (page.status === 'published') {
     try {

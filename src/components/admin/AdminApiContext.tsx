@@ -18,6 +18,7 @@ export function AdminApiProvider({
   children: ReactNode;
 }) {
   const value = useMemo<AdminApiContextValue>(() => {
+    const REQUEST_TIMEOUT_MS = 15_000;
     return {
       csrfToken,
       async fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
@@ -28,11 +29,24 @@ export function AdminApiProvider({
         if (!headers.has('Content-Type') && init?.body && !isFormDataBody) {
           headers.set('Content-Type', 'application/json');
         }
-        const res = await fetch(url, {
-          ...init,
-          headers,
-          credentials: 'include',
-        });
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+        if (init?.signal) {
+          if (init.signal.aborted) controller.abort();
+          else init.signal.addEventListener('abort', () => controller.abort(), { once: true });
+        }
+        let res: Response;
+        try {
+          res = await fetch(url, {
+            ...init,
+            headers,
+            credentials: 'include',
+            cache: 'no-store',
+            signal: controller.signal,
+          });
+        } finally {
+          window.clearTimeout(timeoutId);
+        }
         const text = await res.text();
         let data: unknown = null;
         if (text) {

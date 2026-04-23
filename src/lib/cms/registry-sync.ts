@@ -2,8 +2,92 @@ import { Prisma } from '@prisma/client';
 import { cmsRegistryPages } from '@/lib/cms/page-registry';
 import { prisma } from '@/lib/db/prisma';
 
-export async function syncCmsRegistry() {
+type SyncRegistryOptions = {
+  dryRun?: boolean;
+  allowDestructive?: boolean;
+};
+
+type PageDestructivePlan = {
+  pageKey: string;
+  sectionsToDelete: string[];
+  blocksToDelete: string[];
+};
+
+export type SyncCmsRegistryResult = {
+  syncedPages: number;
+  createdPageKeys: string[];
+  updatedPageKeys: string[];
+  dryRun: boolean;
+  requiresConfirmation: boolean;
+  destructiveChanges: {
+    sections: number;
+    blocks: number;
+    byPage: PageDestructivePlan[];
+  };
+};
+
+export async function syncCmsRegistry(options: SyncRegistryOptions = {}): Promise<SyncCmsRegistryResult> {
+  const dryRun = options.dryRun ?? false;
+  const allowDestructive = options.allowDestructive ?? false;
   const createdPageKeys: string[] = [];
+  const updatedPageKeys: string[] = [];
+  const destructiveByPage: PageDestructivePlan[] = [];
+  let sectionsToDeleteCount = 0;
+  let blocksToDeleteCount = 0;
+
+  for (const page of cmsRegistryPages) {
+    const existing = await prisma.page.findUnique({
+      where: { key: page.key },
+      include: { sections: { include: { blocks: true } } },
+    });
+    if (existing) updatedPageKeys.push(page.key);
+    if (!existing) createdPageKeys.push(page.key);
+
+    const existingSections = existing?.sections ?? [];
+    const registrySectionByKey = new Map(page.sections.map((s) => [s.key, s]));
+    const sectionsToDelete = existingSections
+      .filter((sec) => !registrySectionByKey.has(sec.key))
+      .map((sec) => sec.key);
+    const blocksToDelete: string[] = [];
+
+    for (const dbSec of existingSections) {
+      const regSec = registrySectionByKey.get(dbSec.key);
+      if (!regSec) {
+        for (const block of dbSec.blocks) blocksToDelete.push(`${dbSec.key}/${block.key}`);
+        continue;
+      }
+      const regBlockKeys = new Set(regSec.blocks.map((b) => b.key));
+      for (const block of dbSec.blocks) {
+        if (!regBlockKeys.has(block.key)) blocksToDelete.push(`${dbSec.key}/${block.key}`);
+      }
+    }
+
+    if (sectionsToDelete.length || blocksToDelete.length) {
+      sectionsToDeleteCount += sectionsToDelete.length;
+      blocksToDeleteCount += blocksToDelete.length;
+      destructiveByPage.push({
+        pageKey: page.key,
+        sectionsToDelete,
+        blocksToDelete,
+      });
+    }
+  }
+
+  const requiresConfirmation = (sectionsToDeleteCount > 0 || blocksToDeleteCount > 0) && !allowDestructive;
+  if (dryRun || requiresConfirmation) {
+    return {
+      syncedPages: cmsRegistryPages.length,
+      createdPageKeys,
+      updatedPageKeys,
+      dryRun,
+      requiresConfirmation,
+      destructiveChanges: {
+        sections: sectionsToDeleteCount,
+        blocks: blocksToDeleteCount,
+        byPage: destructiveByPage,
+      },
+    };
+  }
 
   for (const page of cmsRegistryPages) {
     const existing = await prisma.page.findUnique({
@@ -31,8 +115,6 @@ export async function syncCmsRegistry() {
             seoDescription: page.seoDescription,
           },
         });
-
-    if (!existing) createdPageKeys.push(page.key);
 
     const existingSections = existing?.sections ?? [];
 
@@ -111,5 +193,13 @@ export async function syncCmsRegistry() {
   return {
     syncedPages: cmsRegistryPages.length,
     createdPageKeys,
+    updatedPageKeys,
+    dryRun: false,
+    requiresConfirmation: false,
+    destructiveChanges: {
+      sections: sectionsToDeleteCount,
+      blocks: blocksToDeleteCount,
+      byPage: destructiveByPage,
+    },
   };
 }

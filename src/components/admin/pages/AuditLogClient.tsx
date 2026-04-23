@@ -16,6 +16,13 @@ export type AuditRow = {
   actor: { email: string; name: string | null } | null;
 };
 
+function summarizeMetadata(value: unknown): string {
+  if (value == null) return '—';
+  const raw = JSON.stringify(value);
+  if (raw.length <= 220) return raw;
+  return `${raw.slice(0, 220)}...`;
+}
+
 export default function AuditLogClient({ initialLogs, initialTotal }: { initialLogs: AuditRow[]; initialTotal: number }) {
   const { fetchJson } = useAdminApi();
   const { push } = useToast();
@@ -23,10 +30,13 @@ export default function AuditLogClient({ initialLogs, initialTotal }: { initialL
   const [total, setTotal] = useState(initialTotal);
   const [offset, setOffset] = useState(initialLogs.length);
   const [loading, setLoading] = useState(false);
+  const [lastLoadAt, setLastLoadAt] = useState(0);
 
   const loadMore = useCallback(async () => {
     if (offset >= total || loading) return;
+    if (Date.now() - lastLoadAt < 450) return;
     setLoading(true);
+    setLastLoadAt(Date.now());
     try {
       const res = await fetchJson<{ logs: AuditRow[]; total: number; limit: number; offset: number }>(
         `/api/admin/audit?limit=50&offset=${offset}`
@@ -40,7 +50,7 @@ export default function AuditLogClient({ initialLogs, initialTotal }: { initialL
     } finally {
       setLoading(false);
     }
-  }, [fetchJson, offset, total, loading, push]);
+  }, [fetchJson, offset, total, loading, push, lastLoadAt]);
 
   return (
     <div>
@@ -67,7 +77,7 @@ export default function AuditLogClient({ initialLogs, initialTotal }: { initialL
                 {log.entityType}:{log.entityId}
               </td>
               <td className={pageStyles.mono}>
-                {log.metadataJson != null ? JSON.stringify(log.metadataJson) : '—'}
+                {summarizeMetadata(log.metadataJson)}
               </td>
             </tr>
           ))}

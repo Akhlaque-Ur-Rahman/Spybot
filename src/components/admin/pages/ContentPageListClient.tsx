@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
@@ -40,9 +40,21 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
   const { fetchJson } = useAdminApi();
   const { push } = useToast();
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'published'>('all');
+  const [pageSize, setPageSize] = useState(20);
+  const [pageIndex, setPageIndex] = useState(0);
   const [deletingKey, setDeletingKey] = useState<string | null>(null);
   const [duplicatingKey, setDuplicatingKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedQuery(query), 220);
+    return () => window.clearTimeout(timer);
+  }, [query]);
+
+  useEffect(() => {
+    setPageIndex(0);
+  }, [debouncedQuery, statusFilter, pageSize]);
 
   async function duplicatePage(row: ContentPageListRow) {
     setDuplicatingKey(row.key);
@@ -85,7 +97,7 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
   }
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = debouncedQuery.trim().toLowerCase();
     return pages.filter((p) => {
       if (statusFilter !== 'all' && p.status !== statusFilter) return false;
       if (!q) return true;
@@ -96,7 +108,14 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
         p.status.toLowerCase().includes(q)
       );
     });
-  }, [pages, query, statusFilter]);
+  }, [pages, debouncedQuery, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePageIndex = Math.min(pageIndex, totalPages - 1);
+  const paginated = useMemo(
+    () => filtered.slice(safePageIndex * pageSize, safePageIndex * pageSize + pageSize),
+    [filtered, safePageIndex, pageSize],
+  );
 
   return (
     <div className={pageStyles.card} style={{ marginBottom: 'var(--space-4)' }}>
@@ -123,10 +142,22 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
             <option value="published">Published</option>
           </select>
         </label>
+        <label className={pageStyles.lead} style={{ display: 'grid', gap: 8, flex: '0 0 120px' }}>
+          Per page
+          <select
+            className={pageStyles.select}
+            value={pageSize}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>
+        </label>
       </div>
       <p className={pageStyles.lead} style={{ marginTop: 0, marginBottom: 'var(--space-2)' }}>
-        {filtered.length} of {pages.length} page{pages.length === 1 ? '' : 's'}
-        {query.trim() || statusFilter !== 'all' ? ' match filters' : ''}.
+        Showing {paginated.length} of {filtered.length} filtered page{filtered.length === 1 ? '' : 's'}
+        {debouncedQuery.trim() || statusFilter !== 'all' ? ' match filters' : ''}.
         {' '}
         <Link href="/admin/publish" className={pageStyles.link}>
           Open publish queue
@@ -144,7 +175,7 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
             </tr>
           </thead>
           <tbody>
-            {filtered.map((p) => (
+            {paginated.map((p) => (
               <tr key={p.id}>
                 <td>
                   <Link href={`/admin/content/${encodeURIComponent(p.key)}`} className={pageStyles.link}>
@@ -192,7 +223,29 @@ export default function ContentPageListClient({ pages }: { pages: ContentPageLis
         <p className={pageStyles.lead} style={{ marginTop: 'var(--space-3)', marginBottom: 0 }}>
           No pages match. Clear search or use <strong>Import default pages</strong> above.
         </p>
-      ) : null}
+      ) : (
+        <div className={pageStyles.row} style={{ marginTop: 'var(--space-3)' }}>
+          <button
+            type="button"
+            className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+            disabled={safePageIndex <= 0}
+            onClick={() => setPageIndex((p) => Math.max(0, p - 1))}
+          >
+            Previous
+          </button>
+          <span className={pageStyles.lead}>
+            Page {safePageIndex + 1} of {totalPages}
+          </span>
+          <button
+            type="button"
+            className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+            disabled={safePageIndex >= totalPages - 1}
+            onClick={() => setPageIndex((p) => Math.min(totalPages - 1, p + 1))}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

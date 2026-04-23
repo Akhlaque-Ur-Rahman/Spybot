@@ -18,6 +18,7 @@ type SerializedBlock = {
   key: string;
   type: string;
   position: number;
+  updatedAt: string;
   draftJson: unknown;
   liveJson: unknown;
 };
@@ -36,9 +37,25 @@ export type SerializedPage = {
   title: string;
   slug: string;
   status: string;
+  updatedAt: string;
   seoTitle: string | null;
   seoDescription: string | null;
   sections: SerializedSection[];
+};
+
+type PublishPreflightIssue = {
+  severity: 'error' | 'warning';
+  message: string;
+  sectionKey?: string;
+  blockKey?: string;
+};
+
+type PublishPreflightReport = {
+  pageKey: string;
+  ok: boolean;
+  errors: PublishPreflightIssue[];
+  warnings: PublishPreflightIssue[];
+  dirtyBlocks: number;
 };
 
 function parseDraftText(raw: string): unknown {
@@ -124,6 +141,14 @@ export default function ContentPageEditor({
   const [draftText, setDraftText] = useState<Record<string, string>>(initialDrafts);
   const [savingBlock, setSavingBlock] = useState<string | null>(null);
   const [savingAll, setSavingAll] = useState(false);
+  const [pageVersion, setPageVersion] = useState(page.updatedAt);
+  const [blockVersions, setBlockVersions] = useState<Record<string, string>>(() => {
+    const versions: Record<string, string> = {};
+    for (const section of page.sections) {
+      for (const block of section.blocks) versions[block.id] = block.updatedAt;
+    }
+    return versions;
+  });
   const [jsonModeByBlock, setJsonModeByBlock] = useState<Record<string, boolean>>({});
   const [untypedDevJsonByBlock, setUntypedDevJsonByBlock] = useState<Record<string, boolean>>({});
   const [sectionOpen, setSectionOpen] = useState<Record<string, boolean>>({});
@@ -168,11 +193,26 @@ export default function ContentPageEditor({
     setTitle(page.title);
     setSlug(page.slug);
     setSectionKeys([...page.sections].sort((a, b) => a.position - b.position).map((s) => s.key));
-  }, [page.key, page.title, page.slug, sectionSig, page.sections]);
+    setPageVersion(page.updatedAt);
+    setBlockVersions(() => {
+      const versions: Record<string, string> = {};
+      for (const section of page.sections) {
+        for (const block of section.blocks) versions[block.id] = block.updatedAt;
+      }
+      return versions;
+    });
+  }, [page.key, page.title, page.slug, page.updatedAt, sectionSig, page.sections]);
   const blocksDirty = useMemo(
     () => allBlockIds.some((id) => (draftText[id] ?? '') !== (initialDrafts[id] ?? '')),
     [allBlockIds, draftText, initialDrafts],
   );
+  const initialBlockVersionById = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const section of page.sections) {
+      for (const block of section.blocks) map[block.id] = block.updatedAt;
+    }
+    return map;
+  }, [page.sections]);
   const hasUnsaved = metaDirty || blocksDirty;
 
   useEffect(() => {
@@ -192,13 +232,15 @@ export default function ContentPageEditor({
   async function saveMeta() {
     setSavingMeta(true);
     try {
-      await fetchJson(`/api/admin/content/${encodeURIComponent(page.key)}`, {
+      const result = await fetchJson<{ page?: { updatedAt?: string } }>(`/api/admin/content/${encodeURIComponent(page.key)}`, {
         method: 'PATCH',
         body: JSON.stringify({
           title,
           slug,
+          expectedUpdatedAt: pageVersion,
         }),
       });
+      if (result.page?.updatedAt) setPageVersion(result.page.updatedAt);
       push('Page details saved', 'success');
       router.refresh();
     } catch (e) {
@@ -221,10 +263,22 @@ export default function ContentPageEditor({
     }
     setSavingBlock(blockId);
     try {
-      await fetchJson(`/api/admin/content/${encodeURIComponent(page.key)}/blocks/${blockId}`, {
+      const expectedUpdatedAt = blockVersions[blockId] ?? initialBlockVersionById[blockId];
+      if (!expectedUpdatedAt) {
+        push('Your content data is out of date. Refresh this page and try again.', 'error');
+        return;
+      }
+      const result = await fetchJson<{ block?: { updatedAt?: string } }>(`/api/admin/content/${encodeURIComponent(page.key)}/blocks/${blockId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ draftJson: parsed }),
+        body: JSON.stringify({
+          draftJson: parsed,
+          expectedUpdatedAt,
+        }),
       });
+      const updatedAt = result.block?.updatedAt;
+      if (updatedAt) {
+        setBlockVersions((prev) => ({ ...prev, [blockId]: updatedAt }));
+      }
       push('Saved', 'success');
       router.refresh();
     } catch (e) {
@@ -243,24 +297,42 @@ export default function ContentPageEditor({
     }
     setSavingAll(true);
     try {
-      const updates: Array<{ blockId: string; draftJson: unknown }> = [];
+      const updates: Array<{ blockId: string; draftJson: unknown; expectedUpdatedAt: string }> = [];
       for (const blockId of targets) {
         const raw = draftText[blockId] ?? '{}';
         try {
-          updates.push({ blockId, draftJson: JSON.parse(raw) as unknown });
+          const expectedUpdatedAt = blockVersions[blockId] ?? initialBlockVersionById[blockId];
+          if (!expectedUpdatedAt) {
+            push('Your content data is out of date. Refresh this page and try again.', 'error');
+            return;
+          }
+          updates.push({
+            blockId,
+            draftJson: JSON.parse(raw) as unknown,
+            expectedUpdatedAt,
+          });
         } catch (err) {
           logAdminClientError('ContentPageEditor.saveAllBlockDrafts parse', err, { blockId });
           push('One of the blocks could not be saved because the content format is invalid.', 'error');
           return;
         }
       }
-      await fetchJson<{ ok: boolean; updated?: number }>(
+      const batchResult = await fetchJson<{ ok: boolean; updated?: number; blocks?: Array<{ id: string; updatedAt: string }> }>(
         `/api/admin/content/${encodeURIComponent(page.key)}/blocks/batch`,
         {
           method: 'PATCH',
           body: JSON.stringify({ updates }),
         },
       );
+      if (batchResult.blocks?.length) {
+        setBlockVersions((prev) => {
+          const next = { ...prev };
+          for (const block of batchResult.blocks ?? []) {
+            next[block.id] = block.updatedAt;
+          }
+          return next;
+        });
+      }
       push(`Saved ${updates.length} block${updates.length === 1 ? '' : 's'}.`, 'success');
       router.refresh();
     } catch (e) {
@@ -273,6 +345,25 @@ export default function ContentPageEditor({
 
   async function publishPage() {
     try {
+      const preflight = await fetchJson<{ report: PublishPreflightReport }>('/api/admin/publish/preflight', {
+        method: 'POST',
+        body: JSON.stringify({ pageKey: page.key, note: 'Preflight from content editor' }),
+      });
+      if (!preflight.report.ok) {
+        const first = preflight.report.errors[0];
+        const location =
+          first?.sectionKey && first?.blockKey
+            ? ` (${first.sectionKey}/${first.blockKey})`
+            : first?.sectionKey
+              ? ` (${first.sectionKey})`
+              : '';
+        push(`${first?.message ?? 'Publish preflight failed'}${location}`, 'error');
+        return;
+      }
+      if (preflight.report.warnings.length > 0) {
+        push(`Preflight warning: ${preflight.report.warnings[0]!.message}`, 'error');
+      }
+
       await fetchJson<{ ok: boolean }>('/api/admin/publish', {
         method: 'POST',
         body: JSON.stringify({ pageKey: page.key, note: 'Published from CMS' }),
@@ -288,10 +379,11 @@ export default function ContentPageEditor({
   async function unpublishPage() {
     setUnpublishing(true);
     try {
-      await fetchJson(`/api/admin/content/${encodeURIComponent(page.key)}`, {
+      const result = await fetchJson<{ page?: { updatedAt?: string } }>(`/api/admin/content/${encodeURIComponent(page.key)}`, {
         method: 'PATCH',
-        body: JSON.stringify({ status: 'draft' }),
+        body: JSON.stringify({ status: 'draft', expectedUpdatedAt: pageVersion }),
       });
+      if (result.page?.updatedAt) setPageVersion(result.page.updatedAt);
       push('This page is a draft again. Visitors keep seeing the last published version until you publish.', 'success');
       router.refresh();
     } catch (e) {

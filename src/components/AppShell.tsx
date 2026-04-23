@@ -6,6 +6,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PageEntranceOverlay from '@/components/PageEntranceOverlay';
 import SciFiLoaderCanvas from '@/components/loaders/SciFiLoaderCanvas';
+import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton';
+import GoToTopButton from '@/components/GoToTopButton';
 import type { HeaderDropdownConfig, NavMenuItem } from '@/lib/cms/types';
 import type { CmsFooterSettings } from '@/lib/cms/footer-settings';
 import shellStyles from './AppShell.module.css';
@@ -107,6 +109,8 @@ export default function AppShell({
           {children}
         </div>
         <Footer cmsFooter={footerSettings} />
+        <GoToTopButton />
+        <WhatsAppFloatingButton phoneNumber="917870295295" />
       </div>
       {routeLoader ? (
         <div className={shellStyles.routeLoaderDock} aria-hidden>

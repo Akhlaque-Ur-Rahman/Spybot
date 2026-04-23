@@ -1,5 +1,7 @@
 import { Prisma, UserRole } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminContentSyncPostSchema } from '@/lib/api/admin-body-schemas';
+import { readValidatedJson } from '@/lib/api/json-request';
 import { requireApiRole } from '@/lib/api/admin';
 import { createAuditLog } from '@/lib/cms/audit';
 import { syncCmsRegistry } from '@/lib/cms/registry-sync';
@@ -24,16 +26,25 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const result = await syncCmsRegistry();
+    const parsed = await readValidatedJson(request, adminContentSyncPostSchema);
+    if (!parsed.ok) return parsed.response;
+
+    const result = await syncCmsRegistry({
+      dryRun: parsed.data.dryRun ?? false,
+      allowDestructive: parsed.data.allowDestructive ?? false,
+    });
 
     await createAuditLog({
       actorId: auth.session.user.id,
       action: 'content.sync_registry',
       entityType: 'page',
       entityId: 'cms-registry',
-      afterJson: result,
+      afterJson: { ...result, mode: result.dryRun ? 'dry_run' : 'apply' },
     });
 
+    if (result.requiresConfirmation) {
+      return NextResponse.json({ ok: false, ...result }, { status: 409 });
+    }
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
     console.error('[api/admin/content/sync] sync failed', error);
