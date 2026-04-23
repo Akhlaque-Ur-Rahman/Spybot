@@ -771,91 +771,174 @@ export function buildMarketingDetailRegistryPages(deps: {
     demoSection: defaultDemoSectionBlock,
   });
 
-  const fintechPage = createSimplePage({
+  const fintechPage: CmsRegistryPage = {
     key: 'industry-fintech',
     title: 'Fintech',
     slug: ROUTES.fintech,
     seoTitle: 'Identity Verification for Fintech & Banks | SpyBot',
     seoDescription:
       'Accelerate user onboarding for Fintechs and Banks with automated Aadhaar KYC, Video CIP, and real-time bank account validation.',
-    pageHeader: {
-      label: 'Fintech & Banking',
-      title: 'When compliance friction slows onboarding,',
-      gradientText: 'turn trust into a growth lever',
-      description:
-        'Give fintech and banking teams a faster path to account opening, underwriting, and fraud prevention with verification workflows designed for regulated, high-volume onboarding.',
-      primaryCta: { label: 'Explore fintech workflows', href: CTA_LINKS.industryUseCases },
-      secondaryCta: { label: 'Talk to an expert', href: CTA_LINKS.contact },
-      media: MEDIA_CLIPS.financialVerification,
-    },
-    coverageLabel: 'Fintech coverage',
-    benefits: {
-      label: 'The SpyBot Advantage',
-      title: 'Engineered for',
-      gradientText: 'Financial Scale',
-      subtitle: 'SpyBot provides the missing identity layer that connects modern fintech applications with verified government registries.',
-      items: [
-        {
-          icon: 'userCheck',
-          title: 'Sub-Second Account Opening',
-          desc: 'Leverage our Aadhaar OKYC and instant PAN APIs to reduce customer wait times from days down to a few frictionless seconds.',
-          highlight: 'primary',
-        },
-        {
-          icon: 'circleDollarSign',
-          title: 'Automated Underwriting',
-          desc: 'Integrate Bank PDF parsing and Penny Drop verification to instantly validate income streams and securely disburse funds to verified accounts.',
-          highlight: 'teal',
-        },
-        {
-          icon: 'shieldCheck',
-          title: '100% Regulatory Alignment',
-          desc: 'Our enterprise V-CIP solutions provide end-to-end encrypted video KYC that complies strictly with RBI and SEBI mandates.',
-          highlight: 'primary',
-        },
-      ],
-    },
-    challenges: {
-      label: 'The Industry Standard',
-      title: 'Why legacy banking UX',
-      gradientText: 'fails',
-      subtitle:
-        "Today's financial consumers expect instant access. If a lending or trading application requires manual review, the customer is already gone.",
-      items: [
-        {
-          icon: 'clock',
-          title: 'High Drop-offs in Onboarding',
-          desc: 'Lengthy physical paperwork and delayed manual verification processes lead to a massive abandonment rate during loan applications and account creation.',
-          tone: 'danger',
-        },
-        {
-          icon: 'shieldAlert',
-          title: 'Stringent RBI Compliance',
-          desc: 'Failing to uphold rigorous Anti-Money Laundering (AML) and KYC regulations can result in severe financial penalties and trading restrictions.',
-          tone: 'warning',
-        },
-        {
-          icon: 'trendingDown',
-          title: 'Fraudulent Loan Disbursals',
-          desc: 'Sophisticated identity theft and fabricated financial documents expose lenders to high non-performing asset (NPA) risks.',
-          tone: 'info',
-        },
-      ],
-    },
-    lifecycle: {
-      label: 'The Onboarding Flow',
-      title: 'From prospect to',
-      gradientText: 'approved borrower',
-      subtitle: 'An intelligent sequence of automated checks designed specifically for high-risk financial onboarding.',
-      steps: [
-        { num: '01', icon: 'fileCheck2', title: 'Instant Identity check', desc: 'User inputs PAN. SpyBot validates the PAN against NSDL and returns matched names and statuses.' },
-        { num: '02', icon: 'checkCircle2', title: 'Aadhaar OKYC', desc: 'Securely fetch Aadhaar data via offline XML validation, ensuring zero data leakage.' },
-        { num: '03', icon: 'landmark', title: 'Financial Analysis', desc: 'Statements are ingested by OCR; a Penny drop validates the destination bank account.' },
-        { num: '04', icon: 'trendingDown', title: 'Approval Pipeline', desc: 'All signals are fed into your customized onboarding journey within seconds.' },
-      ],
-    },
-    demoSection: defaultDemoSectionBlock,
-  });
+    sections: [
+      section(
+        'fintechHero',
+        'Fintech Hero',
+        1,
+        block('fintechHero', 'fintechHero', {
+          label: 'Trading',
+          title: 'ID Verification for Trading',
+          description:
+            'A secure onboarding experience builds trust. With identity verification at the core, trading platforms can improve user confidence, meet regulatory demands, and reduce fraud risk before account activation.',
+          secondaryDescription:
+            'Verify Aadhaar, PAN, and bank-linked details in one flow so every trader is authenticated with precision while preserving conversion speed.',
+          primaryCta: { label: 'Get API Key', href: CTA_LINKS.sandbox },
+          secondaryCta: { label: 'Contact Sales', href: ROUTES.contact },
+          imageSrc: '/media/trading-banner-img.png',
+          imageAlt: 'Trading verification visual',
+        })
+      ),
+      section(
+        'fintechWhy',
+        'Fintech Why',
+        2,
+        block('fintechWhy', 'fintechWhy', {
+          title: 'Why SpyBot?',
+          items: [
+            {
+              icon: 'zap',
+              title: 'Plug and Play',
+              desc: 'Simple and user-friendly integration flow with language support and dev-ready API patterns.',
+            },
+            {
+              icon: 'clock',
+              title: 'Highest Uptime',
+              desc: 'Reliable uptime-backed verification with resilient fallback routing across critical checks.',
+            },
+            {
+              icon: 'shieldCheck',
+              title: 'Instant & Accurate',
+              desc: 'Data quality is validated before response delivery to minimize errors in trading onboarding.',
+            },
+          ],
+        })
+      ),
+      section(
+        'solutionShowcase',
+        'Verification lanes',
+        3,
+        block('solutionShowcase', 'solutionShowcase', getSolutionShowcaseDraft('financial-verification'))
+      ),
+      section(
+        'fintechLogoStrip',
+        'Trusted Logos Strip',
+        4,
+        block('fintechLogoStrip', 'fintechLogoStrip', {
+          title: 'Trusted by 3,000+ companies',
+          subtitle: 'across regulated and high-growth sectors',
+          logos: ['HDFC Life', 'Airtel', 'Paytm', 'Tata Motors', 'J&K Bank', 'FlexLoans', 'Blinkit', 'Zomato', 'Rapido'],
+        })
+      ),
+      section(
+        'fintechFaqSplit',
+        'Fintech FAQ Split',
+        5,
+        block('fintechFaqSplit', 'fintechFaqSplit', {
+          heading: 'Frequently asked questions?',
+          supportText: 'Still have any question? Please contact our sales team',
+          supportCta: { label: 'Contact our sales team', href: ROUTES.contact },
+          groups: [
+            {
+              title: 'Trading FAQs',
+              items: [
+                {
+                  q: 'What are the APIs used by trading platforms?',
+                  a: 'Trading platforms typically use identity verification, PAN validation, Aadhaar checks, bank account verification, and document OCR APIs.',
+                },
+                {
+                  q: 'What exactly is ID Verification API for trading platforms?',
+                  a: 'It is an API flow used to verify user identity before account activation, helping platforms improve compliance and reduce onboarding fraud.',
+                },
+                {
+                  q: 'How can ID Verification APIs help trading platforms?',
+                  a: 'They automate KYC checks, shorten onboarding time, and improve trust by validating core user details before access is granted.',
+                },
+                {
+                  q: 'Why choose SpyBot ID verification API?',
+                  a: 'SpyBot provides high-uptime verification infrastructure with API-first workflows designed for regulated onboarding teams.',
+                },
+              ],
+            },
+          ],
+        })
+      ),
+      section(
+        'fintechSpotlight',
+        'Fintech Spotlight',
+        6,
+        block('fintechSpotlight', 'fintechSpotlight', {
+          items: [
+            {
+              badge: 'Age Gate',
+              title: 'Age Verification API',
+              description:
+                'Run age checks in real time for regulated onboarding journeys and enforce policy-level access without manual screening queues.',
+              cta: 'Try now',
+              href: ROUTES.identityVerification,
+            },
+            {
+              badge: 'Payout Trust',
+              title: 'Bank Verification API',
+              description:
+                'Validate account ownership, detect mismatch risk, and improve payout reliability with low-latency bank verification responses.',
+              cta: 'Try now',
+              href: ROUTES.financialVerification,
+            },
+          ],
+        })
+      ),
+      section(
+        'fintechCtaBanner',
+        'Fintech CTA Banner',
+        7,
+        block('fintechCtaBanner', 'fintechCtaBanner', {
+          title: 'Ready To Supercharge Your Business?',
+          description:
+            'Fast onboarding, stronger trust checks, and seamless verification workflows in one unified stack.',
+          primaryCta: { label: 'Get API Key', href: CTA_LINKS.sandbox },
+          secondaryCta: { label: 'Contact Sales', href: ROUTES.contact },
+          imageSrc: '/media/trading-cta-mockup.jpg',
+          imageAlt: 'Verification dashboard mockup',
+        })
+      ),
+      section(
+        'fintechApiKey',
+        'Fintech API Key Form',
+        8,
+        block('fintechApiKey', 'fintechApiKey', {
+          title: 'Get API Key',
+          description:
+            'Start building your verification stack with production-grade APIs and a secure sandbox environment tailored for regulated onboarding workflows.',
+          highlights: [
+            'Get access to developer-ready verification APIs in minutes.',
+            'Build KYC/KYB flows with secure onboarding orchestration.',
+            'Deploy faster with sandbox keys and guided implementation support.',
+          ],
+          trustText: 'Trusted by over 3,000+ companies of all sizes.',
+          logos: ['HDFC Life', 'Airtel', 'Paytm', 'Tata Motors', 'J&K Bank', 'FlexLoans'],
+          formTitle: 'Build with us',
+          formDescription: 'Tell us your use case and get API keys for your onboarding flow.',
+          fields: [
+            { id: 'firstName', type: 'text', placeholder: 'First Name' },
+            { id: 'lastName', type: 'text', placeholder: 'Last Name' },
+            { id: 'workEmail', type: 'email', placeholder: 'Work Email' },
+            { id: 'companyName', type: 'text', placeholder: 'Company Name' },
+            { id: 'purpose', type: 'text', placeholder: 'Purpose (KYC/KYB, trading onboarding, etc.)' },
+          ],
+          submitLabel: 'Submit',
+          note: 'By submitting, you agree to our Privacy Policy.',
+        })
+      ),
+    ],
+  };
 
   return [
     identityPage,

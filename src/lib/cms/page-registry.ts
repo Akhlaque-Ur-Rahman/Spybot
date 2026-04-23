@@ -6,6 +6,7 @@ import { getDefaultFooterSettings } from '@/lib/cms/footer-settings';
 import type { CmsIconName } from '@/lib/cms/icon-map';
 import { buildMarketingDetailRegistryPages } from '@/lib/cms/marketing-detail-registry';
 import { getSolutionShowcaseDraft, type SolutionShowcaseData } from '@/lib/solution-showcase-data';
+import type { CardDesignVariant } from '@/lib/ui/card-design';
 
 export type CmsLink = {
   label: string;
@@ -73,12 +74,14 @@ export type CmsCoverageCarouselItem = {
 export type CmsCoverageCarouselBlock = {
   label?: string;
   items?: Array<string | CmsCoverageCarouselItem>;
+  cardDesign?: CardDesignVariant;
 };
 
 export type CmsDirectoryGridBlock = {
   id?: string;
   heading: string;
   subheading?: CmsRichTextValue;
+  cardDesign?: CardDesignVariant;
   items: Array<{
     title: string;
     description: CmsRichTextValue;
@@ -116,11 +119,13 @@ export type CmsSupportPathwaysBlock = {
   heading: string;
   gradientText?: string;
   subheading: CmsRichTextValue;
+  cardDesign?: CardDesignVariant;
   pathways: Array<CmsNamedItem & { action: CmsLink }>;
 };
 
 export type CmsSupportSlaStripBlock = {
   heading: string;
+  cardDesign?: CardDesignVariant;
   cards: Array<{
     kicker: string;
     value: string;
@@ -131,6 +136,7 @@ export type CmsSupportSlaStripBlock = {
 export type CmsResourceGridBlock = {
   heading: string;
   gradientText?: string;
+  cardDesign?: CardDesignVariant;
   tiles: Array<{
     title: string;
     desc: CmsRichTextValue;
@@ -142,6 +148,7 @@ export type CmsResourceGridBlock = {
 export type CmsContactHighlightsBlock = {
   heading: string;
   gradientText?: string;
+  cardDesign?: CardDesignVariant;
   items: CmsNamedItem[];
 };
 
@@ -150,6 +157,7 @@ export type CmsBenefitsBlock = {
   title?: string;
   gradientText?: string;
   subtitle?: CmsRichTextValue;
+  cardDesign?: CardDesignVariant;
   items: Array<CmsNamedItem & { highlight: 'primary' | 'teal'; href?: string }>;
 };
 
@@ -158,6 +166,7 @@ export type CmsChallengesBlock = {
   title?: string;
   gradientText?: string;
   subtitle?: CmsRichTextValue;
+  cardDesign?: CardDesignVariant;
   items: Array<CmsNamedItem & { tone: 'danger' | 'warning' | 'info' | 'accent' | 'success' }>;
 };
 
@@ -218,6 +227,75 @@ export type CmsDemoSectionBlock = {
 /** Tabbed “verification lanes” grid; same shape as {@link SolutionShowcaseData}. */
 export type CmsSolutionShowcaseBlock = SolutionShowcaseData;
 
+export type CmsFintechHeroBlock = {
+  label: string;
+  title: string;
+  description: CmsRichTextValue;
+  secondaryDescription?: CmsRichTextValue;
+  primaryCta: CmsLink;
+  secondaryCta: CmsLink;
+  imageSrc: string;
+  imageAlt: string;
+};
+
+export type CmsFintechWhyBlock = {
+  title: string;
+  items: Array<{
+    icon: CmsIconName;
+    title: string;
+    desc: CmsRichTextValue;
+  }>;
+};
+
+export type CmsFintechLogoStripBlock = {
+  title: string;
+  subtitle?: string;
+  logos: string[];
+};
+
+export type CmsFintechFaqSplitBlock = {
+  heading: string;
+  supportText: string;
+  supportCta: CmsLink;
+  groups: CmsFaqAccordionBlock['groups'];
+};
+
+export type CmsFintechSpotlightBlock = {
+  items: Array<{
+    badge: string;
+    title: string;
+    description: CmsRichTextValue;
+    cta: string;
+    href: string;
+  }>;
+};
+
+export type CmsFintechCtaBannerBlock = {
+  title: string;
+  description: CmsRichTextValue;
+  primaryCta: CmsLink;
+  secondaryCta: CmsLink;
+  imageSrc: string;
+  imageAlt: string;
+};
+
+export type CmsFintechApiKeyBlock = {
+  title: string;
+  description: CmsRichTextValue;
+  highlights: string[];
+  trustText: string;
+  logos: string[];
+  formTitle: string;
+  formDescription: string;
+  fields: Array<{
+    id: string;
+    type: string;
+    placeholder: string;
+  }>;
+  submitLabel: string;
+  note: string;
+};
+
 /** Single source of truth for known CMS block `type` strings (registry, validation, admin). */
 export const CMS_BLOCK_TYPES = [
   'hero',
@@ -225,6 +303,13 @@ export const CMS_BLOCK_TYPES = [
   'coverageCarousel',
   'directoryGrid',
   'solutionShowcase',
+  'fintechHero',
+  'fintechWhy',
+  'fintechLogoStrip',
+  'fintechFaqSplit',
+  'fintechSpotlight',
+  'fintechCtaBanner',
+  'fintechApiKey',
   'sliderSection',
   'utilityCtaBand',
   'faqAccordion',
@@ -248,6 +333,13 @@ export const CMS_BLOCK_TYPE_LABELS = {
   coverageCarousel: 'Coverage carousel',
   directoryGrid: 'Directory grid',
   solutionShowcase: 'Verification lanes (tabbed grid)',
+  fintechHero: 'Fintech hero',
+  fintechWhy: 'Fintech why cards',
+  fintechLogoStrip: 'Fintech trusted logos strip',
+  fintechFaqSplit: 'Fintech FAQ split',
+  fintechSpotlight: 'Fintech spotlight cards',
+  fintechCtaBanner: 'Fintech CTA banner',
+  fintechApiKey: 'Fintech API key section',
   sliderSection: 'Slider',
   utilityCtaBand: 'Call-to-action band',
   faqAccordion: 'FAQ',
@@ -277,6 +369,13 @@ export type CmsBlockValueMap = {
   coverageCarousel: CmsCoverageCarouselBlock;
   directoryGrid: CmsDirectoryGridBlock;
   solutionShowcase: CmsSolutionShowcaseBlock;
+  fintechHero: CmsFintechHeroBlock;
+  fintechWhy: CmsFintechWhyBlock;
+  fintechLogoStrip: CmsFintechLogoStripBlock;
+  fintechFaqSplit: CmsFintechFaqSplitBlock;
+  fintechSpotlight: CmsFintechSpotlightBlock;
+  fintechCtaBanner: CmsFintechCtaBannerBlock;
+  fintechApiKey: CmsFintechApiKeyBlock;
   sliderSection: CmsSliderSectionBlock;
   utilityCtaBand: CmsUtilityCtaBandBlock;
   faqAccordion: CmsFaqAccordionBlock;

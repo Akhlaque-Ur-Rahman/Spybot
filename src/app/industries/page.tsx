@@ -43,6 +43,7 @@ export default async function IndustriesPage() {
         id={directoryGrid?.id ?? 'industries-index'}
         heading={directoryGrid?.heading ?? 'Industry routes'}
         subheading={directoryGrid?.subheading ?? 'Jump into the vertical that matches your customers, partners, or regulatory environment.'}
+        cardDesign={directoryGrid?.cardDesign}
         items={directoryGrid?.items ?? industryNavItems.map((s) => ({
           title: s.label,
           description: s.desc,
@@ -51,7 +52,7 @@ export default async function IndustriesPage() {
         }))}
       />
 
-      <CoverageCarousel label={coverage?.label ?? 'Vertical focus areas'} items={coverage?.items} />
+      <CoverageCarousel label={coverage?.label ?? 'Vertical focus areas'} items={coverage?.items} cardDesign={coverage?.cardDesign} />
 
       <SectionScrollReveal>
         <section className={styles.spotlight} aria-labelledby="spotlight-heading">

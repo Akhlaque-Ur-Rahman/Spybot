@@ -5,10 +5,12 @@ import type { CmsCoverageCarouselItem } from '@/lib/cms/page-registry';
 import { defaultCoverageItems } from '@/lib/cms/page-registry';
 import { getCmsRichTextPlainText, sanitizeCmsHref } from '@/lib/cms/rich-text';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
+import { resolveCardDesignClass, type CardDesignVariant } from '@/lib/ui/card-design';
 
 type Props = {
   items?: Array<string | CmsCoverageCarouselItem>;
   label?: string;
+  cardDesign?: CardDesignVariant;
 };
 
 function normalize(raw: string | CmsCoverageCarouselItem): { title: string; desc?: CmsRichTextValue; href?: string } {
@@ -21,8 +23,9 @@ function hasBodyText(desc: CmsRichTextValue | undefined): boolean {
   return getCmsRichTextPlainText(desc).trim().length > 0;
 }
 
-export default function CoverageCarousel({ items = defaultCoverageItems, label = 'Coverage' }: Props) {
+export default function CoverageCarousel({ items = defaultCoverageItems, label = 'Coverage', cardDesign }: Props) {
   const rows = items.map(normalize).filter((r) => r.title.trim().length > 0);
+  const resolvedCardDesign = resolveCardDesignClass(cardDesign ?? 'carddesign2');
 
   return (
     <section className={styles.section} aria-label={label}>
@@ -37,7 +40,7 @@ export default function CoverageCarousel({ items = defaultCoverageItems, label =
             const showDesc = hasBodyText(item.desc);
 
             return (
-              <li key={`${item.title}-${i}`} className={styles.card}>
+              <li key={`${item.title}-${i}`} className={`${styles.card} ${resolvedCardDesign}`}>
                 <h3 className={styles.cardTitle}>{item.title}</h3>
                 {showDesc ? (
                   <div className={styles.cardBody}>

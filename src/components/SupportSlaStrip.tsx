@@ -1,4 +1,5 @@
 import styles from './SupportSlaStrip.module.css';
+import { resolveCardDesignClass, type CardDesignVariant } from '@/lib/ui/card-design';
 
 type SlaCard = {
   kicker: string;
@@ -28,10 +29,13 @@ export default function SupportSlaStrip({
         'Procurement questionnaires, audit evidence, and data-handling questions go through our security review path.',
     },
   ],
+  cardDesign,
 }: {
   heading?: string;
   cards?: SlaCard[];
+  cardDesign?: CardDesignVariant;
 }) {
+  const resolvedCardDesign = resolveCardDesignClass(cardDesign ?? 'carddesign2');
   return (
     <section className={styles.section} aria-labelledby="sla-heading">
       <div className="container">
@@ -40,7 +44,7 @@ export default function SupportSlaStrip({
         </h2>
         <ul className={styles.grid}>
           {cards.map((card) => (
-            <li key={card.kicker} className={styles.card}>
+            <li key={card.kicker} className={`${styles.card} ${resolvedCardDesign}`}>
               <span className={styles.kicker}>{card.kicker}</span>
               <p className={styles.value}>{card.value}</p>
               <p className={styles.note}>{card.note}</p>

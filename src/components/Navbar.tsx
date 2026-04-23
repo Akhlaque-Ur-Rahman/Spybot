@@ -190,7 +190,18 @@ function resolveDropdownItems(
     }))
     .filter((item) => item.label && item.href)
     .map((item) => ({ ...item, icon: getNavIcon(item.label) }));
-  return parsed.length ? parsed : defaults;
+  if (!parsed.length) return defaults;
+  if (!defaults?.length) return parsed;
+
+  const seen = new Set(defaults.map((item) => `${item.href.toLowerCase()}|${item.label.toLowerCase()}`));
+  const merged = [...defaults];
+  for (const item of parsed) {
+    const key = `${item.href.toLowerCase()}|${item.label.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(item);
+  }
+  return merged;
 }
 
 function getNavIcon(label: string) {

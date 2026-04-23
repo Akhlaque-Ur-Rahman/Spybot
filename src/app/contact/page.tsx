@@ -37,13 +37,14 @@ export default async function ContactPage() {
 
       <DemoSection content={demo ?? undefined} />
 
-      <CoverageCarousel label={coverage?.label ?? 'What teams validate in sandbox'} items={coverage?.items} />
+      <CoverageCarousel label={coverage?.label ?? 'What teams validate in sandbox'} items={coverage?.items} cardDesign={coverage?.cardDesign} />
 
       <SectionScrollReveal>
         <ContactHighlights
           heading={contactHighlights?.heading}
           gradientText={contactHighlights?.gradientText}
           highlightItems={contactHighlights?.items}
+          cardDesign={contactHighlights?.cardDesign}
         />
       </SectionScrollReveal>
     </main>

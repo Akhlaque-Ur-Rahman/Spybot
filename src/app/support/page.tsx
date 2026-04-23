@@ -42,10 +42,11 @@ export default async function SupportPage() {
           gradientText={supportPathways?.gradientText}
           subheading={supportPathways?.subheading}
           items={supportPathways?.pathways}
+          cardDesign={supportPathways?.cardDesign}
         />
       </SectionScrollReveal>
 
-      <SupportSlaStrip heading={supportSlaStrip?.heading} cards={supportSlaStrip?.cards} />
+      <SupportSlaStrip heading={supportSlaStrip?.heading} cards={supportSlaStrip?.cards} cardDesign={supportSlaStrip?.cardDesign} />
 
       <UtilityCtaBand
         title={utilityCtaBand?.title ?? 'Need a faster path on a production issue?'}

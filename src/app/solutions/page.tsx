@@ -47,6 +47,7 @@ export default async function SolutionsPage() {
         id={directoryGrid?.id ?? 'solutions-index'}
         heading={directoryGrid?.heading ?? 'Solution catalog'}
         subheading={directoryGrid?.subheading ?? 'Each route links to a focused brief with capabilities, integration notes, and typical operating models.'}
+        cardDesign={directoryGrid?.cardDesign}
         items={directoryGrid?.items ?? solutionNavItems.map((s) => ({
           title: s.label,
           description: s.desc,
@@ -59,7 +60,7 @@ export default async function SolutionsPage() {
         <SolutionShowcase data={solutionShowcase} />
       </SectionScrollReveal>
 
-      <CoverageCarousel label={coverage?.label ?? 'Coverage'} items={coverage?.items} />
+      <CoverageCarousel label={coverage?.label ?? 'Coverage'} items={coverage?.items} cardDesign={coverage?.cardDesign} />
 
       <SectionScrollReveal>
         <section className={styles.compare} aria-labelledby="compare-heading">

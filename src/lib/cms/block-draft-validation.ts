@@ -97,6 +97,43 @@ const refinements: Record<CmsBlockType, Refine> = {
     }
     return null;
   },
+  fintechHero: (o) => {
+    if (typeof o.title !== 'string') return 'fintechHero: title (string) required';
+    if (typeof o.imageSrc !== 'string') return 'fintechHero: imageSrc (string) required';
+    return validateCmsRichTextField(o.description);
+  },
+  fintechWhy: (o) => {
+    if (!Array.isArray(o.items)) return 'fintechWhy: items (array) required';
+    return validateEachRichField(o.items, 'desc');
+  },
+  fintechLogoStrip: (o) =>
+    typeof o.title === 'string' && Array.isArray(o.logos) ? null : 'fintechLogoStrip: title and logos required',
+  fintechFaqSplit: (o) => {
+    if (typeof o.heading !== 'string') return 'fintechFaqSplit: heading required';
+    if (!Array.isArray(o.groups)) return 'fintechFaqSplit: groups (array) required';
+    const cta = o.supportCta;
+    const ctaOk =
+      cta &&
+      typeof cta === 'object' &&
+      !Array.isArray(cta) &&
+      typeof (cta as { label?: unknown }).label === 'string' &&
+      typeof (cta as { href?: unknown }).href === 'string';
+    if (!ctaOk) return 'fintechFaqSplit: supportCta with label and href required';
+    return null;
+  },
+  fintechSpotlight: (o) => (Array.isArray(o.items) ? null : 'fintechSpotlight: items (array) required'),
+  fintechCtaBanner: (o) => {
+    if (typeof o.title !== 'string') return 'fintechCtaBanner: title required';
+    if (typeof o.imageSrc !== 'string') return 'fintechCtaBanner: imageSrc required';
+    return validateCmsRichTextField(o.description);
+  },
+  fintechApiKey: (o) => {
+    if (typeof o.title !== 'string') return 'fintechApiKey: title required';
+    if (!Array.isArray(o.fields)) return 'fintechApiKey: fields (array) required';
+    if (!Array.isArray(o.highlights)) return 'fintechApiKey: highlights (array) required';
+    if (!Array.isArray(o.logos)) return 'fintechApiKey: logos (array) required';
+    return validateCmsRichTextField(o.description);
+  },
   sliderSection: (o) => {
     if (typeof o.heading !== 'string' || !Array.isArray(o.items)) {
       return 'sliderSection: heading (string) and items (array) required';

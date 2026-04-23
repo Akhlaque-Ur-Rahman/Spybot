@@ -1,7 +1,7 @@
 .section {
   position: relative;
-  padding: var(--space-24) 0;
-  background: var(--color-bg);
+  padding: var(--space-20) 0;
+  background: #f7f8fc;
   overflow: hidden;
   transition: background 0.3s ease;
 }
@@ -14,8 +14,8 @@
 .grid { position: relative; z-index: 1; }
 
 .card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-subtle);
+  background: #ffffff;
+  border: 1px solid #e8ebf4;
   border-radius: var(--radius-xl);
   padding: var(--space-6);
   transition: all 0.35s ease;
@@ -51,8 +51,8 @@
 }
 .card:hover {
   transform: translateY(-5px);
-  border-color: var(--color-border);
-  box-shadow: var(--shadow-md);
+  border-color: #dbe2f4;
+  box-shadow: 0 16px 28px rgba(16, 25, 68, 0.12);
 }
 .card_primary:hover { box-shadow: var(--shadow-md), 0 0 30px rgba(11,114,204,0.12); }
 .card_teal:hover { box-shadow: var(--shadow-md), 0 0 30px rgba(16,189,178,0.1); }
@@ -60,18 +60,25 @@
 
 .cardTop { margin-bottom: 4px; }
 .cardIcon {
-  font-size: 2rem;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #f2f5ff;
+  color: #4458c8;
   line-height: 1;
 }
 .cardTitle {
   font-size: var(--text-h4);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: #222b4a;
   line-height: 1.3;
 }
 .cardDesc {
   font-size: var(--text-body-sm);
-  color: var(--color-text-secondary);
+  color: #596483;
   line-height: 1.6;
   flex: 1;
 }
@@ -84,3 +91,30 @@
 }
 .card_teal .cardLink { color: var(--color-tertiary-400); }
 .cardLink:hover { color: var(--color-primary-300); }
+
+[data-theme='dark'] .section {
+  background: #0b1022;
+}
+
+[data-theme='dark'] .card {
+  background: #131a32;
+  border-color: #253156;
+}
+
+[data-theme='dark'] .card:hover {
+  border-color: #345097;
+  box-shadow: 0 16px 28px rgba(0, 0, 0, 0.42);
+}
+
+[data-theme='dark'] .cardIcon {
+  background: #1a2450;
+  color: #a8bbff;
+}
+
+[data-theme='dark'] .cardTitle {
+  color: #edf2ff;
+}
+
+[data-theme='dark'] .cardDesc {
+  color: #b7c1dd;
+}

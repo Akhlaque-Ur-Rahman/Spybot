@@ -6,6 +6,7 @@ import React from 'react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
+import { resolveCardDesignClass, type CardDesignVariant } from '@/lib/ui/card-design';
 
 export interface BenefitItem {
   icon: React.ReactNode;
@@ -73,8 +74,10 @@ interface BenefitsProps {
     title?: string;
     gradientText?: string;
     subtitle?: CmsRichTextValue;
+    cardDesign?: CardDesignVariant;
     items: BenefitDataItem[];
   };
+  cardDesign?: CardDesignVariant;
 }
 
 export default function Benefits({
@@ -84,11 +87,13 @@ export default function Benefits({
   subtitle = "SpyBot doesn't just read documents — it gives you the intelligence, automation, and scale to confidently onboard any user or business.",
   data = defaultBenefits,
   content,
+  cardDesign,
 }: BenefitsProps) {
   const resolvedLabel = content?.label ?? label;
   const resolvedTitle = content?.title ?? title;
   const resolvedGradientText = content?.gradientText ?? gradientText;
   const resolvedSubtitle = content?.subtitle ?? subtitle;
+  const resolvedCardDesign = resolveCardDesignClass(content?.cardDesign ?? cardDesign ?? 'carddesign1');
   const resolvedData = content
     ? content.items.map((item) => ({
         ...item,
@@ -114,7 +119,7 @@ export default function Benefits({
 
         <div className={`grid-3 ${styles.grid}`}>
           {resolvedData.map((b, i) => (
-            <div key={b.title} className={`${styles.card} ${styles[`card_${b.highlight}`]}`} style={{ animationDelay: `${i * 0.1}s` }}>
+            <div key={b.title} className={`${styles.card} ${styles[`card_${b.highlight}`]} ${resolvedCardDesign}`} style={{ animationDelay: `${i * 0.1}s` }}>
               <div className={styles.cardTop}>
                 <span className={styles.cardIcon} aria-hidden="true">{b.icon}</span>
               </div>

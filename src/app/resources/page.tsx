@@ -39,12 +39,13 @@ export default async function ResourcesPage() {
         media={pageHeader?.media ?? MEDIA_CLIPS.resourceLibrary}
       />
 
-      <CoverageCarousel label={coverage?.label ?? 'Popular topics'} items={coverage?.items} />
+      <CoverageCarousel label={coverage?.label ?? 'Popular topics'} items={coverage?.items} cardDesign={coverage?.cardDesign} />
 
       <ResourceGrid
         heading={resourceGrid?.heading}
         gradientText={resourceGrid?.gradientText}
         tiles={resourceGrid?.tiles}
+        cardDesign={resourceGrid?.cardDesign}
       />
 
       <SectionScrollReveal>

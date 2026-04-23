@@ -71,7 +71,7 @@ function renderBlock(block: ManagedCmsPage['sections'][number]['blocks'][number]
     }
     case 'coverageCarousel': {
       const c = v as CmsCoverageCarouselBlock;
-      return <CoverageCarousel key={key} label={c.label} items={c.items} />;
+      return <CoverageCarousel key={key} label={c.label} items={c.items} cardDesign={c.cardDesign} />;
     }
     case 'directoryGrid': {
       const d = v as CmsDirectoryGridBlock;
@@ -82,6 +82,7 @@ function renderBlock(block: ManagedCmsPage['sections'][number]['blocks'][number]
           heading={d.heading}
           subheading={d.subheading}
           items={d.items}
+          cardDesign={d.cardDesign}
         />
       );
     }
@@ -127,19 +128,20 @@ function renderBlock(block: ManagedCmsPage['sections'][number]['blocks'][number]
           gradientText={sp.gradientText}
           subheading={sp.subheading}
           items={sp.pathways}
+          cardDesign={sp.cardDesign}
         />,
         true
       );
     }
     case 'supportSlaStrip': {
       const ss = v as CmsSupportSlaStripBlock;
-      return wrapScroll(key, <SupportSlaStrip heading={ss.heading} cards={ss.cards} />, true);
+      return wrapScroll(key, <SupportSlaStrip heading={ss.heading} cards={ss.cards} cardDesign={ss.cardDesign} />, true);
     }
     case 'resourceGrid': {
       const rg = v as CmsResourceGridBlock;
       return wrapScroll(
         key,
-        <ResourceGrid tiles={rg.tiles} heading={rg.heading} gradientText={rg.gradientText} />,
+        <ResourceGrid tiles={rg.tiles} heading={rg.heading} gradientText={rg.gradientText} cardDesign={rg.cardDesign} />,
         true
       );
     }
@@ -147,14 +149,14 @@ function renderBlock(block: ManagedCmsPage['sections'][number]['blocks'][number]
       const ch = v as CmsContactHighlightsBlock;
       return wrapScroll(
         key,
-        <ContactHighlights heading={ch.heading} gradientText={ch.gradientText} highlightItems={ch.items} />,
+        <ContactHighlights heading={ch.heading} gradientText={ch.gradientText} highlightItems={ch.items} cardDesign={ch.cardDesign} />,
         true
       );
     }
     case 'benefits':
-      return wrapScroll(key, <Benefits key={key} content={v as CmsBenefitsBlock} />, true);
+      return wrapScroll(key, <Benefits key={key} content={v as CmsBenefitsBlock} cardDesign={(v as CmsBenefitsBlock).cardDesign} />, true);
     case 'challenges':
-      return wrapScroll(key, <Challenges key={key} content={v as CmsChallengesBlock} />, true);
+      return wrapScroll(key, <Challenges key={key} content={v as CmsChallengesBlock} cardDesign={(v as CmsChallengesBlock).cardDesign} />, true);
     case 'lifecycle':
       return wrapScroll(key, <Lifecycle key={key} content={v as CmsLifecycleBlock} />, true);
     case 'decisionFlow': {

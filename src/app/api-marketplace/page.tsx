@@ -42,14 +42,14 @@ export default async function ApiMarketplacePage() {
         media={pageHeader?.media ?? MEDIA_CLIPS.apiMarketplace}
       />
 
-      <CoverageCarousel label={coverage?.label ?? 'Marketplace coverage'} items={coverage?.items} />
+      <CoverageCarousel label={coverage?.label ?? 'Marketplace coverage'} items={coverage?.items} cardDesign={coverage?.cardDesign} />
 
       <SectionScrollReveal>
-        <Challenges content={challenges ?? undefined} />
+        <Challenges content={challenges ?? undefined} cardDesign={challenges?.cardDesign} />
       </SectionScrollReveal>
 
       <SectionScrollReveal>
-        <Benefits content={benefits ?? undefined} />
+        <Benefits content={benefits ?? undefined} cardDesign={benefits?.cardDesign} />
       </SectionScrollReveal>
 
       <section id="solutions-catalog">

@@ -4,6 +4,7 @@ import { MessageSquare, Timer, Shield } from 'lucide-react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
+import { resolveCardDesignClass, type CardDesignVariant } from '@/lib/ui/card-design';
 
 const items = [
   {
@@ -33,10 +34,12 @@ export default function ContactHighlights({
   heading = 'What happens',
   gradientText = 'after you reach out',
   highlightItems,
+  cardDesign,
 }: {
   heading?: string;
   gradientText?: string;
   highlightItems?: ContactHighlightItem[];
+  cardDesign?: CardDesignVariant;
 }) {
   const resolvedItems = highlightItems
     ? highlightItems.map((item) => ({
@@ -44,6 +47,7 @@ export default function ContactHighlights({
         icon: renderCmsIcon(item.icon),
       }))
     : items;
+  const resolvedCardDesign = resolveCardDesignClass(cardDesign ?? 'carddesign1');
 
   return (
     <section className={styles.section} aria-labelledby="contact-highlights-heading">
@@ -53,7 +57,7 @@ export default function ContactHighlights({
         </h2>
         <ul className={styles.grid}>
           {resolvedItems.map((it) => (
-            <li key={it.title} className={styles.card}>
+            <li key={it.title} className={`${styles.card} ${resolvedCardDesign}`}>
               <span className={styles.icon} aria-hidden="true">
                 {it.icon}
               </span>

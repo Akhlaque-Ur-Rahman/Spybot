@@ -38,6 +38,52 @@ export function defaultDraftForBlockType(type: CmsBlockType): unknown {
       };
     case 'solutionShowcase':
       return getSolutionShowcaseDraft('home');
+    case 'fintechHero':
+      return {
+        label: 'Trading',
+        title: 'ID Verification for Trading',
+        description: 'A secure onboarding experience builds trust.',
+        secondaryDescription: 'Verify users with confidence.',
+        primaryCta: { label: 'Get API Key', href: '/' },
+        secondaryCta: { label: 'Contact Sales', href: '/contact' },
+        imageSrc: '/media/trading-banner-img.png',
+        imageAlt: 'Trading verification visual',
+      };
+    case 'fintechWhy':
+      return { title: 'Why SpyBot?', items: [] };
+    case 'fintechLogoStrip':
+      return { title: 'Trusted by 3,000+ companies', subtitle: 'across sectors', logos: [] };
+    case 'fintechFaqSplit':
+      return {
+        heading: 'Frequently asked questions?',
+        supportText: 'Still have any question? Please contact our sales team',
+        supportCta: { label: 'Contact our sales team', href: '/contact' },
+        groups: [],
+      };
+    case 'fintechSpotlight':
+      return { items: [] };
+    case 'fintechCtaBanner':
+      return {
+        title: 'Ready To Supercharge Your Business?',
+        description: 'Fast onboarding and stronger trust checks.',
+        primaryCta: { label: 'Get API Key', href: '/' },
+        secondaryCta: { label: 'Contact Sales', href: '/contact' },
+        imageSrc: '/media/trading-cta-mockup.jpg',
+        imageAlt: 'Verification dashboard mockup',
+      };
+    case 'fintechApiKey':
+      return {
+        title: 'Get API Key',
+        description: 'Start building with production-grade APIs.',
+        highlights: [],
+        trustText: 'Trusted by over 3,000+ companies.',
+        logos: [],
+        formTitle: 'Build with us',
+        formDescription: 'Tell us your use case and get API keys.',
+        fields: [],
+        submitLabel: 'Submit',
+        note: 'By submitting, you agree to our Privacy Policy.',
+      };
     case 'sliderSection':
       return { heading: 'Slider', items: [] };
     case 'utilityCtaBand':

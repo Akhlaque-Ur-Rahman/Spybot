@@ -6,6 +6,7 @@ import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import { ChallengeTone } from '@/site';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
+import { resolveCardDesignClass, type CardDesignVariant } from '@/lib/ui/card-design';
 
 export interface ChallengeItem {
   icon: React.ReactNode;
@@ -111,8 +112,10 @@ interface ChallengesProps {
     title?: string;
     gradientText?: string;
     subtitle?: CmsRichTextValue;
+    cardDesign?: CardDesignVariant;
     items: ChallengeDataItem[];
   };
+  cardDesign?: CardDesignVariant;
 }
 
 export default function Challenges({
@@ -122,11 +125,13 @@ export default function Challenges({
   subtitle = "Outdated KYC processes lose customers and drain resources. SpyBot gives you the identity intelligence advantage to onboard fast and securely.",
   data = defaultChallenges,
   content,
+  cardDesign,
 }: ChallengesProps) {
   const resolvedLabel = content?.label ?? label;
   const resolvedTitle = content?.title ?? title;
   const resolvedGradientText = content?.gradientText ?? gradientText;
   const resolvedSubtitle = content?.subtitle ?? subtitle;
+  const resolvedCardDesign = resolveCardDesignClass(content?.cardDesign ?? cardDesign ?? 'carddesign3');
   const resolvedData = content
     ? content.items.map((item) => ({
         ...item,
@@ -151,7 +156,7 @@ export default function Challenges({
 
         <div className={`grid-3 ${styles.grid}`}>
           {resolvedData.map((c, i) => (
-            <div key={c.title} className={styles.card} style={{ animationDelay: `${i * 0.1}s` }}>
+            <div key={c.title} className={`${styles.card} ${resolvedCardDesign}`} style={{ animationDelay: `${i * 0.1}s` }}>
               <div
                 className={styles.cardIcon}
                 style={toneStyles[c.tone]}

@@ -6,6 +6,7 @@ import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import { ROUTES } from '@/site';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
+import { resolveCardDesignClass, type CardDesignVariant } from '@/lib/ui/card-design';
 
 const pathways = [
   {
@@ -46,11 +47,13 @@ export default function SupportPathways({
   gradientText = 'path',
   subheading = 'Different questions need different owners. Route your request so you get a faster, more precise answer.',
   items,
+  cardDesign,
 }: {
   heading?: string;
   gradientText?: string;
   subheading?: CmsRichTextValue;
   items?: SupportPathwayItem[];
+  cardDesign?: CardDesignVariant;
 }) {
   const resolvedItems = items
     ? items.map((item) => ({
@@ -58,6 +61,7 @@ export default function SupportPathways({
         icon: renderCmsIcon(item.icon),
       }))
     : pathways;
+  const resolvedCardDesign = resolveCardDesignClass(cardDesign ?? 'carddesign1');
 
   return (
     <section className={styles.section} aria-labelledby="support-pathways-heading">
@@ -68,7 +72,7 @@ export default function SupportPathways({
         <div className={`${styles.sub} ${richTextStyles.prose}`}>{renderCmsRichText(subheading)}</div>
         <div className={styles.grid}>
           {resolvedItems.map((p) => (
-            <article key={p.title} className={styles.card}>
+            <article key={p.title} className={`${styles.card} ${resolvedCardDesign}`}>
               <div className={styles.icon} aria-hidden="true">
                 {p.icon}
               </div>

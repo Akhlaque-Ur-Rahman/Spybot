@@ -14,11 +14,11 @@
   right: max(16px, env(safe-area-inset-right));
   bottom: max(20px, env(safe-area-inset-bottom));
   z-index: 99990;
-  width: 112px;
-  height: 112px;
+  width: 84px;
+  height: 84px;
   pointer-events: none;
-  opacity: 0.92;
-  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.45));
+  opacity: 0.86;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.35));
 }
 
 .routeLoaderCanvas {

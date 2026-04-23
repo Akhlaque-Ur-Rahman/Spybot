@@ -4,6 +4,7 @@ import richTextStyles from '@/components/CmsRichText.module.css';
 import { ArrowRight } from 'lucide-react';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
+import { resolveCardDesignClass, type CardDesignVariant } from '@/lib/ui/card-design';
 
 export type DirectoryItem = {
   title: string;
@@ -17,10 +18,12 @@ type Props = {
   heading: string;
   subheading?: CmsRichTextValue;
   items: DirectoryItem[];
+  cardDesign?: CardDesignVariant;
 };
 
-export default function DirectoryGrid({ id, heading, subheading, items }: Props) {
+export default function DirectoryGrid({ id, heading, subheading, items, cardDesign }: Props) {
   const headingId = id ? `${id}-heading` : 'directory-grid-heading';
+  const resolvedCardDesign = resolveCardDesignClass(cardDesign ?? 'carddesign2');
   return (
     <section id={id} className={styles.section} aria-labelledby={headingId}>
       <div className="container">
@@ -35,7 +38,7 @@ export default function DirectoryGrid({ id, heading, subheading, items }: Props)
         <ul className={styles.grid}>
           {items.map((item) => (
             <li key={item.href}>
-              <Link href={item.href} className={styles.card}>
+              <Link href={item.href} className={`${styles.card} ${resolvedCardDesign}`}>
                 {item.badge ? <span className={styles.badge}>{item.badge}</span> : null}
                 <h3 className={styles.title}>{item.title}</h3>
                 <div className={`${styles.desc} ${richTextStyles.prose}`}>{renderCmsRichText(item.description)}</div>
