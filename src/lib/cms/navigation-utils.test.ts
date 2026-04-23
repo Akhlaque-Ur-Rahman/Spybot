@@ -22,12 +22,14 @@ describe('normalizeHeaderDropdownConfig', () => {
       industries: [{ label: 'Fintech', href: '/industries/fintech' }],
       solution: [{ label: 'Identity', href: '' }],
       resources: 'invalid',
+      'Case Studies': [{ label: 'Story', href: '/resources/story' }],
     });
 
     assert.deepEqual(normalized.company, [{ label: 'About', href: '/about', description: 'About page' }]);
     assert.deepEqual(normalized.industries, [{ label: 'Fintech', href: '/industries/fintech', description: null }]);
     assert.deepEqual(normalized.solution, []);
     assert.deepEqual(normalized.resources, []);
+    assert.deepEqual(normalized['case studies'], [{ label: 'Story', href: '/resources/story', description: null }]);
   });
 });
 

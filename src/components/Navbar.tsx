@@ -74,6 +74,17 @@ function canonicalLabelToGroupKey(label: CanonicalMenuLabel): CanonicalMenuGroup
   return 'resources';
 }
 
+function dropdownGroupKeyForItem(item: NavMenuItem, canonical: CanonicalMenuLabel | null): string {
+  if (canonical) return canonicalLabelToGroupKey(canonical);
+  const normalized = item.label
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return normalized;
+}
+
 type NavLink = {
   id: string;
   label: string;
@@ -163,13 +174,13 @@ function defaultLinkByCanonical(label: CanonicalMenuLabel) {
 }
 
 function resolveDropdownItems(
+  item: NavMenuItem,
   canonical: CanonicalMenuLabel | null,
   dropdownConfig?: HeaderDropdownConfig
 ): NavDropdownItem[] | undefined {
-  if (!canonical) return undefined;
-  const defaults = defaultDropdownByCanonical[canonical];
+  const defaults = canonical ? defaultDropdownByCanonical[canonical] : undefined;
   if (!dropdownConfig) return defaults;
-  const group = dropdownConfig[canonicalLabelToGroupKey(canonical)];
+  const group = dropdownConfig[dropdownGroupKeyForItem(item, canonical)];
   if (!group?.length) return defaults;
   const parsed = group
     .map((item) => ({
@@ -246,7 +257,7 @@ function mergeMenuWithDefaults(items: NavMenuItem[], dropdownConfig?: HeaderDrop
         id: canonical ? `${canonical.toLowerCase()}-${index}` : `${slugify(label)}-${index}`,
         label,
         href,
-        dropdown: resolveDropdownItems(canonical, dropdownConfig),
+        dropdown: resolveDropdownItems(item, canonical, dropdownConfig),
         canonicalLabel: canonical,
       } satisfies NavLink;
     })

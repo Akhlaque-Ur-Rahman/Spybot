@@ -30,6 +30,4 @@ export type NavMenuItem = {
   description?: string | null;
 };
 
-export type HeaderDropdownGroupKey = 'company' | 'industries' | 'solution' | 'resources';
-
-export type HeaderDropdownConfig = Record<HeaderDropdownGroupKey, NavMenuItem[]>;
+export type HeaderDropdownConfig = Record<string, NavMenuItem[]>;

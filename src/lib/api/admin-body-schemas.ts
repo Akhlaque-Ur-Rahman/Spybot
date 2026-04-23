@@ -62,12 +62,9 @@ const adminNavigationMenuPatchSchema = z.object({
 
 const dropdownGroupItemsSchema = z.array(navItemSchema).max(200);
 
-const headerDropdownsSchema = z.object({
-  company: dropdownGroupItemsSchema,
-  industries: dropdownGroupItemsSchema,
-  solution: dropdownGroupItemsSchema,
-  resources: dropdownGroupItemsSchema,
-});
+const headerDropdownsSchema = z
+  .record(z.string().min(1).max(80).trim(), dropdownGroupItemsSchema)
+  .refine((groups) => Object.keys(groups).length <= 40, 'Too many dropdown groups');
 
 const adminNavigationDropdownsPatchSchema = z.object({
   dropdowns: headerDropdownsSchema,

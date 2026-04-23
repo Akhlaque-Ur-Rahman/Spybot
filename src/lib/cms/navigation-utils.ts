@@ -37,6 +37,12 @@ export function normalizeHeaderDropdownConfig(value: unknown): HeaderDropdownCon
     if (!Array.isArray(list)) continue;
     next[key] = sanitizeNavItems(list);
   }
+  for (const [key, list] of Object.entries(record)) {
+    const trimmedKey = key.trim().toLowerCase();
+    if (!trimmedKey || trimmedKey in next) continue;
+    if (!Array.isArray(list)) continue;
+    next[trimmedKey] = sanitizeNavItems(list);
+  }
   return next;
 }
 

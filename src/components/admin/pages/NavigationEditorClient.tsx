@@ -1,25 +1,36 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { TextField } from '@/components/admin/fields';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
 import { logAdminClientError } from '@/lib/admin/user-facing-errors';
-import type { HeaderDropdownConfig, HeaderDropdownGroupKey } from '@/lib/cms/types';
+import type { HeaderDropdownConfig } from '@/lib/cms/types';
 
 export type NavItemRow = { id: string; label: string; href: string; description: string | null };
 export type MenuRow = { id: string; key: string; items: NavItemRow[] };
 type GroupItemRow = { label: string; href: string; description: string };
-type GroupState = Record<HeaderDropdownGroupKey, GroupItemRow[]>;
-const GROUP_KEYS: HeaderDropdownGroupKey[] = ['company', 'industries', 'solution', 'resources'];
+type GroupState = Record<string, GroupItemRow[]>;
+const DEFAULT_GROUP_KEYS = ['company', 'industries', 'solution', 'resources'] as const;
 
-function groupLabel(group: HeaderDropdownGroupKey) {
-  if (group === 'company') return 'Company';
-  if (group === 'industries') return 'Industries';
-  if (group === 'solution') return 'Solution';
-  return 'Resources';
+function groupLabel(group: string) {
+  if (!group) return '';
+  return group
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part[0]!.toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function toGroupKey(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 function menuSummary(key: string) {
@@ -91,7 +102,25 @@ export default function NavigationEditorClient({
       href: i.href,
       description: i.description ?? '',
     })),
+    ...Object.fromEntries(
+      Object.entries(dropdowns)
+        .filter(([key]) => !DEFAULT_GROUP_KEYS.includes(key as (typeof DEFAULT_GROUP_KEYS)[number]))
+        .map(([key, items]) => [
+          key,
+          items.map((i) => ({
+            label: i.label,
+            href: i.href,
+            description: i.description ?? '',
+          })),
+        ])
+    ),
   }));
+  const [groupOrder, setGroupOrder] = useState<string[]>(() => {
+    const extras = Object.keys(dropdowns).filter((key) => !DEFAULT_GROUP_KEYS.includes(key as (typeof DEFAULT_GROUP_KEYS)[number]));
+    return [...DEFAULT_GROUP_KEYS, ...extras];
+  });
+  const [newGroupName, setNewGroupName] = useState('');
+  const groupRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [savingDropdowns, setSavingDropdowns] = useState(false);
 
   function updateItem(menuIdx: number, itemIdx: number, patch: Partial<{ label: string; href: string; description: string }>) {
@@ -163,7 +192,7 @@ export default function NavigationEditorClient({
   }
 
   function updateGroupItem(
-    group: HeaderDropdownGroupKey,
+    group: string,
     itemIdx: number,
     patch: Partial<GroupItemRow>
   ) {
@@ -174,7 +203,7 @@ export default function NavigationEditorClient({
     });
   }
 
-  function moveGroupItem(group: HeaderDropdownGroupKey, itemIdx: number, delta: number) {
+  function moveGroupItem(group: string, itemIdx: number, delta: number) {
     setGroupState((prev) => {
       const items = [...prev[group]];
       const target = itemIdx + delta;
@@ -186,48 +215,66 @@ export default function NavigationEditorClient({
     });
   }
 
-  function addGroupItem(group: HeaderDropdownGroupKey) {
+  function addGroupItem(group: string) {
     setGroupState((prev) => ({
       ...prev,
       [group]: [...prev[group], { label: 'New link', href: '/', description: '' }],
     }));
+    requestAnimationFrame(() => {
+      groupRefs.current[group]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }
 
-  function removeGroupItem(group: HeaderDropdownGroupKey, itemIdx: number) {
+  function removeGroupItem(group: string, itemIdx: number) {
     setGroupState((prev) => ({
       ...prev,
       [group]: prev[group].filter((_, i) => i !== itemIdx),
     }));
   }
 
+  function addDropdownGroup() {
+    const key = toGroupKey(newGroupName);
+    if (!key) {
+      push('Enter a valid group name', 'error');
+      return;
+    }
+    if (groupState[key]) {
+      push('Group already exists', 'error');
+      return;
+    }
+    setGroupState((prev) => ({ ...prev, [key]: [] }));
+    setGroupOrder((prev) => [...prev, key]);
+    setNewGroupName('');
+    requestAnimationFrame(() => {
+      groupRefs.current[key]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  function removeDropdownGroup(group: string) {
+    setGroupState((prev) => {
+      const next = { ...prev };
+      delete next[group];
+      return next;
+    });
+    setGroupOrder((prev) => prev.filter((g) => g !== group));
+  }
+
   async function saveDropdowns() {
     setSavingDropdowns(true);
     try {
+      const payload = groupOrder.reduce<Record<string, Array<{ label: string; href: string; description?: string }>>>((acc, key) => {
+        const items = groupState[key] ?? [];
+        acc[key] = items.map((i) => ({
+          label: i.label,
+          href: i.href,
+          description: i.description || undefined,
+        }));
+        return acc;
+      }, {});
       await fetchJson('/api/admin/navigation', {
         method: 'PATCH',
         body: JSON.stringify({
-          dropdowns: {
-            company: groupState.company.map((i) => ({
-              label: i.label,
-              href: i.href,
-              description: i.description || undefined,
-            })),
-            industries: groupState.industries.map((i) => ({
-              label: i.label,
-              href: i.href,
-              description: i.description || undefined,
-            })),
-            solution: groupState.solution.map((i) => ({
-              label: i.label,
-              href: i.href,
-              description: i.description || undefined,
-            })),
-            resources: groupState.resources.map((i) => ({
-              label: i.label,
-              href: i.href,
-              description: i.description || undefined,
-            })),
-          },
+          dropdowns: payload,
         }),
       });
       push('Dropdown links saved', 'success');
@@ -303,18 +350,55 @@ export default function NavigationEditorClient({
         >
           {savingDropdowns ? 'Saving…' : 'Save dropdowns'}
         </button>
+        <div className={pageStyles.row} style={{ marginTop: 12 }}>
+          <TextField label="Create group" value={newGroupName} onChange={setNewGroupName} />
+          <button
+            type="button"
+            className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+            onClick={addDropdownGroup}
+            disabled={savingDropdowns}
+          >
+            Add group
+          </button>
+        </div>
         <div style={{ marginTop: 16, display: 'grid', gap: 16 }}>
-          {GROUP_KEYS.map((group) => (
-            <div key={group} className={pageStyles.listItem}>
+          {groupOrder.map((group) => (
+            <div
+              key={group}
+              className={pageStyles.listItem}
+              ref={(el) => {
+                groupRefs.current[group] = el;
+              }}
+            >
               <div className={pageStyles.row}>
                 <h4 style={{ margin: 0 }}>{groupLabel(group)}</h4>
-                <button
-                  type="button"
-                  className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
-                  onClick={() => addGroupItem(group)}
-                >
-                  Add item
-                </button>
+                <div className={pageStyles.row}>
+                  <button
+                    type="button"
+                    className={`${pageStyles.btn} ${pageStyles.btnSecondary}`}
+                    onClick={() => addGroupItem(group)}
+                  >
+                    Add item
+                  </button>
+                  <button
+                    type="button"
+                    className={pageStyles.btn}
+                    disabled={savingDropdowns}
+                    onClick={() => void saveDropdowns()}
+                  >
+                    {savingDropdowns ? 'Saving…' : 'Save'}
+                  </button>
+                  {!DEFAULT_GROUP_KEYS.includes(group as (typeof DEFAULT_GROUP_KEYS)[number]) ? (
+                    <button
+                      type="button"
+                      className={`${pageStyles.btn} ${pageStyles.btnDanger}`}
+                      disabled={savingDropdowns}
+                      onClick={() => removeDropdownGroup(group)}
+                    >
+                      Delete group
+                    </button>
+                  ) : null}
+                </div>
               </div>
               <ul className={pageStyles.list}>
                 {groupState[group].map((item, itemIdx) => (
