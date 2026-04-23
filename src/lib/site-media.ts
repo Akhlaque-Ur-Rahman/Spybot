@@ -21,7 +21,13 @@ export type MediaClipMeta = {
 };
 
 export function mediaEncodingFormat(src: string): 'video/mp4' | 'video/webm' {
-  return src.endsWith('.mp4') ? 'video/mp4' : 'video/webm';
+  return /\.(mp4|m4v)(\?.*)?$/i.test(src) ? 'video/mp4' : 'video/webm';
+}
+
+export function mediaSourceKind(src: string): 'video' | 'image' | 'other' {
+  if (/\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(src)) return 'video';
+  if (/\.(png|jpe?g|gif|webp|svg|avif)(\?.*)?$/i.test(src)) return 'image';
+  return 'other';
 }
 
 export function siteOrigin(): string {

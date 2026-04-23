@@ -4,7 +4,7 @@ import styles from './Hero.module.css';
 import richTextStyles from '@/components/CmsRichText.module.css';
 import { Rocket } from 'lucide-react';
 import { CTA_LINKS } from '@/site';
-import { MEDIA_CLIPS, mediaEncodingFormat } from '@/lib/site-media';
+import { MEDIA_CLIPS, mediaEncodingFormat, mediaSourceKind } from '@/lib/site-media';
 import type { MediaClipMeta } from '@/lib/site-media';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
@@ -59,14 +59,21 @@ export function HeroSection({ content }: { content?: HeroContent }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const resolvedClip = (content?.media ?? heroClip) as MediaClipMeta;
+  const sourceKind = mediaSourceKind(resolvedClip.src);
+  const isVideoSource = sourceKind === 'video';
+  const isImageSource = sourceKind === 'image';
   const staticPoster = resolvedClip.poster?.trim() || undefined;
   const [framePosterUrl, setFramePosterUrl] = useState<string | null>(null);
-  const heroPoster = staticPoster ?? framePosterUrl ?? undefined;
-  const heroVideoType = mediaEncodingFormat(resolvedClip.src);
+  const heroPoster = isVideoSource ? staticPoster ?? framePosterUrl ?? undefined : undefined;
+  const heroVideoType = isVideoSource ? mediaEncodingFormat(resolvedClip.src) : undefined;
   const resolvedStats = content?.stats ?? stats;
   const resolvedThreats = content?.threats ?? threats;
 
   useEffect(() => {
+    if (!isVideoSource) {
+      setFramePosterUrl(null);
+      return;
+    }
     const v = videoRef.current;
     if (!v) return;
     v.muted = true;
@@ -135,7 +142,7 @@ export function HeroSection({ content }: { content?: HeroContent }) {
       revoke();
       setFramePosterUrl(null);
     };
-  }, [staticPoster, resolvedClip.src]);
+  }, [isVideoSource, staticPoster, resolvedClip.src]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -204,19 +211,23 @@ export function HeroSection({ content }: { content?: HeroContent }) {
   return (
     <section className={styles.hero} id="hero">
       <div className={styles.heroVideoWrap} aria-hidden="true">
-        <video
-          ref={videoRef}
-          className={styles.heroVideo}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          poster={heroPoster}
-          tabIndex={-1}
-        >
-          <source src={resolvedClip.src} type={heroVideoType} />
-        </video>
+        {isVideoSource && heroVideoType ? (
+          <video
+            ref={videoRef}
+            className={styles.heroVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster={heroPoster}
+            tabIndex={-1}
+          >
+            <source src={resolvedClip.src} type={heroVideoType} />
+          </video>
+        ) : isImageSource ? (
+          <img src={resolvedClip.src} alt={resolvedClip.title} className={styles.heroVideo} />
+        ) : null}
         <div className={styles.heroScrim} />
       </div>
       <canvas ref={canvasRef} className={styles.canvas} aria-hidden />

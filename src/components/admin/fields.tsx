@@ -199,7 +199,10 @@ export function MediaClipFields({
   const [assetOptions, setAssetOptions] = useState<MediaAssetOption[]>([]);
   const [assetError, setAssetError] = useState<string | null>(null);
   const srcKind = mediaKind(null, value.src);
-  const videoOptions = assetOptions.filter((row) => mediaKind(row.mimeType, row.url) === 'video');
+  const sourceOptions = assetOptions.filter((row) => {
+    const kind = mediaKind(row.mimeType, row.url);
+    return kind === 'video' || kind === 'image';
+  });
   const imageOptions = assetOptions.filter((row) => mediaKind(row.mimeType, row.url) === 'image');
 
   useEffect(() => {
@@ -246,9 +249,9 @@ export function MediaClipFields({
         </select>
       </label>
       <div className={styles.fieldGrid2} style={{ marginTop: 12 }}>
-        <TextField label="Video src" value={value.src} onChange={(src) => onChange({ ...value, src })} />
+        <TextField label="Media src" value={value.src} onChange={(src) => onChange({ ...value, src })} />
         <label className={styles.label}>
-          <span>From library (video)</span>
+          <span>From library (media)</span>
           <select
             className={styles.select}
             value=""
@@ -259,8 +262,8 @@ export function MediaClipFields({
               event.target.value = '';
             }}
           >
-            <option value="">{videoOptions.length ? 'Select a video asset' : 'No video assets yet'}</option>
-            {videoOptions.map((asset) => (
+            <option value="">{sourceOptions.length ? 'Select an image or video asset' : 'No media assets yet'}</option>
+            {sourceOptions.map((asset) => (
               <option key={asset.id} value={asset.url}>
                 {asset.url}
               </option>
@@ -297,7 +300,7 @@ export function MediaClipFields({
         <TextField label="Title" value={value.title} onChange={(title) => onChange({ ...value, title })} />
         <TextField label="Description" value={value.description} onChange={(description) => onChange({ ...value, description })} />
       </div>
-      {srcKind !== 'video' ? <p className={styles.label}>Current source is not a video URL.</p> : null}
+      <p className={styles.label}>Detected source type: {srcKind}</p>
       {assetError ? <p className={styles.label}>{assetError}</p> : null}
     </fieldset>
   );

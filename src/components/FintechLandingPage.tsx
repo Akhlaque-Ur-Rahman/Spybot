@@ -2,29 +2,17 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import {
-  BadgeCheck,
-  Banknote,
   Clock3,
-  FileBadge2,
-  FileText,
-  Landmark,
   PlugZap,
   ShieldCheck,
-  Building2,
-  PenLine,
-  ScanFace,
-  Video,
-  Briefcase,
-  CreditCard,
-  UserSquare2,
-  type LucideIcon,
 } from 'lucide-react';
 import FaqAccordion from '@/components/FaqAccordion';
+import SolutionShowcase from '@/components/SolutionShowcase';
 import { CTA_LINKS, ROUTES } from '@/site';
-import type { ShowcaseIconKey, SolutionShowcaseData } from '@/lib/solution-showcase-data';
+import type { SolutionShowcaseData } from '@/lib/solution-showcase-data';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
 import styles from './FintechLandingPage.module.css';
 
@@ -236,21 +224,6 @@ const fallbackApiKey: FintechApiKeyData = {
   note: 'By submitting, you agree to our Privacy Policy.',
 };
 
-const ICONS: Record<ShowcaseIconKey, LucideIcon> = {
-  fileText: FileText,
-  badgeCheck: BadgeCheck,
-  creditCard: CreditCard,
-  landmark: Landmark,
-  building2: Building2,
-  scanFace: ScanFace,
-  video: Video,
-  penLine: PenLine,
-  shield: ShieldCheck,
-  userCheck: UserSquare2,
-  briefcase: Briefcase,
-  banknote: Banknote,
-};
-
 const fallbackLanesData: SolutionShowcaseData = {
   title: 'APIs Used By Trading Companies',
   subtitle: 'Secure, compliant, and fraud-resilient verification blocks for trading platforms.',
@@ -314,12 +287,6 @@ export default function FintechLandingPage({
   const spotlight = spotlightData?.items?.length ? spotlightData.items : spotlightCards;
   const ctaBanner = ctaBannerData ?? fallbackCtaBanner;
   const apiKey = apiKeyData ?? fallbackApiKey;
-  const verticals = useMemo(
-    () => (lanesData.verticals?.length ? lanesData.verticals : fallbackLanesData.verticals),
-    [lanesData.verticals],
-  );
-  const [activeTab, setActiveTab] = useState(verticals[0]?.id ?? '');
-  const activeVertical = verticals.find((v) => v.id === activeTab) ?? verticals[0];
   const rootRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -373,25 +340,6 @@ export default function FintechLandingPage({
 
     return () => ctx.revert();
   }, []);
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    gsap.fromTo(
-      root.querySelectorAll('[data-anim-api-card]'),
-      { autoAlpha: 0, y: 12 },
-      {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.4,
-        ease: 'power2.out',
-        stagger: 0.03,
-        clearProps: 'transform,opacity,visibility',
-      },
-    );
-  }, [activeVertical.id]);
 
   return (
     <main ref={rootRef} className={styles.page}>
@@ -447,58 +395,7 @@ export default function FintechLandingPage({
         </div>
       </section>
 
-      <section className={styles.lanesSection} aria-label="Verification lanes">
-        <div className="container">
-          <header className={styles.lanesHeader} data-anim-inview>
-            <h2>{lanesData.title || fallbackLanesData.title}</h2>
-            <p>{lanesData.subtitle || fallbackLanesData.subtitle}</p>
-            <div className={styles.tabsRow} role="tablist" aria-label="Verification lanes">
-              {verticals.map((v) => (
-                <button
-                  key={v.id}
-                  type="button"
-                  className={`${styles.lanesPill} ${activeVertical.id === v.id ? styles.lanesPillActive : ''}`}
-                  role="tab"
-                  aria-selected={activeVertical.id === v.id}
-                  onClick={() => setActiveTab(v.id)}
-                >
-                  {v.label}
-                </button>
-              ))}
-            </div>
-          </header>
-
-          <div className={styles.lanesBody}>
-            <aside className={styles.lanesSidebar} data-anim-inview>
-              <h4>{activeVertical.panelTitle}</h4>
-              <p>{activeVertical.panelDescription}</p>
-              <div className={styles.lanesActions}>
-                <Link href={lanesData.primaryCta?.href ?? fallbackLanesData.primaryCta.href} className="btn btn-primary btn-sm">
-                  {lanesData.primaryCta?.label ?? fallbackLanesData.primaryCta.label}
-                </Link>
-                <Link href={lanesData.secondaryCta?.href ?? fallbackLanesData.secondaryCta.href} className="btn btn-secondary btn-sm">
-                  {lanesData.secondaryCta?.label ?? fallbackLanesData.secondaryCta.label}
-                </Link>
-              </div>
-            </aside>
-
-            <div className={styles.lanesGrid}>
-              {activeVertical.cards.map((api) => {
-                const Icon = ICONS[api.icon] ?? FileBadge2;
-                return (
-                  <article key={api.title} className={`${styles.apiCard} carddesign1`} data-anim-inview data-anim-api-card>
-                    <span className={styles.apiIcon} aria-hidden="true">
-                      <Icon size={18} strokeWidth={1.8} />
-                    </span>
-                    <h4>{api.title}</h4>
-                    <p>{api.description}</p>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
+      <SolutionShowcase data={lanesData} />
 
       <section className={styles.logoStrip} aria-label="Trusted companies">
         <div className={`container ${styles.logoStripInner}`}>

@@ -2,7 +2,7 @@ import styles from './PageHeader.module.css';
 import ViewportVideo from './ViewportVideo';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
-import { mediaEncodingFormat, type MediaClipMeta } from '@/lib/site-media';
+import { mediaEncodingFormat, mediaSourceKind, type MediaClipMeta } from '@/lib/site-media';
 
 interface PageHeaderProps {
   label: string;
@@ -11,7 +11,7 @@ interface PageHeaderProps {
   description: CmsRichTextValue;
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
-  /** Optional clip with visible caption for SEO (indexable text + `VideoObject` context on the page). */
+  /** Optional media with visible caption on the page. */
   media?: MediaClipMeta;
 }
 
@@ -24,7 +24,8 @@ export default function PageHeader({
   secondaryCta,
   media,
 }: PageHeaderProps) {
-  const mediaType = media ? mediaEncodingFormat(media.src) : undefined;
+  const mediaKind = media ? mediaSourceKind(media.src) : 'other';
+  const mediaType = media && mediaKind === 'video' ? mediaEncodingFormat(media.src) : undefined;
 
   return (
     <section className={`${styles.section} ${media ? styles.sectionWithMedia : ''}`}>
@@ -59,13 +60,17 @@ export default function PageHeader({
 
           {media && (
             <figure className={styles.mediaFigure}>
-              <ViewportVideo
-                className={styles.mediaVideo}
-                poster={media.poster}
-                ariaLabel={media.title}
-                src={media.src}
-                type={mediaType!}
-              />
+              {mediaKind === 'video' && mediaType ? (
+                <ViewportVideo
+                  className={styles.mediaVideo}
+                  poster={media.poster}
+                  ariaLabel={media.title}
+                  src={media.src}
+                  type={mediaType}
+                />
+              ) : mediaKind === 'image' ? (
+                <img className={styles.mediaVideo} src={media.src} alt={media.title} loading="lazy" />
+              ) : null}
               <figcaption className={styles.mediaCaption}>
                 <strong>{media.title}</strong>
                 <span className={styles.mediaCaptionSep}> — </span>

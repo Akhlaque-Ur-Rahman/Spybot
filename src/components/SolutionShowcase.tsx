@@ -74,16 +74,21 @@ export default function SolutionShowcase({ data }: { data: SolutionShowcaseData 
           })}
         </div>
 
-        <div
-          className={styles.tabPanel}
-          role="tabpanel"
-          id={panelId}
-          aria-labelledby={`${tabsId}-${active.id}`}
-        >
-          <div className={styles.panelBand}>
+        <div className={styles.divider} aria-hidden />
+
+        <div className={styles.tabPanel} role="tabpanel" id={panelId} aria-labelledby={`${tabsId}-${active.id}`}>
+          <aside className={styles.panelBand}>
             <h4 className={styles.panelTitle}>{active.panelTitle}</h4>
             <p className={styles.panelDesc}>{active.panelDescription}</p>
-          </div>
+            <div className={styles.ctas}>
+              <Link href={data.primaryCta.href} className="btn btn-primary btn-sm">
+                {data.primaryCta.label}
+              </Link>
+              <Link href={data.secondaryCta.href} className="btn btn-secondary btn-sm">
+                {data.secondaryCta.label}
+              </Link>
+            </div>
+          </aside>
 
           <div className={styles.cardGrid}>
             {active.cards.map((c, i) => {
@@ -98,17 +103,6 @@ export default function SolutionShowcase({ data }: { data: SolutionShowcaseData 
                 </article>
               );
             })}
-          </div>
-
-          <div className={styles.ctaRow}>
-            <div className={styles.ctas}>
-              <Link href={data.primaryCta.href} className="btn btn-primary btn-sm">
-                {data.primaryCta.label}
-              </Link>
-              <Link href={data.secondaryCta.href} className="btn btn-secondary btn-sm">
-                {data.secondaryCta.label}
-              </Link>
-            </div>
           </div>
         </div>
       </div>
