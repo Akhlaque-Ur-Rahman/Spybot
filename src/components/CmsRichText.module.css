@@ -5,6 +5,8 @@
 
 .prose :global(p) {
   margin: 0 0 0.65em;
+  max-width: 68ch;
+  text-wrap: pretty;
 }
 
 .prose :global(p:last-child) {
@@ -26,4 +28,15 @@
 .prose :global(a) {
   color: var(--color-primary-300);
   text-decoration: underline;
+}
+
+.prose :global(ul),
+.prose :global(ol) {
+  margin: 0.5em 0 0.75em;
+  padding-left: 1.25em;
+}
+
+.prose :global(li) {
+  margin-bottom: 0.35em;
+  text-wrap: pretty;
 }
