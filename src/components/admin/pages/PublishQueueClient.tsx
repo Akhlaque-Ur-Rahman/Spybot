@@ -7,6 +7,7 @@ import { useAdminApi } from '@/components/admin/AdminApiContext';
 import { useToast } from '@/components/admin/Toast';
 import pageStyles from '@/components/admin/adminPage.module.css';
 import { logAdminClientError } from '@/lib/admin/user-facing-errors';
+import { formatPublishPreflightErrorSummary } from '@/lib/cms/publish-preflight';
 
 type DraftPage = {
   id: string;
@@ -64,7 +65,11 @@ export default function PublishQueueClient({
         body: JSON.stringify({ pageKey, note: 'Preflight from queue' }),
       });
       if (!preflight.report.ok) {
-        push('This page is not ready to publish yet. Please review and try again.', 'error');
+        const hint = formatPublishPreflightErrorSummary(preflight.report);
+        push(
+          hint ? `This page is not ready to publish yet: ${hint}` : 'This page is not ready to publish yet. Please review and try again.',
+          'error',
+        );
         return;
       }
       if (preflight.report.warnings.length > 0) {
@@ -116,10 +121,13 @@ export default function PublishQueueClient({
         body: JSON.stringify({ pageKey, note: 'Queue change insight' }),
       });
       setInsights((prev) => ({ ...prev, [pageKey]: preflight.report }));
+      const failHint = preflight.report.ok ? '' : formatPublishPreflightErrorSummary(preflight.report);
       push(
         preflight.report.ok
           ? `Review ready: ${preflight.report.dirtyBlocks} changed block(s).`
-          : 'This page still needs updates before publish.',
+          : failHint
+            ? `This page still needs updates before publish: ${failHint}`
+            : 'This page still needs updates before publish.',
         preflight.report.ok ? 'success' : 'error',
       );
     } catch (e) {

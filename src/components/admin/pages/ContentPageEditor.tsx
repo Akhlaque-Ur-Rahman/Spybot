@@ -11,6 +11,7 @@ import pageStyles from '@/components/admin/adminPage.module.css';
 import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 import { stableStringify } from '@/lib/cms/json-stable';
 import { getCmsBlockContract } from '@/lib/cms/block-contracts';
+import { formatPublishPreflightErrorSummary } from '@/lib/cms/publish-preflight';
 import { CMS_BLOCK_TYPES, cmsBlockTypeLabel } from '@/lib/cms/page-registry';
 import { CMS_SECTION_TEMPLATES } from '@/lib/cms/section-templates';
 
@@ -374,7 +375,11 @@ export default function ContentPageEditor({
         body: JSON.stringify({ pageKey: page.key, note: 'Preflight from content editor' }),
       });
       if (!preflight.report.ok) {
-        push('This page is not ready to publish yet. Please review and try again.', 'error');
+        const hint = formatPublishPreflightErrorSummary(preflight.report);
+        push(
+          hint ? `This page is not ready to publish yet: ${hint}` : 'This page is not ready to publish yet. Please review and try again.',
+          'error',
+        );
         return;
       }
       if (preflight.report.warnings.length > 0) {

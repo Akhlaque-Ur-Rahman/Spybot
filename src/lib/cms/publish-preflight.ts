@@ -32,6 +32,15 @@ export type PublishPreflightReport = {
   dirtyBlocks: number;
 };
 
+/** Short human-readable line for toasts (first few preflight errors). */
+export function formatPublishPreflightErrorSummary(report: Pick<PublishPreflightReport, 'errors'>): string {
+  const msgs = report.errors.map((e) => e.message).filter(Boolean);
+  if (!msgs.length) return '';
+  const max = 4;
+  const head = msgs.slice(0, max).join(' · ');
+  return msgs.length > max ? `${head} · …` : head;
+}
+
 export function runPublishPreflight(page: PageWithBlocks): PublishPreflightReport {
   const errors: PublishPreflightIssue[] = [];
   const warnings: PublishPreflightIssue[] = [];
