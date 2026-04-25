@@ -31,12 +31,16 @@ function toFintechHeroMediaShape(input: unknown): { next: Prisma.InputJsonValue;
     changed = true;
   }
 
-  if (!isRecord(next.backgroundMedia) || typeof next.backgroundMedia.src !== 'string') {
-    next.backgroundMedia = {
-      src: '/media/vtials_pivc.webm',
-      title: 'SpyBot verification experience',
-      description: 'Homepage hero media preview for identity and onboarding workflows.',
-    };
+  const stillBackdrop = {
+    src: '/media/trading-hero.jpg',
+    title: 'SpyBot marketing backdrop',
+    description: 'Still imagery used behind hero sections instead of motion backgrounds.',
+  };
+  const bm = next.backgroundMedia;
+  const src = isRecord(bm) && typeof bm.src === 'string' ? bm.src.trim() : '';
+  const isVideoBackdrop = /\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(src);
+  if (!src || isVideoBackdrop) {
+    next.backgroundMedia = stillBackdrop;
     changed = true;
   }
 

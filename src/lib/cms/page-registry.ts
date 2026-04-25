@@ -1,6 +1,6 @@
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import type { MediaClipMeta } from '@/lib/site-media';
-import { MEDIA_CLIPS } from '@/lib/site-media';
+import { MEDIA_CLIPS, MEDIA_HERO_BACKDROP } from '@/lib/site-media';
 import { CTA_LINKS, ROUTES, industryNavItems, solutionNavItems } from '@/site';
 import { getDefaultFooterSettings } from '@/lib/cms/footer-settings';
 import type { CmsIconName } from '@/lib/cms/icon-map';
@@ -714,7 +714,7 @@ export const homeHeroBlock: CmsHeroBlock = {
   primaryCta: { label: 'Get Sandbox Access', href: CTA_LINKS.sandbox },
   secondaryCta: { label: 'Explore Superflow', href: CTA_LINKS.superflowStudio },
   trustItems: ['SOC 2 Type II', 'ISO 27001', 'GDPR Ready', 'NIST CSF'],
-  backgroundMedia: MEDIA_CLIPS.homeHero,
+  backgroundMedia: MEDIA_HERO_BACKDROP,
   stats: [
     { value: '99.99%', label: 'Uptime SLA' },
     { value: '100+', label: 'Identity APIs' },

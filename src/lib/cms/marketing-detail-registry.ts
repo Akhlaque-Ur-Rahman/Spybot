@@ -793,7 +793,7 @@ export function buildMarketingDetailRegistryPages(deps: {
             'Verify Aadhaar, PAN, and bank-linked details in one flow so every trader is authenticated with precision while preserving conversion speed.',
           primaryCta: { label: 'Get API Key', href: CTA_LINKS.sandbox },
           secondaryCta: { label: 'Contact Sales', href: ROUTES.contact },
-          backgroundMedia: MEDIA_CLIPS.homeHero,
+          backgroundMedia: MEDIA_CLIPS.heroBackdrop,
           media: {
             src: '/media/trading-banner-img.png',
             title: 'Trading verification visual',

@@ -4,7 +4,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { mediaEncodingFormat, mediaSourceKind, type MediaClipMeta, MEDIA_CLIPS } from '@/lib/site-media';
+import {
+  mediaEncodingFormat,
+  mediaSourceKind,
+  type MediaClipMeta,
+  MEDIA_CLIPS,
+  resolveOptionalHeroBackground,
+} from '@/lib/site-media';
 import {
   Clock3,
   PlugZap,
@@ -128,7 +134,7 @@ const fallbackHero: FintechHeroData = {
     'Verify Aadhaar, PAN, and bank-linked details in one flow so every trader is authenticated with precision while preserving conversion speed.',
   primaryCta: { label: 'Get API Key', href: CTA_LINKS.sandbox },
   secondaryCta: { label: 'Contact Sales', href: ROUTES.contact },
-  backgroundMedia: MEDIA_CLIPS.homeHero,
+  backgroundMedia: MEDIA_CLIPS.heroBackdrop,
   media: {
     src: '/media/trading-banner-img.png',
     title: 'Trading verification visual',
@@ -297,10 +303,10 @@ export default function FintechLandingPage({
   const ctaBanner = ctaBannerData ?? fallbackCtaBanner;
   const apiKey = apiKeyData ?? fallbackApiKey;
   const rootRef = useRef<HTMLElement | null>(null);
-  const backgroundMedia = hero.backgroundMedia;
-  const backgroundKind = backgroundMedia ? mediaSourceKind(backgroundMedia.src) : 'other';
+  const resolvedBackground = resolveOptionalHeroBackground(hero.backgroundMedia);
+  const backgroundKind = resolvedBackground ? mediaSourceKind(resolvedBackground.src) : 'other';
   const backgroundVideoType =
-    backgroundMedia && backgroundKind === 'video' ? mediaEncodingFormat(backgroundMedia.src) : undefined;
+    resolvedBackground && backgroundKind === 'video' ? mediaEncodingFormat(resolvedBackground.src) : undefined;
   const heroMedia = hero.media;
   const heroMediaKind = heroMedia ? mediaSourceKind(heroMedia.src) : 'other';
   const heroMediaType = heroMedia && heroMediaKind === 'video' ? mediaEncodingFormat(heroMedia.src) : undefined;
@@ -362,7 +368,7 @@ export default function FintechLandingPage({
   return (
     <main ref={rootRef} className={styles.page}>
       <section className={styles.hero}>
-        {backgroundMedia ? (
+        {resolvedBackground ? (
           <div className={styles.heroBackground} aria-hidden="true">
             {backgroundKind === 'video' && backgroundVideoType ? (
               <video
@@ -372,15 +378,15 @@ export default function FintechLandingPage({
                 loop
                 playsInline
                 preload="metadata"
-                poster={backgroundMedia.poster}
+                poster={resolvedBackground.poster}
                 tabIndex={-1}
               >
-                <source src={backgroundMedia.src} type={backgroundVideoType} />
+                <source src={resolvedBackground.src} type={backgroundVideoType} />
               </video>
             ) : backgroundKind === 'image' ? (
               <Image
-                src={backgroundMedia.src}
-                alt={backgroundMedia.title}
+                src={resolvedBackground.src}
+                alt={resolvedBackground.title}
                 fill
                 sizes="100vw"
                 className={styles.heroBackgroundMedia}

@@ -83,7 +83,7 @@ function EditorHero({ value, onChange }: Props) {
       <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
       <MediaClipFields
         label="Background media (hero backdrop)"
-        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.homeHero)}
+        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.heroBackdrop)}
         onChange={(backgroundMedia) => patch({ backgroundMedia })}
       />
       <MediaClipFields label="Right media" value={mediaMeta(o.media)} onChange={(media) => patch({ media })} />
@@ -160,7 +160,7 @@ function EditorPageHeader({ value, onChange }: Props) {
       <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
       <MediaClipFields
         label="Background media (optional)"
-        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.homeHero)}
+        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.heroBackdrop)}
         onChange={(backgroundMedia) => patch({ backgroundMedia })}
       />
       <MediaClipFields label="Right media (optional)" value={mediaMeta(o.media ?? MEDIA_CLIPS.homeHero)} onChange={(media) => patch({ media })} />
@@ -200,7 +200,7 @@ function EditorFintechHero({ value, onChange }: Props) {
       <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
       <MediaClipFields
         label="Background media (hero backdrop)"
-        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.homeHero)}
+        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.heroBackdrop)}
         onChange={(backgroundMedia) => patch({ backgroundMedia })}
       />
       <MediaClipFields

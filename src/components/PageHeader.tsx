@@ -3,7 +3,12 @@ import Image, { type ImageLoader } from 'next/image';
 import ViewportVideo from './ViewportVideo';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
-import { mediaEncodingFormat, mediaSourceKind, type MediaClipMeta } from '@/lib/site-media';
+import {
+  mediaEncodingFormat,
+  mediaSourceKind,
+  resolveOptionalHeroBackground,
+  type MediaClipMeta,
+} from '@/lib/site-media';
 const passthroughLoader: ImageLoader = ({ src }) => src;
 
 interface PageHeaderProps {
@@ -32,9 +37,10 @@ export default function PageHeader({
   mediaAspectRatio,
   mediaObjectFit,
 }: PageHeaderProps) {
-  const backgroundKind = backgroundMedia ? mediaSourceKind(backgroundMedia.src) : 'other';
+  const resolvedBackground = resolveOptionalHeroBackground(backgroundMedia);
+  const backgroundKind = resolvedBackground ? mediaSourceKind(resolvedBackground.src) : 'other';
   const backgroundType =
-    backgroundMedia && backgroundKind === 'video' ? mediaEncodingFormat(backgroundMedia.src) : undefined;
+    resolvedBackground && backgroundKind === 'video' ? mediaEncodingFormat(resolvedBackground.src) : undefined;
   const mediaKind = media ? mediaSourceKind(media.src) : 'other';
   const mediaType = media && mediaKind === 'video' ? mediaEncodingFormat(media.src) : undefined;
   const resolvedAspectRatio = mediaAspectRatio?.trim() || '16 / 10';
@@ -42,7 +48,7 @@ export default function PageHeader({
 
   return (
     <section className={`${styles.section} ${media ? styles.sectionWithMedia : ''}`}>
-      {backgroundMedia ? (
+      {resolvedBackground ? (
         <div className={styles.backgroundMediaWrap} aria-hidden="true">
           {backgroundKind === 'video' && backgroundType ? (
             <video
@@ -52,18 +58,18 @@ export default function PageHeader({
               loop
               playsInline
               preload="metadata"
-              poster={backgroundMedia.poster}
+              poster={resolvedBackground.poster}
               tabIndex={-1}
             >
-              <source src={backgroundMedia.src} type={backgroundType} />
+              <source src={resolvedBackground.src} type={backgroundType} />
             </video>
           ) : backgroundKind === 'image' ? (
             <Image
               loader={passthroughLoader}
               unoptimized
               className={styles.backgroundMedia}
-              src={backgroundMedia.src}
-              alt={backgroundMedia.title}
+              src={resolvedBackground.src}
+              alt={resolvedBackground.title}
               fill
               sizes="100vw"
             />

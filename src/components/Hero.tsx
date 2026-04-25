@@ -4,7 +4,7 @@ import styles from './Hero.module.css';
 import richTextStyles from '@/components/CmsRichText.module.css';
 import { Rocket } from 'lucide-react';
 import { CTA_LINKS } from '@/site';
-import { MEDIA_CLIPS, mediaEncodingFormat, mediaSourceKind } from '@/lib/site-media';
+import { MEDIA_CLIPS, mediaEncodingFormat, mediaSourceKind, resolveHeroBackdropClip } from '@/lib/site-media';
 import type { MediaClipMeta } from '@/lib/site-media';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
@@ -39,7 +39,7 @@ type HeroContent = {
 };
 
 export function HeroSection({ content }: { content?: HeroContent }) {
-  const backgroundClip = (content?.backgroundMedia ?? heroClip) as MediaClipMeta;
+  const backgroundClip = resolveHeroBackdropClip(content?.backgroundMedia);
   const backgroundKind = mediaSourceKind(backgroundClip.src);
   const isBackgroundVideo = backgroundKind === 'video';
   const isBackgroundImage = backgroundKind === 'image';

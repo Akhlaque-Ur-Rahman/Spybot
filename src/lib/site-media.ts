@@ -30,6 +30,31 @@ export function mediaSourceKind(src: string): 'video' | 'image' | 'other' {
   return 'other';
 }
 
+const heroBackdropMeta = {
+  src: '/media/trading-hero.jpg',
+  poster: undefined,
+  title: 'SpyBot marketing backdrop',
+  description: 'Still imagery used behind hero sections instead of motion backgrounds.',
+} satisfies MediaClipMeta;
+
+/** Still image behind hero copy (no looping video). */
+export const MEDIA_HERO_BACKDROP: MediaClipMeta = heroBackdropMeta;
+
+/** Home / CMS hero: use clip if it is already an image; otherwise static backdrop. */
+export function resolveHeroBackdropClip(clip: MediaClipMeta | undefined): MediaClipMeta {
+  if (!clip || mediaSourceKind(clip.src) === 'video') {
+    return MEDIA_HERO_BACKDROP;
+  }
+  return clip;
+}
+
+/** PageHeader / fintech hero: only coerce video backgrounds to still; omit layer if unset. */
+export function resolveOptionalHeroBackground(clip: MediaClipMeta | undefined): MediaClipMeta | undefined {
+  if (!clip) return undefined;
+  if (mediaSourceKind(clip.src) === 'video') return MEDIA_HERO_BACKDROP;
+  return clip;
+}
+
 export function siteOrigin(): string {
   return (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://spybot.ai').replace(/\/$/, '');
 }
@@ -115,4 +140,5 @@ export const MEDIA_CLIPS = {
     description:
       'Live and agent-assisted video verification aligned with RBI V-CIP-style compliance requirements.',
   },
+  heroBackdrop: heroBackdropMeta,
 } as const satisfies Record<string, MediaClipMeta>;

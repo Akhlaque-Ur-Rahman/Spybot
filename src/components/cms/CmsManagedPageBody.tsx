@@ -65,7 +65,10 @@ function renderBlock(block: ManagedCmsPage['sections'][number]['blocks'][number]
           description={p.description}
           primaryCta={p.primaryCta}
           secondaryCta={p.secondaryCta}
+          backgroundMedia={p.backgroundMedia}
           media={p.media}
+          mediaAspectRatio={p.mediaAspectRatio}
+          mediaObjectFit={p.mediaObjectFit}
         />
       );
     }
