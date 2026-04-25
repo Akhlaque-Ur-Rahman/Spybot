@@ -6,6 +6,7 @@ import { renderCmsRichText } from '@/lib/cms/rich-text';
 import {
   mediaEncodingFormat,
   mediaSourceKind,
+  optionalMediaClip,
   resolveOptionalHeroBackground,
   type MediaClipMeta,
 } from '@/lib/site-media';
@@ -38,17 +39,19 @@ export default function PageHeader({
   mediaAspectRatio,
   mediaObjectFit,
 }: PageHeaderProps) {
-  const resolvedBackground = resolveOptionalHeroBackground(backgroundMedia);
+  const bgClip = optionalMediaClip(backgroundMedia);
+  const fgClip = optionalMediaClip(media);
+  const resolvedBackground = resolveOptionalHeroBackground(bgClip);
   const backgroundKind = resolvedBackground ? mediaSourceKind(resolvedBackground.src) : 'other';
   const backgroundType =
     resolvedBackground && backgroundKind === 'video' ? mediaEncodingFormat(resolvedBackground.src) : undefined;
-  const mediaKind = media ? mediaSourceKind(media.src) : 'other';
-  const mediaType = media && mediaKind === 'video' ? mediaEncodingFormat(media.src) : undefined;
+  const mediaKind = fgClip ? mediaSourceKind(fgClip.src) : 'other';
+  const mediaType = fgClip && mediaKind === 'video' ? mediaEncodingFormat(fgClip.src) : undefined;
   const resolvedAspectRatio = mediaAspectRatio?.trim() || '16 / 10';
   const resolvedObjectFit = mediaObjectFit ?? 'cover';
 
   return (
-    <section className={`${styles.section} ${media ? styles.sectionWithMedia : ''}`}>
+    <section className={`${styles.section} ${fgClip ? styles.sectionWithMedia : ''}`}>
       {resolvedBackground ? (
         <div className={styles.backgroundMediaWrap} aria-hidden="true">
           {backgroundKind === 'video' && backgroundType ? (
@@ -79,8 +82,8 @@ export default function PageHeader({
       ) : null}
       <div className={`glow-orb glow-orb-blue ${styles.glow}`} style={{ width: 600, height: 600 }} aria-hidden="true" />
       <div className="container">
-        <div className={media ? styles.split : styles.content}>
-          <div className={media ? styles.copy : undefined}>
+        <div className={fgClip ? styles.split : styles.content}>
+          <div className={fgClip ? styles.copy : undefined}>
             <span className="badge badge-primary badge-dot" style={{ marginBottom: 24 }}>
               {label}
             </span>
@@ -120,14 +123,14 @@ export default function PageHeader({
             </div>
           </div>
 
-          {media && (
+          {fgClip && (
             <figure className={styles.mediaFigure}>
               {mediaKind === 'video' && mediaType ? (
                 <ViewportVideo
                   className={styles.mediaVideo}
-                  poster={media.poster}
-                  ariaLabel={media.title}
-                  src={media.src}
+                  poster={fgClip.poster}
+                  ariaLabel={fgClip.title}
+                  src={fgClip.src}
                   type={mediaType}
                   style={{ aspectRatio: resolvedAspectRatio, objectFit: resolvedObjectFit }}
                 />
@@ -135,17 +138,17 @@ export default function PageHeader({
                 <Image
                   unoptimized
                   className={styles.mediaVideo}
-                  src={media.src}
-                  alt={media.title}
+                  src={fgClip.src}
+                  alt={fgClip.title}
                   width={1280}
                   height={800}
                   style={{ aspectRatio: resolvedAspectRatio, objectFit: resolvedObjectFit }}
                 />
               ) : null}
               <figcaption className={styles.mediaCaption}>
-                <strong>{media.title}</strong>
+                <strong>{fgClip.title}</strong>
                 <span className={styles.mediaCaptionSep}> — </span>
-                {media.description}
+                {fgClip.description}
               </figcaption>
             </figure>
           )}

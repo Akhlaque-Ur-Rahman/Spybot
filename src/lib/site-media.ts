@@ -20,6 +20,21 @@ export type MediaClipMeta = {
   description: string;
 };
 
+/** CMS "No media" / empty `src` must not render (avoids truthy `{ src: '' }` objects). */
+export function optionalMediaClip(clip: MediaClipMeta | undefined | null): MediaClipMeta | undefined {
+  if (!clip) return undefined;
+  const src = typeof clip.src === 'string' ? clip.src.trim() : '';
+  if (!src) return undefined;
+  const poster = typeof clip.poster === 'string' && clip.poster.trim() ? clip.poster.trim() : undefined;
+  return {
+    ...clip,
+    src,
+    poster,
+    title: typeof clip.title === 'string' ? clip.title : '',
+    description: typeof clip.description === 'string' ? clip.description : '',
+  };
+}
+
 export function mediaEncodingFormat(src: string): 'video/mp4' | 'video/webm' {
   return /\.(mp4|m4v)(\?.*)?$/i.test(src) ? 'video/mp4' : 'video/webm';
 }
