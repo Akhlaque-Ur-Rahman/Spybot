@@ -10,7 +10,13 @@ import { logAdminClientError } from '@/lib/admin/user-facing-errors';
 
 const roles = ['OWNER', 'EDITOR', 'REVIEWER'] as const satisfies readonly UserRole[];
 
-export default function AddUserForm() {
+export default function AddUserForm({
+  className,
+  title = 'Invite user',
+}: {
+  className?: string;
+  title?: string;
+}) {
   const router = useRouter();
   const { fetchJson } = useAdminApi();
   const { push } = useToast();
@@ -52,8 +58,8 @@ export default function AddUserForm() {
   }
 
   return (
-    <div className={pageStyles.card} style={{ marginBottom: 'var(--space-6)', maxWidth: 520 }}>
-      <h4 className={pageStyles.cardTitle}>New user</h4>
+    <div className={`${pageStyles.card} ${className ?? ''}`}>
+      <h4 className={pageStyles.cardTitle}>{title}</h4>
       <label className={pageStyles.contentToolbarField}>
         Email
         <input
@@ -79,7 +85,7 @@ export default function AddUserForm() {
         Name
         <input className={pageStyles.input} value={name} onChange={(e) => setName(e.target.value)} autoComplete="off" />
       </label>
-      <label className={pageStyles.contentToolbarField} style={{ marginBottom: 'var(--space-4)' }}>
+      <label className={pageStyles.contentToolbarField}>
         Role
         <select className={pageStyles.select} value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
           {roles.map((r) => (
@@ -90,7 +96,7 @@ export default function AddUserForm() {
         </select>
       </label>
       <button type="button" className={pageStyles.btn} disabled={loading} onClick={submit}>
-        {loading ? 'Creating…' : 'Create'}
+        {loading ? 'Inviting…' : 'Invite user'}
       </button>
     </div>
   );

@@ -792,8 +792,14 @@ export function buildMarketingDetailRegistryPages(deps: {
             'Verify Aadhaar, PAN, and bank-linked details in one flow so every trader is authenticated with precision while preserving conversion speed.',
           primaryCta: { label: 'Get API Key', href: CTA_LINKS.sandbox },
           secondaryCta: { label: 'Contact Sales', href: ROUTES.contact },
-          imageSrc: '/media/trading-banner-img.png',
-          imageAlt: 'Trading verification visual',
+          backgroundMedia: MEDIA_CLIPS.homeHero,
+          media: {
+            src: '/media/trading-banner-img.png',
+            title: 'Trading verification visual',
+            description: 'Fintech hero media',
+          },
+          mediaAspectRatio: '16 / 10',
+          mediaObjectFit: 'contain',
         })
       ),
       section(

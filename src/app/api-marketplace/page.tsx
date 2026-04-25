@@ -39,7 +39,10 @@ export default async function ApiMarketplacePage() {
         description={pageHeader?.description ?? 'Replace fragmented KYC, KYB, payout, and fraud tools with a marketplace designed to help product, risk, and compliance teams solve approval bottlenecks faster.'}
         primaryCta={pageHeader?.primaryCta ?? { label: 'Request sandbox access', href: '#sandbox-access' }}
         secondaryCta={pageHeader?.secondaryCta ?? { label: 'Talk to an architect', href: CTA_LINKS.contact }}
+        backgroundMedia={pageHeader?.backgroundMedia}
         media={pageHeader?.media ?? MEDIA_CLIPS.apiMarketplace}
+        mediaAspectRatio={pageHeader?.mediaAspectRatio}
+        mediaObjectFit={pageHeader?.mediaObjectFit}
       />
 
       <CoverageCarousel label={coverage?.label ?? 'Marketplace coverage'} items={coverage?.items} cardDesign={coverage?.cardDesign} />

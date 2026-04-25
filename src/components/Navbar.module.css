@@ -128,8 +128,8 @@ button.navLink {
 .dropdown {
   position: relative;
   width: clamp(360px, 48vw, 620px);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 94%, var(--color-bg) 6%);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
   padding: 12px;
   box-shadow: var(--shadow-lg);
@@ -161,6 +161,14 @@ button.navLink {
   margin-bottom: 10px;
   background: color-mix(in srgb, var(--color-surface-raised) 84%, transparent);
   border-color: var(--color-border-subtle);
+}
+
+[data-theme='dark'] .navLink:hover {
+  background: color-mix(in srgb, var(--color-surface-raised) 86%, var(--color-bg) 14%);
+}
+[data-theme='dark'] .dropdownItem:hover {
+  background: color-mix(in srgb, var(--color-surface-raised) 88%, var(--color-bg) 12%);
+  border-color: color-mix(in srgb, var(--color-border) 84%, var(--color-primary-300) 16%);
 }
 .dropdownIcon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
 .dropdownLabel { font-size: 0.875rem; font-weight: 600; }

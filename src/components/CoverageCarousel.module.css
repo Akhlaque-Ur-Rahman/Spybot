@@ -3,10 +3,10 @@
   border-block: 1px solid var(--color-border-subtle);
   background: linear-gradient(
     180deg,
-    rgba(11, 114, 204, 0.05) 0%,
+    rgba(var(--color-primary-rgb), 0.05) 0%,
     var(--color-bg) 28%,
     var(--color-bg) 72%,
-    rgba(16, 189, 178, 0.04) 100%
+    rgba(var(--color-tertiary-rgb), 0.04) 100%
   );
 }
 
@@ -100,11 +100,11 @@
   margin-top: auto;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-primary-400);
+  color: var(--color-primary-500);
   align-self: flex-start;
   transition: color 0.2s;
 }
 
 .cardLinkStandalone:hover {
-  color: var(--color-primary-300);
+  color: var(--color-primary-400);
 }

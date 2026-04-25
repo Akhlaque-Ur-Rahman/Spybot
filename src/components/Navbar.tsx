@@ -800,9 +800,9 @@ export default function Navbar({
 
           {/* CTA buttons */}
           <div className={styles.navCtas}>
-            <ThemeToggle />
             <Link href={CTA_LINKS.sandbox} className="btn btn-secondary btn-sm" aria-label="Get sandbox access">Get Sandbox Access</Link>
             <Link href={primaryCtaHref} className="btn btn-primary btn-sm" aria-label={primaryCtaText}>{primaryCtaText}</Link>
+            <ThemeToggle />
           </div>
 
           {/* Hamburger */}

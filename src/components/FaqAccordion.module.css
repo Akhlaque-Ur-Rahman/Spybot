@@ -52,7 +52,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 48%);
+  background: linear-gradient(135deg, rgba(var(--color-secondary-rgb), 0.08), transparent 48%);
   border-radius: inherit;
 }
 
@@ -64,7 +64,7 @@
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at 30% 30%, var(--color-primary-300), var(--color-primary-600));
-  color: #fff;
+  color: var(--color-text-primary);
   font-family: var(--font-display);
   font-size: 3rem;
   line-height: 1;
@@ -86,7 +86,7 @@
   font-size: var(--heading-h3-fluid);
   letter-spacing: 0;
   margin-bottom: var(--space-5);
-  color: #1f2b4e;
+  color: var(--color-text-primary);
 }
 .list {
   list-style: none;
@@ -190,12 +190,12 @@
 }
 
 .answerRich :global(a) {
-  color: var(--color-primary-300);
+  color: var(--color-primary-500);
   text-decoration: underline;
 }
 
 [data-theme='dark'] .groupTitle {
-  color: #edf2ff;
+  color: var(--color-text-primary);
 }
 
 [data-theme='dark'] .item {
@@ -206,20 +206,20 @@
 }
 
 [data-theme='dark'] .question {
-  color: #e5ecff;
+  color: var(--color-text-primary);
 }
 
 [data-theme='dark'] .question:hover {
-  background: #1a2440;
+  background: color-mix(in srgb, var(--color-surface-raised) 74%, var(--color-primary-900) 26%);
 }
 
 [data-theme='dark'] .icon,
 [data-theme='dark'] .iconOpen {
-  color: #9aacd6;
+  color: var(--color-text-muted);
 }
 
 [data-theme='dark'] .answerOpen {
-  color: #b9c4e2;
+  color: var(--color-text-secondary);
   border-top-color: color-mix(in srgb, var(--color-border-subtle) 70%, var(--color-primary-500) 30%);
 }
 

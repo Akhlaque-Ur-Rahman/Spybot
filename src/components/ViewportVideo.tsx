@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type CSSProperties } from 'react';
 
 type ViewportVideoProps = {
   className: string;
@@ -8,6 +8,7 @@ type ViewportVideoProps = {
   type: 'video/mp4' | 'video/webm';
   poster?: string;
   ariaLabel: string;
+  style?: CSSProperties;
 };
 
 export default function ViewportVideo({
@@ -16,6 +17,7 @@ export default function ViewportVideo({
   type,
   poster,
   ariaLabel,
+  style,
 }: ViewportVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -69,6 +71,7 @@ export default function ViewportVideo({
       preload="metadata"
       poster={poster}
       aria-label={ariaLabel}
+      style={style}
       disablePictureInPicture
       tabIndex={-1}
     >

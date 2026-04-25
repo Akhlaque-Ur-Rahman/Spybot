@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { drawSciFiLoaderFrame, type SciFiLoaderVariant } from './sciFiLoaderDraw';
+import { drawSciFiLoaderFrame, type SciFiLoaderPalette, type SciFiLoaderVariant } from './sciFiLoaderDraw';
 
 type Props = {
   variant: SciFiLoaderVariant;
@@ -14,6 +14,12 @@ export default function SciFiLoaderCanvas({ variant, active, reducedMotion, clas
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tRef = useRef(0);
   const rafRef = useRef(0);
+  const paletteRef = useRef<SciFiLoaderPalette>({
+    primaryRgb: '11, 114, 204',
+    tertiaryRgb: '16, 189, 178',
+    secondaryRgb: '26, 48, 80',
+    mutedRgb: '100, 116, 139',
+  });
 
   useEffect(() => {
     if (!active || reducedMotion) return;
@@ -23,6 +29,17 @@ export default function SciFiLoaderCanvas({ variant, active, reducedMotion, clas
     if (!ctx) return;
 
     const dpr = Math.min(window.devicePixelRatio ?? 1, 2);
+    const readPalette = () => {
+      const css = getComputedStyle(document.documentElement);
+      paletteRef.current = {
+        primaryRgb: css.getPropertyValue('--color-primary-rgb').trim() || '11, 114, 204',
+        tertiaryRgb: css.getPropertyValue('--color-tertiary-rgb').trim() || '16, 189, 178',
+        secondaryRgb: css.getPropertyValue('--color-secondary-rgb').trim() || '26, 48, 80',
+        mutedRgb: '100, 116, 139',
+      };
+    };
+    readPalette();
+
     let w = 0;
     let h = 0;
 
@@ -39,7 +56,7 @@ export default function SciFiLoaderCanvas({ variant, active, reducedMotion, clas
 
     const tick = () => {
       tRef.current += variant === 'boot' ? 0.014 : 0.02;
-      drawSciFiLoaderFrame(ctx, w, h, tRef.current, dpr, variant);
+      drawSciFiLoaderFrame(ctx, w, h, tRef.current, dpr, variant, paletteRef.current);
       rafRef.current = requestAnimationFrame(tick);
     };
     tick();

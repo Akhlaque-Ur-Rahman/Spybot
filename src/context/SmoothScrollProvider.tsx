@@ -8,6 +8,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+declare global {
+  interface Window {
+    __spybotLenis?: Lenis;
+  }
+}
+
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
@@ -17,6 +23,7 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       smoothWheel: true,
       wheelMultiplier: 0.9,
     });
+    window.__spybotLenis = lenis;
 
     lenis.on('scroll', ScrollTrigger.update);
 
@@ -30,6 +37,9 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
+      if (window.__spybotLenis === lenis) {
+        delete window.__spybotLenis;
+      }
     };
   }, []);
 

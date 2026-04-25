@@ -24,6 +24,6 @@
 }
 
 .prose :global(a) {
-  color: var(--color-primary-300);
+  color: var(--color-primary-500);
   text-decoration: underline;
 }

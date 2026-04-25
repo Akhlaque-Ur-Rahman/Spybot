@@ -40,7 +40,10 @@ export default async function SolutionsPage() {
         description={pageHeader?.description ?? 'These pages are an index into deeper solution briefs. Choose the module that matches your bottleneck, identity, business, financial, or assisted verification, then orchestrate the sequence in Superflow.'}
         primaryCta={pageHeader?.primaryCta ?? { label: 'Explore the API marketplace', href: CTA_LINKS.solutionsCatalog }}
         secondaryCta={pageHeader?.secondaryCta ?? { label: 'Talk to solutions', href: CTA_LINKS.contact }}
+        backgroundMedia={pageHeader?.backgroundMedia}
         media={pageHeader?.media ?? MEDIA_CLIPS.solutionsHub}
+        mediaAspectRatio={pageHeader?.mediaAspectRatio}
+        mediaObjectFit={pageHeader?.mediaObjectFit}
       />
 
       <DirectoryGrid

@@ -8,6 +8,15 @@ const SCROLL_THRESHOLD = 320;
 export default function GoToTopButton() {
   const [visible, setVisible] = useState(false);
 
+  const handleGoToTop = () => {
+    const lenis = window.__spybotLenis;
+    if (lenis) {
+      lenis.scrollTo(0, { immediate: false });
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setVisible(window.scrollY > SCROLL_THRESHOLD);
@@ -24,7 +33,7 @@ export default function GoToTopButton() {
     <button
       type="button"
       className={styles.fab}
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      onClick={handleGoToTop}
       aria-label="Go to top"
     >
       <svg viewBox="0 0 24 24" className={styles.icon} aria-hidden="true" focusable="false">

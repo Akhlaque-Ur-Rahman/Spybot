@@ -68,14 +68,14 @@
   width: fit-content;
 }
 .branchLabel[data-type="yes"] {
-  background: rgba(34, 197, 94, 0.15);
-  color: #22C55E;
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: rgba(var(--color-success-rgb), 0.15);
+  color: var(--color-success);
+  border: 1px solid rgba(var(--color-success-rgb), 0.3);
 }
 .branchLabel[data-type="no"] {
-  background: rgba(239, 68, 68, 0.15);
-  color: #EF4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(var(--color-danger-rgb), 0.15);
+  color: var(--color-danger);
+  border: 1px solid rgba(var(--color-danger-rgb), 0.3);
 }
 .branchAction {
   padding: 8px 12px;
@@ -84,8 +84,8 @@
   color: var(--color-text-secondary);
   border: 1px dashed var(--color-border-subtle);
 }
-.branchAction[data-type="yes"] { border-color: rgba(34,197,94,0.2); }
-.branchAction[data-type="no"] { border-color: rgba(239,68,68,0.2); }
+.branchAction[data-type="yes"] { border-color: rgba(var(--color-success-rgb), 0.2); }
+.branchAction[data-type="no"] { border-color: rgba(var(--color-danger-rgb), 0.2); }
 
 .nodeConnector {
   width: 2px;

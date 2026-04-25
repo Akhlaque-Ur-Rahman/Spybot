@@ -27,6 +27,10 @@ export function defaultDraftForBlockType(type: CmsBlockType): unknown {
         gradientText: 'headline',
         description: 'Description',
         primaryCta: { label: 'Primary', href: '/' },
+        backgroundMedia: clone(homeHeroBlock.backgroundMedia),
+        media: clone(homeHeroBlock.media),
+        mediaAspectRatio: '16 / 10',
+        mediaObjectFit: 'cover',
       };
     case 'coverageCarousel':
       return { label: 'Coverage', items: [...defaultCoverageItems] };
@@ -46,8 +50,14 @@ export function defaultDraftForBlockType(type: CmsBlockType): unknown {
         secondaryDescription: 'Verify users with confidence.',
         primaryCta: { label: 'Get API Key', href: '/' },
         secondaryCta: { label: 'Contact Sales', href: '/contact' },
-        imageSrc: '/media/trading-banner-img.png',
-        imageAlt: 'Trading verification visual',
+        backgroundMedia: clone(homeHeroBlock.backgroundMedia),
+        media: {
+          src: '/media/trading-banner-img.png',
+          title: 'Trading verification visual',
+          description: 'Fintech hero media',
+        },
+        mediaAspectRatio: '16 / 10',
+        mediaObjectFit: 'contain',
       };
     case 'fintechWhy':
       return { title: 'Why SpyBot?', items: [] };

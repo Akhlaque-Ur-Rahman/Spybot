@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { mediaEncodingFormat, mediaSourceKind, type MediaClipMeta, MEDIA_CLIPS } from '@/lib/site-media';
 import {
   Clock3,
   PlugZap,
@@ -62,8 +63,10 @@ type FintechHeroData = {
   secondaryDescription?: string;
   primaryCta: { label: string; href: string };
   secondaryCta: { label: string; href: string };
-  imageSrc: string;
-  imageAlt: string;
+  backgroundMedia?: MediaClipMeta;
+  media?: MediaClipMeta;
+  mediaAspectRatio?: string;
+  mediaObjectFit?: 'cover' | 'contain';
 };
 
 type FintechWhyData = {
@@ -125,8 +128,14 @@ const fallbackHero: FintechHeroData = {
     'Verify Aadhaar, PAN, and bank-linked details in one flow so every trader is authenticated with precision while preserving conversion speed.',
   primaryCta: { label: 'Get API Key', href: CTA_LINKS.sandbox },
   secondaryCta: { label: 'Contact Sales', href: ROUTES.contact },
-  imageSrc: '/media/trading-banner-img.png',
-  imageAlt: 'Trading verification visual',
+  backgroundMedia: MEDIA_CLIPS.homeHero,
+  media: {
+    src: '/media/trading-banner-img.png',
+    title: 'Trading verification visual',
+    description: 'Fintech hero media',
+  },
+  mediaAspectRatio: '16 / 10',
+  mediaObjectFit: 'contain',
 };
 
 const spotlightCards = [
@@ -288,6 +297,15 @@ export default function FintechLandingPage({
   const ctaBanner = ctaBannerData ?? fallbackCtaBanner;
   const apiKey = apiKeyData ?? fallbackApiKey;
   const rootRef = useRef<HTMLElement | null>(null);
+  const backgroundMedia = hero.backgroundMedia;
+  const backgroundKind = backgroundMedia ? mediaSourceKind(backgroundMedia.src) : 'other';
+  const backgroundVideoType =
+    backgroundMedia && backgroundKind === 'video' ? mediaEncodingFormat(backgroundMedia.src) : undefined;
+  const heroMedia = hero.media;
+  const heroMediaKind = heroMedia ? mediaSourceKind(heroMedia.src) : 'other';
+  const heroMediaType = heroMedia && heroMediaKind === 'video' ? mediaEncodingFormat(heroMedia.src) : undefined;
+  const heroMediaAspectRatio = hero.mediaAspectRatio?.trim() || '16 / 10';
+  const heroMediaObjectFit = hero.mediaObjectFit ?? 'contain';
 
   useEffect(() => {
     const root = rootRef.current;
@@ -344,6 +362,33 @@ export default function FintechLandingPage({
   return (
     <main ref={rootRef} className={styles.page}>
       <section className={styles.hero}>
+        {backgroundMedia ? (
+          <div className={styles.heroBackground} aria-hidden="true">
+            {backgroundKind === 'video' && backgroundVideoType ? (
+              <video
+                className={styles.heroBackgroundMedia}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                poster={backgroundMedia.poster}
+                tabIndex={-1}
+              >
+                <source src={backgroundMedia.src} type={backgroundVideoType} />
+              </video>
+            ) : backgroundKind === 'image' ? (
+              <Image
+                src={backgroundMedia.src}
+                alt={backgroundMedia.title}
+                fill
+                sizes="100vw"
+                className={styles.heroBackgroundMedia}
+              />
+            ) : null}
+            <div className={styles.heroBackgroundScrim} />
+          </div>
+        ) : null}
         <div className={`container ${styles.heroInner}`}>
           <div className={styles.heroCopy}>
             <p className={styles.heroLabel} data-anim-hero>{hero.label}</p>
@@ -365,14 +410,30 @@ export default function FintechLandingPage({
           </div>
           <div className={styles.heroVisual} data-anim-hero>
             <div className={styles.visualCanvas}>
-              <Image
-                src={hero.imageSrc}
-                alt={hero.imageAlt}
-                fill
-                sizes="(max-width: 960px) 90vw, 540px"
-                className={styles.heroGraphic}
-                priority
-              />
+              {heroMediaKind === 'video' && heroMediaType && heroMedia ? (
+                <video
+                  className={styles.heroGraphic}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  poster={heroMedia.poster}
+                  style={{ aspectRatio: heroMediaAspectRatio, objectFit: heroMediaObjectFit }}
+                >
+                  <source src={heroMedia.src} type={heroMediaType} />
+                </video>
+              ) : heroMediaKind === 'image' && heroMedia ? (
+                <Image
+                  src={heroMedia.src}
+                  alt={heroMedia.title}
+                  fill
+                  sizes="(max-width: 960px) 90vw, 540px"
+                  className={styles.heroGraphic}
+                  style={{ aspectRatio: heroMediaAspectRatio, objectFit: heroMediaObjectFit }}
+                  priority
+                />
+              ) : null}
             </div>
           </div>
         </div>

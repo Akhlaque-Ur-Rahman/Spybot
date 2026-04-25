@@ -33,7 +33,10 @@ export default async function SupportPage() {
         description={pageHeader?.description ?? 'Pick a pathway so your request reaches the right team. For self-serve answers, start with FAQs, then escalate with context when you need a specialist.'}
         primaryCta={pageHeader?.primaryCta ?? { label: 'Read the FAQ', href: CTA_LINKS.faq }}
         secondaryCta={pageHeader?.secondaryCta ?? { label: 'Contact the team', href: CTA_LINKS.contact }}
+        backgroundMedia={pageHeader?.backgroundMedia}
         media={pageHeader?.media ?? MEDIA_CLIPS.trustOps}
+        mediaAspectRatio={pageHeader?.mediaAspectRatio}
+        mediaObjectFit={pageHeader?.mediaObjectFit}
       />
 
       <SectionScrollReveal>

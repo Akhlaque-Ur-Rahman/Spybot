@@ -1,6 +1,12 @@
 /** Canvas frame for boot + route transitions (phyllotaxis + rose harmonics). */
 
 export type SciFiLoaderVariant = 'boot' | 'route';
+export type SciFiLoaderPalette = {
+  primaryRgb: string;
+  tertiaryRgb: string;
+  secondaryRgb: string;
+  mutedRgb: string;
+};
 
 export function drawSciFiLoaderFrame(
   ctx: CanvasRenderingContext2D,
@@ -9,6 +15,7 @@ export function drawSciFiLoaderFrame(
   t: number,
   dpr: number,
   variant: SciFiLoaderVariant,
+  palette: SciFiLoaderPalette,
 ) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, w, h);
@@ -20,8 +27,8 @@ export function drawSciFiLoaderFrame(
 
   if (variant === 'route') {
     const aura = ctx.createRadialGradient(cx, cy, 0, cx, cy, scale * 1.35);
-    aura.addColorStop(0, 'rgba(16, 189, 178, 0.14)');
-    aura.addColorStop(1, 'rgba(11, 114, 204, 0)');
+    aura.addColorStop(0, `rgba(${palette.tertiaryRgb}, 0.14)`);
+    aura.addColorStop(1, `rgba(${palette.primaryRgb}, 0)`);
     ctx.fillStyle = aura;
     ctx.beginPath();
     ctx.arc(cx, cy, scale * 1.35, 0, Math.PI * 2);
@@ -37,9 +44,9 @@ export function drawSciFiLoaderFrame(
       ctx.translate(cx, cy);
       ctx.rotate(a);
       const grad = ctx.createLinearGradient(-capsuleW * 0.5, 0, capsuleW * 0.5, 0);
-      grad.addColorStop(0, 'rgba(11, 114, 204, 0.16)');
-      grad.addColorStop(0.5, 'rgba(16, 189, 178, 0.86)');
-      grad.addColorStop(1, 'rgba(11, 114, 204, 0.16)');
+      grad.addColorStop(0, `rgba(${palette.primaryRgb}, 0.16)`);
+      grad.addColorStop(0.5, `rgba(${palette.tertiaryRgb}, 0.86)`);
+      grad.addColorStop(1, `rgba(${palette.primaryRgb}, 0.16)`);
       ctx.strokeStyle = grad;
       ctx.lineWidth = 1.25 * dpr;
       ctx.beginPath();
@@ -54,8 +61,8 @@ export function drawSciFiLoaderFrame(
       const px = cx + Math.cos(phase) * orbit;
       const py = cy + Math.sin(phase) * orbit;
       const dot = ctx.createRadialGradient(px, py, 0, px, py, 5 * dpr);
-      dot.addColorStop(0, 'rgba(16, 189, 178, 0.96)');
-      dot.addColorStop(1, 'rgba(16, 189, 178, 0)');
+      dot.addColorStop(0, `rgba(${palette.tertiaryRgb}, 0.96)`);
+      dot.addColorStop(1, `rgba(${palette.tertiaryRgb}, 0)`);
       ctx.fillStyle = dot;
       ctx.beginPath();
       ctx.arc(px, py, 4 * dpr, 0, Math.PI * 2);
@@ -65,12 +72,12 @@ export function drawSciFiLoaderFrame(
     const pulse = 0.62 + 0.38 * Math.sin(t * 2.1) ** 2;
     ctx.beginPath();
     ctx.arc(cx, cy, 3.2 * dpr * pulse, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(16, 189, 178, 0.92)';
+    ctx.fillStyle = `rgba(${palette.tertiaryRgb}, 0.92)`;
     ctx.fill();
     return;
   }
 
-  ctx.strokeStyle = 'rgba(71, 85, 105, 0.28)';
+  ctx.strokeStyle = `rgba(${palette.mutedRgb}, 0.28)`;
   ctx.lineWidth = 0.9 * dpr;
   const spokes = 14;
   for (let s = 0; s < spokes; s++) {
@@ -95,8 +102,8 @@ export function drawSciFiLoaderFrame(
     const y = cy + Math.sin(ang) * (r + ripple);
     const rad = (0.9 + 2.1 * (1 - fi)) * dpr;
     const g = ctx.createRadialGradient(x, y, 0, x, y, rad * 5);
-    g.addColorStop(0, `rgba(16, 189, 178, ${0.06 + 0.38 * (1 - fi)})`);
-    g.addColorStop(1, 'rgba(11, 114, 204, 0)');
+    g.addColorStop(0, `rgba(${palette.tertiaryRgb}, ${0.06 + 0.38 * (1 - fi)})`);
+    g.addColorStop(1, `rgba(${palette.primaryRgb}, 0)`);
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(x, y, rad, 0, Math.PI * 2);
@@ -117,9 +124,9 @@ export function drawSciFiLoaderFrame(
     else ctx.lineTo(px, py);
   }
   const lg = ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
-  lg.addColorStop(0, 'rgba(11, 114, 204, 0.2)');
-  lg.addColorStop(0.45, 'rgba(16, 189, 178, 0.95)');
-  lg.addColorStop(1, 'rgba(11, 114, 204, 0.35)');
+  lg.addColorStop(0, `rgba(${palette.primaryRgb}, 0.2)`);
+  lg.addColorStop(0.45, `rgba(${palette.tertiaryRgb}, 0.95)`);
+  lg.addColorStop(1, `rgba(${palette.primaryRgb}, 0.35)`);
   ctx.strokeStyle = lg;
   ctx.lineWidth = 2.1 * dpr;
   ctx.lineCap = 'round';
@@ -129,6 +136,6 @@ export function drawSciFiLoaderFrame(
   const pulse = 0.38 + 0.62 * Math.sin(t * 2.75) ** 2;
   ctx.beginPath();
   ctx.arc(cx, cy, 5 * dpr * pulse, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(16, 189, 178, 0.92)';
+  ctx.fillStyle = `rgba(${palette.tertiaryRgb}, 0.92)`;
   ctx.fill();
 }

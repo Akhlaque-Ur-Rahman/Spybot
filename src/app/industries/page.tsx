@@ -36,7 +36,10 @@ export default async function IndustriesPage() {
         description={pageHeader?.description ?? 'Start from the industry page that matches your operating reality, each brief focuses on the checks and routing patterns that tend to matter most.'}
         primaryCta={pageHeader?.primaryCta ?? { label: 'See marketplace use cases', href: CTA_LINKS.industryUseCases }}
         secondaryCta={pageHeader?.secondaryCta ?? { label: 'Talk to a specialist', href: CTA_LINKS.contact }}
+        backgroundMedia={pageHeader?.backgroundMedia}
         media={pageHeader?.media ?? MEDIA_CLIPS.industriesHub}
+        mediaAspectRatio={pageHeader?.mediaAspectRatio}
+        mediaObjectFit={pageHeader?.mediaObjectFit}
       />
 
       <DirectoryGrid

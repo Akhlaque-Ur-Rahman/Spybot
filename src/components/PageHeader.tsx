@@ -13,8 +13,11 @@ interface PageHeaderProps {
   description: CmsRichTextValue;
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
+  backgroundMedia?: MediaClipMeta;
   /** Optional media with visible caption on the page. */
   media?: MediaClipMeta;
+  mediaAspectRatio?: string;
+  mediaObjectFit?: 'cover' | 'contain';
 }
 
 export default function PageHeader({
@@ -24,13 +27,50 @@ export default function PageHeader({
   description,
   primaryCta,
   secondaryCta,
+  backgroundMedia,
   media,
+  mediaAspectRatio,
+  mediaObjectFit,
 }: PageHeaderProps) {
+  const backgroundKind = backgroundMedia ? mediaSourceKind(backgroundMedia.src) : 'other';
+  const backgroundType =
+    backgroundMedia && backgroundKind === 'video' ? mediaEncodingFormat(backgroundMedia.src) : undefined;
   const mediaKind = media ? mediaSourceKind(media.src) : 'other';
   const mediaType = media && mediaKind === 'video' ? mediaEncodingFormat(media.src) : undefined;
+  const resolvedAspectRatio = mediaAspectRatio?.trim() || '16 / 10';
+  const resolvedObjectFit = mediaObjectFit ?? 'cover';
 
   return (
     <section className={`${styles.section} ${media ? styles.sectionWithMedia : ''}`}>
+      {backgroundMedia ? (
+        <div className={styles.backgroundMediaWrap} aria-hidden="true">
+          {backgroundKind === 'video' && backgroundType ? (
+            <video
+              className={styles.backgroundMedia}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              poster={backgroundMedia.poster}
+              tabIndex={-1}
+            >
+              <source src={backgroundMedia.src} type={backgroundType} />
+            </video>
+          ) : backgroundKind === 'image' ? (
+            <Image
+              loader={passthroughLoader}
+              unoptimized
+              className={styles.backgroundMedia}
+              src={backgroundMedia.src}
+              alt={backgroundMedia.title}
+              fill
+              sizes="100vw"
+            />
+          ) : null}
+          <div className={styles.backgroundScrim} />
+        </div>
+      ) : null}
       <div className={`glow-orb glow-orb-blue ${styles.glow}`} style={{ width: 600, height: 600 }} aria-hidden="true" />
       <div className="container">
         <div className={media ? styles.split : styles.content}>
@@ -69,6 +109,7 @@ export default function PageHeader({
                   ariaLabel={media.title}
                   src={media.src}
                   type={mediaType}
+                  style={{ aspectRatio: resolvedAspectRatio, objectFit: resolvedObjectFit }}
                 />
               ) : mediaKind === 'image' ? (
                 <Image
@@ -79,6 +120,7 @@ export default function PageHeader({
                   alt={media.title}
                   width={1280}
                   height={800}
+                  style={{ aspectRatio: resolvedAspectRatio, objectFit: resolvedObjectFit }}
                 />
               ) : null}
               <figcaption className={styles.mediaCaption}>

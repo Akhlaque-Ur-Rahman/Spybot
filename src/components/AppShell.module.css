@@ -18,7 +18,7 @@
   height: 84px;
   pointer-events: none;
   opacity: 0.86;
-  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 6px 18px rgba(var(--color-secondary-rgb), 0.35));
 }
 
 .routeLoaderCanvas {

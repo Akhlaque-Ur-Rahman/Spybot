@@ -43,15 +43,11 @@ export type CmsHeroBlock = {
   primaryCta: CmsLink;
   secondaryCta: CmsLink;
   trustItems: string[];
-  dashboardTitle: string;
-  dashboardBadge: string;
-  threats: CmsHeroThreat[];
-  riskLabel: string;
-  riskScore: string;
-  riskSummary: CmsRichTextValue;
-  riskPercent: number;
+  backgroundMedia: MediaClipMeta;
   stats: CmsHeroStat[];
   media: MediaClipMeta;
+  mediaAspectRatio?: string;
+  mediaObjectFit?: 'cover' | 'contain';
 };
 
 export type CmsPageHeaderBlock = {
@@ -62,7 +58,10 @@ export type CmsPageHeaderBlock = {
   description: CmsRichTextValue;
   primaryCta?: CmsLink;
   secondaryCta?: CmsLink;
+  backgroundMedia?: MediaClipMeta;
   media?: MediaClipMeta;
+  mediaAspectRatio?: string;
+  mediaObjectFit?: 'cover' | 'contain';
 };
 
 export type CmsCoverageCarouselItem = {
@@ -234,8 +233,10 @@ export type CmsFintechHeroBlock = {
   secondaryDescription?: CmsRichTextValue;
   primaryCta: CmsLink;
   secondaryCta: CmsLink;
-  imageSrc: string;
-  imageAlt: string;
+  backgroundMedia?: MediaClipMeta;
+  media?: MediaClipMeta;
+  mediaAspectRatio?: string;
+  mediaObjectFit?: 'cover' | 'contain';
 };
 
 export type CmsFintechWhyBlock = {
@@ -694,25 +695,20 @@ export const homeHeroBlock: CmsHeroBlock = {
   primaryCta: { label: 'Get Sandbox Access', href: CTA_LINKS.sandbox },
   secondaryCta: { label: 'Explore Superflow', href: CTA_LINKS.superflowStudio },
   trustItems: ['SOC 2 Type II', 'ISO 27001', 'GDPR Ready', 'NIST CSF'],
-  dashboardTitle: 'SpyBot Identity Pipeline',
-  dashboardBadge: 'LIVE',
-  threats: [
-    { label: 'PAN Verification (APPROVED)', severity: 'LOW', time: '2s ago' },
-    { label: 'Bank Penny Drop (SUCCESS)', severity: 'LOW', time: '14s ago' },
-    { label: 'Video KYC (PENDING)', severity: 'MEDIUM', time: '1m ago' },
-    { label: 'Impersonation Alert', severity: 'CRITICAL', time: '3m ago' },
-  ],
-  riskLabel: 'Identity Trust Score',
-  riskScore: '92 / 100',
-  riskSummary: 'Highly Verified',
-  riskPercent: 92,
+  backgroundMedia: MEDIA_CLIPS.homeHero,
   stats: [
     { value: '99.99%', label: 'Uptime SLA' },
     { value: '100+', label: 'Identity APIs' },
     { value: '80%', label: 'Cost Reduction' },
     { value: '50M+', label: 'Verifications' },
   ],
-  media: MEDIA_CLIPS.homeHero,
+  media: {
+    src: '/media/vtials_pivc.webm',
+    title: 'SpyBot verification experience',
+    description: 'Homepage hero media preview for identity and onboarding workflows.',
+  },
+  mediaAspectRatio: '16 / 10',
+  mediaObjectFit: 'cover',
 };
 
 export function createSimplePage(args: {

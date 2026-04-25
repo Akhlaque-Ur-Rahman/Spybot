@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import './ui-color-contract.css';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { SmoothScrollProvider } from '@/context/SmoothScrollProvider';
 import AppShell from '@/components/AppShell';
@@ -15,8 +16,8 @@ import {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#060E18' },
-    { media: '(prefers-color-scheme: light)', color: '#F8FAFC' },
+    { media: '(prefers-color-scheme: dark)', color: '#0C121D' },
+    { media: '(prefers-color-scheme: light)', color: '#F6F8FC' },
   ],
   width: 'device-width',
   initialScale: 1,

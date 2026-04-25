@@ -9,10 +9,15 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "tokens:check": "node scripts/check-token-usage.mjs",
+    "lint:strict": "pnpm lint && pnpm tokens:check",
     "test": "node scripts/test.mjs",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "db:migrate:fintech-hero-media": "tsx scripts/migrate-fintech-hero-media.ts",
+    "db:migrate:fintech-hero-media:dry": "tsx scripts/migrate-fintech-hero-media.ts --dry-run",
+    "db:migrate:fintech-hero-media:dry:one": "tsx scripts/migrate-fintech-hero-media.ts --dry-run --block-key=fintechHero"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

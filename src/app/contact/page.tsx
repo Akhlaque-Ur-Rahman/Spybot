@@ -32,7 +32,10 @@ export default async function ContactPage() {
         description={pageHeader?.description ?? 'Share your funnel, risk model, and timelines. The fastest next step is often sandbox validation on the exact checks and thresholds you plan to ship.'}
         primaryCta={pageHeader?.primaryCta ?? { label: 'Jump to the form', href: '#demo' }}
         secondaryCta={pageHeader?.secondaryCta ?? { label: 'Explore APIs first', href: CTA_LINKS.solutionsCatalog }}
+        backgroundMedia={pageHeader?.backgroundMedia}
         media={pageHeader?.media}
+        mediaAspectRatio={pageHeader?.mediaAspectRatio}
+        mediaObjectFit={pageHeader?.mediaObjectFit}
       />
 
       <DemoSection content={demo ?? undefined} />

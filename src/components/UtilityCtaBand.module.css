@@ -11,21 +11,25 @@
   gap: var(--space-8);
   padding: var(--space-8);
   border-radius: var(--radius-xl);
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  background: linear-gradient(135deg, #3d4fdd, #2f42c4);
-  box-shadow: 0 18px 34px rgba(22, 32, 109, 0.22);
+  border: 1px solid color-mix(in srgb, var(--color-primary-300) 45%, var(--color-border) 55%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-secondary-700) 78%, var(--color-primary-500) 22%),
+    color-mix(in srgb, var(--color-secondary-800) 82%, var(--color-primary-600) 18%)
+  );
+  box-shadow: 0 18px 34px rgba(var(--color-primary-rgb), 0.22);
 }
 
 .title {
   font-size: var(--text-h3);
   font-weight: 700;
-  color: #ffffff;
+  color: var(--color-text-primary);
   margin-bottom: var(--space-2);
 }
 
 .desc {
   font-size: var(--text-body-sm);
-  color: rgba(240, 244, 255, 0.92);
+  color: color-mix(in srgb, var(--color-text-primary) 78%, var(--color-primary-100) 22%);
   max-width: 520px;
   line-height: 1.55;
   margin: 0;
@@ -46,7 +50,7 @@
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
-  color: #fff;
+  color: var(--color-text-primary);
   background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
   border: 1px solid transparent;
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -66,14 +70,14 @@
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: color-mix(in srgb, var(--color-text-primary) 86%, var(--color-primary-50) 14%);
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.38);
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .ghost:hover {
-  border-color: #fff;
+  border-color: rgba(var(--color-tertiary-rgb), 0.45);
   transform: translateY(-1px);
 }
 
@@ -84,7 +88,7 @@
     color-mix(in srgb, var(--color-primary-100) 68%, white),
     color-mix(in srgb, var(--color-primary-200) 54%, white)
   );
-  box-shadow: 0 16px 30px rgba(11, 114, 204, 0.14);
+  box-shadow: 0 16px 30px rgba(var(--color-primary-rgb), 0.14);
 }
 
 :global(html[data-theme='light']) .title {
@@ -97,12 +101,12 @@
 
 :global(html[data-theme='light']) .ghost {
   color: var(--color-secondary-700);
-  background: rgba(255, 255, 255, 0.72);
-  border-color: rgba(15, 23, 42, 0.2);
+  background: rgba(var(--color-secondary-rgb), 0.72);
+  border-color: rgba(var(--color-secondary-rgb), 0.2);
 }
 
 :global(html[data-theme='light']) .ghost:hover {
-  border-color: rgba(15, 23, 42, 0.36);
+  border-color: rgba(var(--color-secondary-rgb), 0.36);
 }
 
 @media (max-width: 640px) {

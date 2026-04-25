@@ -40,6 +40,10 @@
 }
 
 .link {
-  color: var(--color-primary-300);
+  color: var(--color-primary-500);
   align-self: center;
+}
+
+.link:hover {
+  color: var(--color-primary-400);
 }

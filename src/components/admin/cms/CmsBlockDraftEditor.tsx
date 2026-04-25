@@ -7,7 +7,6 @@ import {
   IconSelectField,
   LinkFields,
   MediaClipFields,
-  NumberField,
   RepeatItemShell,
   SelectField,
   TextAreaField,
@@ -30,12 +29,6 @@ type Props = {
 
 function str(v: unknown, fallback = ''): string {
   return typeof v === 'string' ? v : fallback;
-}
-
-function num(v: unknown, fallback = 0): number {
-  if (typeof v === 'number' && Number.isFinite(v)) return v;
-  if (typeof v === 'string' && v.trim() !== '' && Number.isFinite(Number(v))) return Number(v);
-  return fallback;
 }
 
 function link(v: unknown): LinkValue {
@@ -65,17 +58,20 @@ function iconName(v: unknown): CmsIconName {
   return (cmsIconNames as readonly string[]).includes(s) ? (s as CmsIconName) : 'globe';
 }
 
-const severities = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] as const;
 const challengeTones = ['danger', 'warning', 'info', 'accent', 'success'] as const;
 const benefitHighlights = ['primary', 'teal'] as const;
+const mediaObjectFitOptions = ['cover', 'contain'] as const;
 
 function EditorHero({ value, onChange }: Props) {
   const o = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
   const patch = (p: Record<string, unknown>) => onChange({ ...o, ...p });
 
-  const threats = Array.isArray(o.threats) ? o.threats : [];
   const stats = Array.isArray(o.stats) ? o.stats : [];
   const trustItems = Array.isArray(o.trustItems) ? o.trustItems.map((x) => str(x)) : [];
+  const mediaObjectFit =
+    mediaObjectFitOptions.includes(o.mediaObjectFit as (typeof mediaObjectFitOptions)[number])
+      ? (o.mediaObjectFit as (typeof mediaObjectFitOptions)[number])
+      : 'cover';
 
   return (
     <div style={{ display: 'grid', gap: 16 }}>
@@ -85,62 +81,29 @@ function EditorHero({ value, onChange }: Props) {
       <RichTextField label="Subheadline" value={o.subheadline} onChange={(subheadline) => patch({ subheadline })} />
       <LinkFields label="Primary CTA" value={link(o.primaryCta)} onChange={(primaryCta) => patch({ primaryCta })} />
       <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
-      <TextField label="Dashboard title" value={str(o.dashboardTitle)} onChange={(dashboardTitle) => patch({ dashboardTitle })} />
-      <TextField label="Dashboard badge" value={str(o.dashboardBadge)} onChange={(dashboardBadge) => patch({ dashboardBadge })} />
-      <TextField label="Risk label" value={str(o.riskLabel)} onChange={(riskLabel) => patch({ riskLabel })} />
-      <TextField label="Risk score" value={str(o.riskScore)} onChange={(riskScore) => patch({ riskScore })} />
-      <RichTextField label="Risk summary" value={o.riskSummary} compact onChange={(riskSummary) => patch({ riskSummary })} />
-      <NumberField label="Risk percent" value={num(o.riskPercent)} onChange={(riskPercent) => patch({ riskPercent })} min={0} max={100} />
-      <MediaClipFields label="Hero media" value={mediaMeta(o.media)} onChange={(media) => patch({ media })} />
+      <MediaClipFields
+        label="Background media (hero backdrop)"
+        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.homeHero)}
+        onChange={(backgroundMedia) => patch({ backgroundMedia })}
+      />
+      <MediaClipFields label="Right media" value={mediaMeta(o.media)} onChange={(media) => patch({ media })} />
+      <TextField
+        label="Right media aspect ratio (e.g. 16 / 10, 4 / 3)"
+        value={str(o.mediaAspectRatio, '16 / 10')}
+        onChange={(mediaAspectRatio) => patch({ mediaAspectRatio })}
+      />
+      <SelectField
+        label="Right media fit"
+        value={mediaObjectFit}
+        options={mediaObjectFitOptions.map((fit) => ({ value: fit, label: fit }))}
+        onChange={(fit) => patch({ mediaObjectFit: fit })}
+      />
       <TextAreaField
         label="Trust items (one per line)"
         value={trustItems.join('\n')}
         onChange={(text) => patch({ trustItems: text.split('\n').map((s) => s.trim()).filter(Boolean) })}
         rows={4}
       />
-      <div>
-        <div className={styles.repeatToolbar}>
-          <strong>Threats</strong>
-          <button
-            type="button"
-            className={styles.btnSmall}
-            onClick={() =>
-              patch({
-                threats: [...threats, { label: 'New', severity: 'MEDIUM', time: '—' }],
-              })
-            }
-          >
-            Add threat
-          </button>
-        </div>
-        {threats.map((t, i) => {
-          const row = t && typeof t === 'object' && !Array.isArray(t) ? (t as Record<string, unknown>) : {};
-          return (
-            <RepeatItemShell key={i} title="Threat" index={i} onRemove={() => patch({ threats: threats.filter((_, j) => j !== i) })}>
-              <TextField label="Label" value={str(row.label)} onChange={(label) => {
-                const next = [...threats];
-                next[i] = { ...row, label };
-                patch({ threats: next });
-              }} />
-              <SelectField
-                label="Severity"
-                value={severities.includes(row.severity as (typeof severities)[number]) ? (row.severity as (typeof severities)[number]) : 'MEDIUM'}
-                options={severities.map((s) => ({ value: s, label: s }))}
-                onChange={(severity) => {
-                  const next = [...threats];
-                  next[i] = { ...row, severity };
-                  patch({ threats: next });
-                }}
-              />
-              <TextField label="Time" value={str(row.time)} onChange={(time) => {
-                const next = [...threats];
-                next[i] = { ...row, time };
-                patch({ threats: next });
-              }} />
-            </RepeatItemShell>
-          );
-        })}
-      </div>
       <div>
         <div className={styles.repeatToolbar}>
           <strong>Stats</strong>
@@ -179,6 +142,10 @@ function EditorHero({ value, onChange }: Props) {
 function EditorPageHeader({ value, onChange }: Props) {
   const o = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
   const patch = (p: Record<string, unknown>) => onChange({ ...o, ...p });
+  const mediaObjectFit =
+    mediaObjectFitOptions.includes(o.mediaObjectFit as (typeof mediaObjectFitOptions)[number])
+      ? (o.mediaObjectFit as (typeof mediaObjectFitOptions)[number])
+      : 'cover';
   return (
     <div style={{ display: 'grid', gap: 16 }}>
       <TextField label="Eyebrow / label" value={str(o.label)} onChange={(label) => patch({ label })} />
@@ -191,7 +158,67 @@ function EditorPageHeader({ value, onChange }: Props) {
       />
       <LinkFields label="Primary CTA" value={link(o.primaryCta)} onChange={(primaryCta) => patch({ primaryCta })} />
       <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
-      <MediaClipFields label="Media (optional)" value={mediaMeta(o.media ?? MEDIA_CLIPS.homeHero)} onChange={(media) => patch({ media })} />
+      <MediaClipFields
+        label="Background media (optional)"
+        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.homeHero)}
+        onChange={(backgroundMedia) => patch({ backgroundMedia })}
+      />
+      <MediaClipFields label="Right media (optional)" value={mediaMeta(o.media ?? MEDIA_CLIPS.homeHero)} onChange={(media) => patch({ media })} />
+      <TextField
+        label="Right media aspect ratio (e.g. 16 / 10, 4 / 3)"
+        value={str(o.mediaAspectRatio, '16 / 10')}
+        onChange={(mediaAspectRatio) => patch({ mediaAspectRatio })}
+      />
+      <SelectField
+        label="Right media fit"
+        value={mediaObjectFit}
+        options={mediaObjectFitOptions.map((fit) => ({ value: fit, label: fit }))}
+        onChange={(fit) => patch({ mediaObjectFit: fit })}
+      />
+    </div>
+  );
+}
+
+function EditorFintechHero({ value, onChange }: Props) {
+  const o = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+  const patch = (p: Record<string, unknown>) => onChange({ ...o, ...p });
+  const mediaObjectFit =
+    mediaObjectFitOptions.includes(o.mediaObjectFit as (typeof mediaObjectFitOptions)[number])
+      ? (o.mediaObjectFit as (typeof mediaObjectFitOptions)[number])
+      : 'contain';
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <TextField label="Label" value={str(o.label)} onChange={(label) => patch({ label })} />
+      <TextField label="Title" value={str(o.title)} onChange={(title) => patch({ title })} />
+      <RichTextField label="Description" value={o.description} onChange={(description) => patch({ description })} />
+      <RichTextField
+        label="Secondary description (optional)"
+        value={o.secondaryDescription}
+        onChange={(secondaryDescription) => patch({ secondaryDescription })}
+      />
+      <LinkFields label="Primary CTA" value={link(o.primaryCta)} onChange={(primaryCta) => patch({ primaryCta })} />
+      <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
+      <MediaClipFields
+        label="Background media (hero backdrop)"
+        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.homeHero)}
+        onChange={(backgroundMedia) => patch({ backgroundMedia })}
+      />
+      <MediaClipFields
+        label="Right media"
+        value={mediaMeta(o.media ?? MEDIA_CLIPS.homeHero)}
+        onChange={(media) => patch({ media })}
+      />
+      <TextField
+        label="Right media aspect ratio (e.g. 16 / 10, 4 / 3)"
+        value={str(o.mediaAspectRatio, '16 / 10')}
+        onChange={(mediaAspectRatio) => patch({ mediaAspectRatio })}
+      />
+      <SelectField
+        label="Right media fit"
+        value={mediaObjectFit}
+        options={mediaObjectFitOptions.map((fit) => ({ value: fit, label: fit }))}
+        onChange={(fit) => patch({ mediaObjectFit: fit })}
+      />
     </div>
   );
 }
@@ -1146,6 +1173,7 @@ function EditorDemoSection({ value, onChange }: Props) {
 const REGISTRY: Record<string, (p: Props) => ReactNode> = {
   hero: EditorHero,
   pageHeader: EditorPageHeader,
+  fintechHero: EditorFintechHero,
   coverageCarousel: EditorCoverageCarousel,
   directoryGrid: EditorDirectoryGrid,
   solutionShowcase: EditorSolutionShowcase,

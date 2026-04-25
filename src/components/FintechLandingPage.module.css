@@ -3,8 +3,37 @@
 }
 
 .hero {
-  padding: clamp(3rem, 7vw, 5rem) 0 clamp(3rem, 6vw, 4.5rem);
+  position: relative;
+  padding: clamp(1.5rem, 4vw, 2.75rem) 0 clamp(3rem, 6vw, 4.5rem);
   background: linear-gradient(180deg, var(--color-hero-bg-start) 0%, var(--color-bg) 100%);
+  overflow: hidden;
+}
+
+.heroBackground {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.heroBackgroundMedia {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.42;
+  transform: scale(1.02);
+}
+
+.heroBackgroundScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-hero-bg-start) 80%, transparent) 0%,
+    color-mix(in srgb, var(--color-bg) 72%, transparent) 55%,
+    color-mix(in srgb, var(--color-bg) 86%, transparent) 100%
+  );
 }
 
 .heroInner {
@@ -12,6 +41,8 @@
   grid-template-columns: 1.1fr 0.9fr;
   gap: clamp(1.5rem, 4vw, 3rem);
   align-items: center;
+  position: relative;
+  z-index: 2;
 }
 
 .heroLabel {
@@ -91,9 +122,9 @@
   border-radius: 999px;
   padding: 0.48rem 0.2rem;
   background:
-    linear-gradient(120deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01)),
+    linear-gradient(120deg, rgba(var(--color-secondary-rgb), 0.06), rgba(var(--color-secondary-rgb), 0.01)),
     var(--color-surface-overlay);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), var(--shadow-sm);
+  box-shadow: inset 0 1px 0 rgba(var(--color-secondary-rgb), 0.07), var(--shadow-sm);
   mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
 }
@@ -134,7 +165,7 @@
 .spotlightSection {
   padding: clamp(2rem, 4.2vw, 3.3rem) 0 clamp(2.4rem, 5.2vw, 3.8rem);
   background:
-    radial-gradient(1200px 440px at 10% -20%, rgba(var(--color-primary-rgb), 0.18), transparent 62%),
+    radial-gradient(1200px 440px at 10% -20%, rgba(var(--color-primary-rgb), 0.12), transparent 62%),
     linear-gradient(180deg, var(--color-secondary-700), var(--color-secondary-800));
 }
 
@@ -155,8 +186,8 @@
   border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--color-primary-300) 42%, var(--color-border));
   background:
-    radial-gradient(130% 90% at 0% 0%, rgba(var(--color-primary-rgb), 0.26), transparent 60%),
-    linear-gradient(165deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+    radial-gradient(130% 90% at 0% 0%, rgba(var(--color-primary-rgb), 0.18), transparent 60%),
+    linear-gradient(165deg, rgba(var(--color-secondary-rgb), 0.1), rgba(var(--color-secondary-rgb), 0.03));
   box-shadow: var(--shadow-md);
   min-height: 220px;
   display: flex;
@@ -176,7 +207,7 @@
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--color-primary-300) 58%, var(--color-border-subtle));
   background: rgba(var(--color-primary-rgb), 0.2);
-  color: #8fd3ff;
+  color: var(--color-primary-200);
   padding: 0.2rem 0.52rem;
   font-size: 0.65rem;
   font-weight: 700;
@@ -186,24 +217,28 @@
 
 .spotlightCard h4 {
   margin: 0.15rem 0 0;
-  color: #eaf3ff;
+  color: var(--color-secondary-50);
   font-size: 1.02rem;
   line-height: 1.3;
 }
 
 .spotlightCard p {
   margin: 0;
-  color: #b8c8e6;
+  color: var(--color-secondary-200);
   font-size: 0.83rem;
   line-height: 1.52;
   flex: 1;
 }
 
 .spotlightCta {
-  color: #3cbcff;
+  color: var(--color-primary-500);
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+}
+
+.spotlightCta:hover {
+  color: var(--color-primary-400);
 }
 
 .spotlightMiniVisual {
@@ -212,7 +247,7 @@
   height: 52px;
   border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--color-primary-300) 38%, var(--color-border));
-  background: linear-gradient(145deg, rgba(var(--color-primary-rgb), 0.14), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(145deg, rgba(var(--color-primary-rgb), 0.14), rgba(var(--color-secondary-rgb), 0.02));
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -230,7 +265,7 @@
   width: 22px;
   height: 4px;
   border-radius: 999px;
-  background: color-mix(in srgb, #2ea8ff 70%, #22d1bf 30%);
+  background: color-mix(in srgb, var(--color-primary-300) 70%, var(--color-tertiary-300) 30%);
   opacity: 0.82;
 }
 
@@ -247,8 +282,8 @@
 .ctaBannerSection {
   padding: clamp(2.1rem, 4.5vw, 3.2rem) 0;
   background:
-    radial-gradient(900px 300px at 10% -10%, rgba(var(--color-primary-rgb), 0.28), transparent 60%),
-    radial-gradient(700px 280px at 100% 120%, rgba(var(--color-tertiary-rgb), 0.2), transparent 60%),
+    radial-gradient(900px 300px at 10% -10%, rgba(var(--color-primary-rgb), 0.2), transparent 60%),
+    radial-gradient(700px 280px at 100% 120%, rgba(var(--color-tertiary-rgb), 0.12), transparent 60%),
     linear-gradient(135deg, var(--color-secondary-600), var(--color-secondary-700));
   border-block: 1px solid color-mix(in srgb, var(--color-border-subtle) 72%, var(--color-primary-300) 28%);
 }
@@ -269,7 +304,7 @@
 
 .ctaBannerCopy h2 {
   margin: 0 0 0.5rem;
-  color: #fff;
+  color: var(--color-secondary-50);
   font-family: var(--font-display);
   font-size: clamp(1.3rem, 3vw, var(--text-h2));
   line-height: 1.1;
@@ -393,8 +428,8 @@
   border: 1px solid color-mix(in srgb, var(--color-primary-300) 46%, var(--color-border-subtle));
   padding: 0.9rem;
   background:
-    radial-gradient(120% 100% at 10% -10%, rgba(var(--color-primary-rgb), 0.26), transparent 62%),
-    radial-gradient(90% 90% at 100% 120%, rgba(var(--color-tertiary-rgb), 0.14), transparent 60%),
+    radial-gradient(120% 100% at 10% -10%, rgba(var(--color-primary-rgb), 0.2), transparent 62%),
+    radial-gradient(90% 90% at 100% 120%, rgba(var(--color-tertiary-rgb), 0.1), transparent 60%),
     linear-gradient(165deg, var(--color-surface), color-mix(in srgb, var(--color-surface) 84%, var(--color-surface-raised) 16%));
   overflow: hidden;
   box-shadow: var(--shadow-md);
@@ -418,14 +453,14 @@
   border-radius: 16px;
   border: 1px solid color-mix(in srgb, var(--color-border-subtle) 76%, var(--color-primary-300) 24%);
   background:
-    linear-gradient(150deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03)),
+    linear-gradient(150deg, rgba(var(--color-secondary-rgb), 0.1), rgba(var(--color-secondary-rgb), 0.03)),
     color-mix(in srgb, var(--color-surface) 90%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 1rem;
   display: grid;
   gap: 0.62rem;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(var(--color-secondary-rgb), 0.1);
 }
 
 .apiKeyForm h4 {
@@ -527,12 +562,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-primary-300);
+  color: var(--color-primary-500);
   background:
     radial-gradient(circle at 30% 30%, rgba(var(--color-primary-rgb), 0.22), transparent 62%),
     var(--color-badge-primary-bg);
   border: 1px solid var(--color-badge-primary-border);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(var(--color-secondary-rgb), 0.08);
 }
 
 .whyCard h4 {
@@ -551,13 +586,13 @@
 .lanesSection {
   padding: clamp(2.3rem, 4.8vw, 3.6rem) 0;
   background:
-    radial-gradient(800px 250px at 20% -20%, rgba(var(--color-primary-rgb), 0.22), transparent 60%),
+    radial-gradient(800px 250px at 20% -20%, rgba(var(--color-primary-rgb), 0.16), transparent 60%),
     linear-gradient(180deg, var(--color-secondary-600), var(--color-secondary-700));
 }
 
 .lanesHeader {
   margin-bottom: 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(var(--color-secondary-rgb), 0.2);
   padding-bottom: 1rem;
 }
 
@@ -583,8 +618,8 @@
 .lanesPill {
   display: inline-flex;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(var(--color-secondary-rgb), 0.3);
+  background: rgba(var(--color-secondary-rgb), 0.09);
   color: var(--color-text-primary);
   padding: 0.34rem 0.74rem;
   font-size: 0.72rem;
@@ -594,9 +629,9 @@
 }
 
 .lanesPillActive {
-  background: #fff;
+  background: var(--color-secondary-50);
   color: var(--color-secondary-600);
-  border-color: #fff;
+  border-color: var(--color-secondary-50);
 }
 
 .lanesBody {
@@ -647,12 +682,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--color-secondary-50);
   background:
-    radial-gradient(circle at 25% 25%, rgba(var(--color-tertiary-rgb), 0.35), transparent 58%),
-    rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.26);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    radial-gradient(circle at 25% 25%, rgba(var(--color-tertiary-rgb), 0.26), transparent 58%),
+    rgba(var(--color-secondary-rgb), 0.12);
+  border: 1px solid rgba(var(--color-secondary-rgb), 0.26);
+  box-shadow: inset 0 1px 0 rgba(var(--color-secondary-rgb), 0.18);
 }
 
 .apiCard h4 {
@@ -664,7 +699,7 @@
 
 .apiCard p {
   margin: 0;
-  color: rgba(231, 236, 251, 0.88);
+  color: color-mix(in srgb, var(--color-secondary-50) 88%, transparent);
   font-size: 0.74rem;
   line-height: 1.5;
 }
@@ -688,7 +723,7 @@
 :global(html[data-theme='light']) .lanesPillActive {
   background: var(--color-primary-600);
   border-color: var(--color-primary-600);
-  color: #ffffff;
+  color: var(--color-secondary-50);
 }
 
 :global(html[data-theme='light']) .apiIcon {
@@ -713,7 +748,7 @@
   border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-primary-300) 22%);
   background:
     radial-gradient(130% 90% at 0% 0%, rgba(var(--color-primary-rgb), 0.14), transparent 60%),
-    linear-gradient(165deg, rgba(var(--color-primary-rgb), 0.04), rgba(255, 255, 255, 0.75));
+    linear-gradient(165deg, rgba(var(--color-primary-rgb), 0.04), rgba(var(--color-secondary-rgb), 0.75));
 }
 
 :global(html[data-theme='light']) .spotlightCard h4 {

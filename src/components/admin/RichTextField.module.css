@@ -72,8 +72,12 @@
 }
 
 .richLink {
-  color: var(--color-primary-300);
+  color: var(--color-primary-500);
   text-decoration: underline;
+}
+
+.richLink:hover {
+  color: var(--color-primary-400);
 }
 
 .hint {

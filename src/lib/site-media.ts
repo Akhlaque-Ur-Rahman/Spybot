@@ -37,7 +37,7 @@ export function siteOrigin(): string {
 /** Curated clips: titles/captions are indexable copy; pair each page with a distinct file where possible. */
 export const MEDIA_CLIPS = {
   homeHero: {
-    src: '/media/media1.webm',
+    src: '/media/vtials_pivc.webm',
     poster: undefined,
     title: 'SpyBot identity and onboarding experience',
     description:

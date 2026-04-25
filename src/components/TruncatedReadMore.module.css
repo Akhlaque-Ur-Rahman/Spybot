@@ -34,25 +34,25 @@
 }
 
 .linkPrimary {
-  color: var(--color-primary-400);
+  color: var(--color-primary-500);
 }
 .linkPrimary:hover {
-  color: var(--color-primary-300);
+  color: var(--color-primary-400);
 }
 
 .linkTeal {
-  color: var(--color-tertiary-400);
+  color: var(--color-tertiary-600);
 }
 .linkTeal:hover {
-  color: var(--color-tertiary-300);
+  color: var(--color-tertiary-500);
 }
 
 .linkLifecycle {
-  color: var(--color-primary-400);
+  color: var(--color-primary-500);
   margin-inline: auto;
 }
 .linkLifecycle:hover {
-  color: var(--color-primary-300);
+  color: var(--color-primary-400);
 }
 
 .overlay {
@@ -63,7 +63,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-6);
-  background: rgba(8, 15, 35, 0.55);
+  background: rgba(var(--color-secondary-rgb), 0.55);
   backdrop-filter: blur(6px);
 }
 

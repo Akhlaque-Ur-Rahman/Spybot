@@ -31,7 +31,10 @@ export default async function FaqPage() {
         description={pageHeader?.description ?? 'Search by topic below. If you need account-specific guidance, route through Support or Contact so we can reference your environment and rollout stage.'}
         primaryCta={pageHeader?.primaryCta ?? { label: 'Contact support', href: CTA_LINKS.support }}
         secondaryCta={pageHeader?.secondaryCta ?? { label: 'Talk to sales', href: CTA_LINKS.contact }}
+        backgroundMedia={pageHeader?.backgroundMedia}
         media={pageHeader?.media ?? MEDIA_CLIPS.trustOps}
+        mediaAspectRatio={pageHeader?.mediaAspectRatio}
+        mediaObjectFit={pageHeader?.mediaObjectFit}
       />
 
       <SectionScrollReveal>

@@ -30,6 +30,7 @@ const typedEditorBlocks = new Set<CmsBlockType>([
   'lifecycle',
   'decisionFlow',
   'demoSection',
+  'fintechHero',
 ]);
 
 function validateEachRichField(items: unknown, key: 'desc' | 'description'): string | null {
@@ -46,14 +47,26 @@ function validateEachRichField(items: unknown, key: 'desc' | 'description'): str
 const refinements: Record<CmsBlockType, Refine> = {
   hero: (o) => {
     if (typeof o.headline !== 'string') return 'hero: headline (string) required';
-    for (const key of ['subheadline', 'riskSummary'] as const) {
+    for (const key of ['subheadline'] as const) {
       const err = validateCmsRichTextField(o[key]);
       if (err) return err;
+    }
+    if (o.mediaAspectRatio !== undefined && o.mediaAspectRatio !== null && typeof o.mediaAspectRatio !== 'string') {
+      return 'hero: mediaAspectRatio must be a string';
+    }
+    if (o.mediaObjectFit !== undefined && o.mediaObjectFit !== null && o.mediaObjectFit !== 'cover' && o.mediaObjectFit !== 'contain') {
+      return "hero: mediaObjectFit must be 'cover' or 'contain'";
     }
     return null;
   },
   pageHeader: (o) => {
     if (typeof o.title !== 'string') return 'pageHeader: title (string) required';
+    if (o.mediaAspectRatio !== undefined && o.mediaAspectRatio !== null && typeof o.mediaAspectRatio !== 'string') {
+      return 'pageHeader: mediaAspectRatio must be a string';
+    }
+    if (o.mediaObjectFit !== undefined && o.mediaObjectFit !== null && o.mediaObjectFit !== 'cover' && o.mediaObjectFit !== 'contain') {
+      return "pageHeader: mediaObjectFit must be 'cover' or 'contain'";
+    }
     if (o.description === undefined || o.description === null) return null;
     return validateCmsRichTextField(o.description);
   },
@@ -122,7 +135,20 @@ const refinements: Record<CmsBlockType, Refine> = {
   },
   fintechHero: (o) => {
     if (typeof o.title !== 'string') return 'fintechHero: title (string) required';
-    if (typeof o.imageSrc !== 'string') return 'fintechHero: imageSrc (string) required';
+    const mediaObj = o.media;
+    const hasMediaSrc =
+      mediaObj &&
+      typeof mediaObj === 'object' &&
+      !Array.isArray(mediaObj) &&
+      typeof (mediaObj as { src?: unknown }).src === 'string' &&
+      String((mediaObj as { src?: unknown }).src).trim() !== '';
+    if (!hasMediaSrc) return 'fintechHero: media.src required';
+    if (o.mediaAspectRatio !== undefined && o.mediaAspectRatio !== null && typeof o.mediaAspectRatio !== 'string') {
+      return 'fintechHero: mediaAspectRatio must be a string';
+    }
+    if (o.mediaObjectFit !== undefined && o.mediaObjectFit !== null && o.mediaObjectFit !== 'cover' && o.mediaObjectFit !== 'contain') {
+      return "fintechHero: mediaObjectFit must be 'cover' or 'contain'";
+    }
     return validateCmsRichTextField(o.description);
   },
   fintechWhy: (o) => {

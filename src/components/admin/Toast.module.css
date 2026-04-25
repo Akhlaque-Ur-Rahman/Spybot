@@ -18,7 +18,7 @@
   border: 1px solid var(--color-border);
   background: var(--color-surface-raised);
   color: var(--color-text-primary);
-  box-shadow: var(--shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.35));
+  box-shadow: var(--shadow-lg, 0 8px 24px rgba(var(--color-secondary-rgb), 0.35));
   pointer-events: auto;
 }
 

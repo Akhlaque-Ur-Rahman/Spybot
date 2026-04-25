@@ -36,7 +36,10 @@ export default async function ResourcesPage() {
         description={pageHeader?.description ?? 'Scan topics, open the guides that match your bottleneck, then validate changes in sandbox with the same checks you plan to run in production.'}
         primaryCta={pageHeader?.primaryCta ?? { label: 'Book a consultation', href: CTA_LINKS.contact }}
         secondaryCta={pageHeader?.secondaryCta ?? { label: 'API marketplace', href: CTA_LINKS.solutionsCatalog }}
+        backgroundMedia={pageHeader?.backgroundMedia}
         media={pageHeader?.media ?? MEDIA_CLIPS.resourceLibrary}
+        mediaAspectRatio={pageHeader?.mediaAspectRatio}
+        mediaObjectFit={pageHeader?.mediaObjectFit}
       />
 
       <CoverageCarousel label={coverage?.label ?? 'Popular topics'} items={coverage?.items} cardDesign={coverage?.cardDesign} />
