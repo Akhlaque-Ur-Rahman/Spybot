@@ -25,35 +25,6 @@
   flex-direction: column;
 }
 
-.backgroundMediaWrap {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.backgroundMedia {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.38;
-  transform: scale(1.02);
-}
-
-.backgroundScrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-hero-bg-start) 82%, transparent) 0%,
-    color-mix(in srgb, var(--color-hero-bg-mid) 68%, transparent) 48%,
-    color-mix(in srgb, var(--color-bg) 84%, transparent) 100%
-  );
-}
-
 .glow {
   top: -20%;
   left: 50%;
@@ -63,19 +34,6 @@
 
 [data-theme="light"] .glow {
   opacity: 0.1;
-}
-
-[data-theme='light'] .backgroundMedia {
-  opacity: 0.56;
-  filter: contrast(1.05) saturate(1.08);
-}
-[data-theme='light'] .backgroundScrim {
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-hero-bg-start) 42%, transparent) 0%,
-    color-mix(in srgb, var(--color-hero-bg-mid) 36%, transparent) 48%,
-    color-mix(in srgb, var(--color-bg) 52%, transparent) 100%
-  );
 }
 
 .content {

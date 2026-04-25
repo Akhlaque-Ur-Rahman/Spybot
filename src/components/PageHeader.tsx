@@ -3,13 +3,7 @@ import Image from 'next/image';
 import ViewportVideo from './ViewportVideo';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
-import {
-  mediaEncodingFormat,
-  mediaSourceKind,
-  optionalMediaClip,
-  resolveOptionalHeroBackground,
-  type MediaClipMeta,
-} from '@/lib/site-media';
+import { mediaEncodingFormat, mediaSourceKind, optionalMediaClip, type MediaClipMeta } from '@/lib/site-media';
 
 interface PageHeaderProps {
   label: string;
@@ -34,17 +28,12 @@ export default function PageHeader({
   primaryCta,
   secondaryCta,
   secondaryDescription,
-  backgroundMedia,
+  backgroundMedia: _backgroundMedia,
   media,
   mediaAspectRatio,
   mediaObjectFit,
 }: PageHeaderProps) {
-  const bgClip = optionalMediaClip(backgroundMedia);
   const fgClip = optionalMediaClip(media);
-  const resolvedBackground = resolveOptionalHeroBackground(bgClip);
-  const backgroundKind = resolvedBackground ? mediaSourceKind(resolvedBackground.src) : 'other';
-  const backgroundType =
-    resolvedBackground && backgroundKind === 'video' ? mediaEncodingFormat(resolvedBackground.src) : undefined;
   const mediaKind = fgClip ? mediaSourceKind(fgClip.src) : 'other';
   const mediaType = fgClip && mediaKind === 'video' ? mediaEncodingFormat(fgClip.src) : undefined;
   const resolvedAspectRatio = mediaAspectRatio?.trim() || '16 / 10';
@@ -52,34 +41,6 @@ export default function PageHeader({
 
   return (
     <section className={`${styles.section} ${fgClip ? styles.sectionWithMedia : ''}`}>
-      {resolvedBackground ? (
-        <div className={styles.backgroundMediaWrap} aria-hidden="true">
-          {backgroundKind === 'video' && backgroundType ? (
-            <video
-              className={styles.backgroundMedia}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              poster={resolvedBackground.poster}
-              tabIndex={-1}
-            >
-              <source src={resolvedBackground.src} type={backgroundType} />
-            </video>
-          ) : backgroundKind === 'image' ? (
-            <Image
-              unoptimized
-              className={styles.backgroundMedia}
-              src={resolvedBackground.src}
-              alt={resolvedBackground.title}
-              fill
-              sizes="100vw"
-            />
-          ) : null}
-          <div className={styles.backgroundScrim} />
-        </div>
-      ) : null}
       <div className={`glow-orb glow-orb-blue ${styles.glow}`} style={{ width: 600, height: 600 }} aria-hidden="true" />
       <div className="container">
         <div className={fgClip ? styles.split : styles.content}>

@@ -4,7 +4,7 @@ import styles from './Hero.module.css';
 import richTextStyles from '@/components/CmsRichText.module.css';
 import { Rocket } from 'lucide-react';
 import { CTA_LINKS } from '@/site';
-import { MEDIA_CLIPS, mediaEncodingFormat, mediaSourceKind, resolveHeroBackdropClip } from '@/lib/site-media';
+import { MEDIA_CLIPS, mediaEncodingFormat, mediaSourceKind } from '@/lib/site-media';
 import type { MediaClipMeta } from '@/lib/site-media';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
@@ -38,12 +38,6 @@ type HeroContent = {
 };
 
 export function HeroSection({ content }: { content?: HeroContent }) {
-  const backgroundClip = resolveHeroBackdropClip(content?.backgroundMedia);
-  const backgroundKind = mediaSourceKind(backgroundClip.src);
-  const isBackgroundVideo = backgroundKind === 'video';
-  const isBackgroundImage = backgroundKind === 'image';
-  const backgroundPoster = backgroundClip.poster?.trim() || undefined;
-  const backgroundVideoType = isBackgroundVideo ? mediaEncodingFormat(backgroundClip.src) : undefined;
   const rawResolvedClip = (content?.media ?? heroClip) as MediaClipMeta;
   const resolvedClip = {
     ...rawResolvedClip,
@@ -61,29 +55,6 @@ export function HeroSection({ content }: { content?: HeroContent }) {
   return (
     <section className={styles.hero} id="hero">
       <div className={styles.heroVideoWrap} aria-hidden="true">
-        {isBackgroundVideo && backgroundVideoType ? (
-          <video
-            className={styles.heroVideo}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster={backgroundPoster}
-            tabIndex={-1}
-          >
-            <source src={backgroundClip.src} type={backgroundVideoType} />
-          </video>
-        ) : isBackgroundImage ? (
-          <Image
-            unoptimized
-            src={backgroundClip.src}
-            alt={backgroundClip.title}
-            className={styles.heroVideo}
-            fill
-            sizes="100vw"
-          />
-        ) : null}
         <div className={styles.heroScrim} />
       </div>
 

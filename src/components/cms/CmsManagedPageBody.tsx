@@ -17,7 +17,7 @@ import SupportSlaStrip from '@/components/SupportSlaStrip';
 import SolutionShowcase from '@/components/SolutionShowcase';
 import { HeroSection } from '@/components/Hero';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
-import type { ManagedCmsPage } from '@/lib/cms/page-content';
+import { getManagedBlock, type ManagedCmsPage } from '@/lib/cms/page-content';
 import type {
   CmsBenefitsBlock,
   CmsChallengesBlock,
@@ -220,6 +220,17 @@ export default function CmsManagedPageBody({
   const nodes: ReactNode[] = [];
   const blocksFlat = sections.flatMap((sec) => sortByPosition(sec.blocks));
   const preferFintechHero = blocksFlat.some((b) => b.type === 'fintechHero');
+  const hasHeroBlock = blocksFlat.some((b) => b.type === 'hero');
+  const showsPageHeader = blocksFlat.some((b) => b.type === 'pageHeader') && !preferFintechHero;
+  const showsFintechHero = preferFintechHero;
+  const hasTopHero = hasHeroBlock || showsPageHeader || showsFintechHero;
+
+  if (!hasTopHero) {
+    const heroValue = getManagedBlock(page, 'hero', 'hero');
+    nodes.push(
+      <HeroSection key="__default-hero" content={heroValue != null ? (heroValue as CmsHeroBlock) : undefined} />
+    );
+  }
 
   for (const sec of sections) {
     for (const b of sortByPosition(sec.blocks)) {

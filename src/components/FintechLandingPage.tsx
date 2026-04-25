@@ -9,7 +9,6 @@ import {
   mediaSourceKind,
   type MediaClipMeta,
   MEDIA_CLIPS,
-  resolveOptionalHeroBackground,
 } from '@/lib/site-media';
 import {
   Clock3,
@@ -303,10 +302,6 @@ export default function FintechLandingPage({
   const ctaBanner = ctaBannerData ?? fallbackCtaBanner;
   const apiKey = apiKeyData ?? fallbackApiKey;
   const rootRef = useRef<HTMLElement | null>(null);
-  const resolvedBackground = resolveOptionalHeroBackground(hero.backgroundMedia);
-  const backgroundKind = resolvedBackground ? mediaSourceKind(resolvedBackground.src) : 'other';
-  const backgroundVideoType =
-    resolvedBackground && backgroundKind === 'video' ? mediaEncodingFormat(resolvedBackground.src) : undefined;
   const heroMedia =
     hero.media && typeof hero.media.src === 'string' && hero.media.src.trim() !== '' ? hero.media : undefined;
   const heroMediaKind = heroMedia ? mediaSourceKind(heroMedia.src) : 'other';
@@ -369,33 +364,9 @@ export default function FintechLandingPage({
   return (
     <main ref={rootRef} className={styles.page}>
       <section className={styles.hero}>
-        {resolvedBackground ? (
-          <div className={styles.heroBackground} aria-hidden="true">
-            {backgroundKind === 'video' && backgroundVideoType ? (
-              <video
-                className={styles.heroBackgroundMedia}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                poster={resolvedBackground.poster}
-                tabIndex={-1}
-              >
-                <source src={resolvedBackground.src} type={backgroundVideoType} />
-              </video>
-            ) : backgroundKind === 'image' ? (
-              <Image
-                src={resolvedBackground.src}
-                alt={resolvedBackground.title}
-                fill
-                sizes="100vw"
-                className={styles.heroBackgroundMedia}
-              />
-            ) : null}
-            <div className={styles.heroBackgroundScrim} />
-          </div>
-        ) : null}
+        <div className={styles.heroBackground} aria-hidden="true">
+          <div className={styles.heroBackgroundScrim} />
+        </div>
         <div className={`container ${styles.heroInner}`}>
           <div className={styles.heroCopy}>
             <p className={styles.heroLabel} data-anim-hero>{hero.label}</p>
