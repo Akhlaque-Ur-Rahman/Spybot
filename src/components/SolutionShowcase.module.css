@@ -78,17 +78,18 @@
   outline-offset: 3px;
 }
 
+/* Default = dark theme (:root); light tab chrome is under html[data-theme='light'] below */
 .tabActive {
-  background: linear-gradient(135deg, var(--color-primary-50), var(--color-secondary-50));
-  color: var(--color-secondary-700);
-  border: 1px solid var(--color-primary-100);
+  background: color-mix(in srgb, var(--color-surface-raised) 82%, var(--color-primary-900) 18%);
+  color: var(--color-text-primary);
+  border: 1px solid color-mix(in srgb, var(--color-primary-400) 38%, var(--color-border-subtle));
   box-shadow: var(--shadow-sm), var(--glow-primary);
 }
 
 .tabActive:hover {
-  color: var(--color-secondary-700);
-  border-color: var(--color-primary-50);
-  background: linear-gradient(135deg, var(--color-secondary-50), var(--color-primary-50));
+  color: var(--color-text-primary);
+  border-color: color-mix(in srgb, var(--color-primary-400) 48%, var(--color-border));
+  background: color-mix(in srgb, var(--color-surface-raised) 74%, var(--color-primary-800) 26%);
 }
 
 .divider {

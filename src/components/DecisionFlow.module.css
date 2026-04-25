@@ -132,14 +132,29 @@
   display: flex;
   gap: 14px;
   padding: var(--space-4);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-left: 3px solid var(--color-primary-500);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
   margin-top: 4px;
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
 }
-.aiNoteIcon { font-size: 1.25rem; flex-shrink: 0; }
-.aiNoteTitle { font-size: 0.875rem; font-weight: 600; color: var(--color-primary-500); margin-bottom: 4px; }
+.aiNote:hover {
+  border-color: var(--color-border);
+  background: var(--color-surface-raised);
+  transform: translateX(4px);
+}
+.aiNoteIcon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-text-muted);
+}
+.aiNoteTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
 .aiNoteText { font-size: 0.75rem; color: var(--color-text-secondary); line-height: 1.5; }
 
 @media (max-width: 1024px) {

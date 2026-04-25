@@ -629,9 +629,9 @@
 }
 
 .lanesPillActive {
-  background: var(--color-secondary-50);
-  color: var(--color-secondary-600);
-  border-color: var(--color-secondary-50);
+  background: color-mix(in srgb, var(--color-surface-raised) 78%, var(--color-primary-900) 22%);
+  color: var(--color-text-primary);
+  border-color: color-mix(in srgb, var(--color-primary-400) 36%, var(--color-border-subtle));
 }
 
 .lanesBody {
@@ -699,7 +699,7 @@
 
 .apiCard p {
   margin: 0;
-  color: color-mix(in srgb, var(--color-secondary-50) 88%, transparent);
+  color: var(--color-text-secondary);
   font-size: 0.74rem;
   line-height: 1.5;
 }
