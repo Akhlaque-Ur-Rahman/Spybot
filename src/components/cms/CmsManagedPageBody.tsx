@@ -218,9 +218,12 @@ export default function CmsManagedPageBody({
 }) {
   const sections = sortByPosition(page.sections);
   const nodes: ReactNode[] = [];
+  const blocksFlat = sections.flatMap((sec) => sortByPosition(sec.blocks));
+  const preferFintechHero = blocksFlat.some((b) => b.type === 'fintechHero');
 
   for (const sec of sections) {
     for (const b of sortByPosition(sec.blocks)) {
+      if (preferFintechHero && b.type === 'pageHeader') continue;
       const el = renderBlock({ ...b, key: b.key, type: b.type, position: b.position, value: b.value });
       if (el) nodes.push(el);
     }

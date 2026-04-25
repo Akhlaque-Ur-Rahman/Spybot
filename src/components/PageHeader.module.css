@@ -10,6 +10,21 @@
   background: linear-gradient(180deg, var(--color-hero-bg-start) 0%, var(--color-bg) 100%);
 }
 
+/* Match `Hero.module.css` split layout: equal columns, homepage padding + gap + media width */
+.sectionWithMedia {
+  min-height: 100vh;
+  flex-direction: column;
+  padding: 0;
+  background: linear-gradient(180deg, var(--color-hero-bg-start) 0%, var(--color-hero-bg-mid) 50%, var(--color-bg) 100%);
+  transition: background 0.3s ease;
+}
+
+.sectionWithMedia .container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .backgroundMediaWrap {
   position: absolute;
   inset: 0;
@@ -82,6 +97,9 @@
   text-align: left;
   margin-left: 0;
   margin-right: 0;
+  max-width: 540px;
+  font-size: clamp(1rem, 2.2vw, 1.125rem);
+  line-height: 1.7;
 }
 .sectionWithMedia .ctas {
   justify-content: flex-start;
@@ -91,9 +109,13 @@
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, min(38vw, 420px));
-  gap: var(--space-12);
+  /* Same as `.heroInner` in Hero.module.css */
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-16);
   align-items: start;
+  padding-top: var(--site-hero-padding-top);
+  padding-bottom: var(--space-12);
+  flex: 1;
 }
 .copy {
   display: flex;
@@ -103,21 +125,37 @@
   gap: var(--space-4);
 }
 
+.sectionWithMedia .copy {
+  gap: var(--space-6);
+}
+
 .mediaFigure {
   margin: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   width: 100%;
+  min-width: 0;
 }
+
+/* Match `.mediaWrap` + `.media` from Hero.module.css */
+.mediaWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
 .mediaVideo {
   width: 100%;
+  max-width: 560px;
   aspect-ratio: 16 / 10;
   border-radius: var(--radius-2xl);
-  border: 1px solid var(--color-border-subtle);
+  border: 1px solid var(--color-border);
   background: var(--color-surface);
   box-shadow: var(--shadow-lg);
   object-fit: cover;
+  overflow: hidden;
 }
 .mediaCaption {
   font-size: 0.8125rem;
@@ -182,9 +220,20 @@
   flex-wrap: wrap;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   .split {
     grid-template-columns: 1fr;
+    gap: var(--space-12);
+    padding-top: var(--site-hero-padding-top);
+    padding-bottom: var(--space-10);
+  }
+  .mediaVideo {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 960px) {
+  .split {
     gap: var(--space-10);
   }
   .sectionWithMedia .copy {
@@ -207,6 +256,9 @@
 @media (max-width: 640px) {
   .section {
     padding: var(--space-6) 0 var(--space-8);
+  }
+  .sectionWithMedia {
+    padding: 0;
   }
   .ctas {
     flex-direction: column;

@@ -125,26 +125,28 @@ export default function PageHeader({
 
           {fgClip && (
             <figure className={styles.mediaFigure}>
-              {mediaKind === 'video' && mediaType ? (
-                <ViewportVideo
-                  className={styles.mediaVideo}
-                  poster={fgClip.poster}
-                  ariaLabel={fgClip.title}
-                  src={fgClip.src}
-                  type={mediaType}
-                  style={{ aspectRatio: resolvedAspectRatio, objectFit: resolvedObjectFit }}
-                />
-              ) : mediaKind === 'image' ? (
-                <Image
-                  unoptimized
-                  className={styles.mediaVideo}
-                  src={fgClip.src}
-                  alt={fgClip.title}
-                  width={1280}
-                  height={800}
-                  style={{ aspectRatio: resolvedAspectRatio, objectFit: resolvedObjectFit }}
-                />
-              ) : null}
+              <div className={styles.mediaWrap}>
+                {mediaKind === 'video' && mediaType ? (
+                  <ViewportVideo
+                    className={styles.mediaVideo}
+                    poster={fgClip.poster}
+                    ariaLabel={fgClip.title}
+                    src={fgClip.src}
+                    type={mediaType}
+                    style={{ aspectRatio: resolvedAspectRatio, objectFit: resolvedObjectFit }}
+                  />
+                ) : mediaKind === 'image' ? (
+                  <Image
+                    unoptimized
+                    className={styles.mediaVideo}
+                    src={fgClip.src}
+                    alt={fgClip.title}
+                    width={1280}
+                    height={800}
+                    style={{ aspectRatio: resolvedAspectRatio, objectFit: resolvedObjectFit }}
+                  />
+                ) : null}
+              </div>
               <figcaption className={styles.mediaCaption}>
                 <strong>{fgClip.title}</strong>
                 <span className={styles.mediaCaptionSep}> — </span>
