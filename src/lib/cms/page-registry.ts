@@ -422,6 +422,25 @@ export function block<T extends CmsBlockType>(key: string, type: T, value: CmsBl
   return { key, type, position: 1, value };
 }
 
+function toCamelCase(input: string): string {
+  const parts = input
+    .split(/[^a-zA-Z0-9]+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length === 0) return 'page';
+  return parts
+    .map((part, index) => {
+      const lower = part.toLowerCase();
+      if (index === 0) return lower;
+      return `${lower.charAt(0).toUpperCase()}${lower.slice(1)}`;
+    })
+    .join('');
+}
+
+export function heroSectionLabel(pageKey: string): string {
+  return `${toCamelCase(pageKey)}Hero`;
+}
+
 export const defaultCoverageItems: CmsCoverageCarouselItem[] = [
   {
     title: 'Aadhaar · PAN · Voter ID',
@@ -735,7 +754,7 @@ export function createSimplePage(args: {
   demoSection?: CmsDemoSectionBlock;
 }): CmsRegistryPage {
   const sections: CmsRegistrySection[] = [
-    section('pageHeader', 'Page Header', 1, block('pageHeader', 'pageHeader', args.pageHeader)),
+    section('pageHeader', heroSectionLabel(args.key), 1, block('pageHeader', 'pageHeader', args.pageHeader)),
   ];
 
   let position = 2;
@@ -1140,7 +1159,7 @@ export const cmsRegistryPages: CmsRegistryPage[] = [
     seoDescription:
       'Reduce onboarding friction with SpyBot identity verification, KYB, financial verification, and orchestration workflows built for modern digital businesses.',
     sections: [
-      section('hero', 'Hero', 1, block('hero', 'hero', homeHeroBlock)),
+      section('hero', heroSectionLabel('home'), 1, block('hero', 'hero', homeHeroBlock)),
       section(
         'challenges',
         'Challenges',

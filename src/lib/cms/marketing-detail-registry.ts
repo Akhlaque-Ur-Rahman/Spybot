@@ -5,6 +5,7 @@ import type {
   CmsRegistryPage,
   CmsRegistrySection,
 } from '@/lib/cms/page-registry';
+import { heroSectionLabel } from '@/lib/cms/page-registry';
 import { CTA_LINKS, ROUTES } from '@/site';
 import { MEDIA_CLIPS } from '@/lib/site-media';
 import { getSolutionShowcaseDraft } from '@/lib/solution-showcase-data';
@@ -28,7 +29,7 @@ export function buildMarketingDetailRegistryPages(deps: {
     sections: [
       section(
         'pageHeader',
-        'Page Header',
+        heroSectionLabel('solution-video-kyc'),
         1,
         block('pageHeader', 'pageHeader', {
           label: 'Video KYC (V-CIP)',
@@ -149,7 +150,7 @@ export function buildMarketingDetailRegistryPages(deps: {
     sections: [
       section(
         'pageHeader',
-        'Page Header',
+        heroSectionLabel('solution-kyb-suite'),
         1,
         block('pageHeader', 'pageHeader', {
           label: 'Automated KYB',
@@ -269,7 +270,7 @@ export function buildMarketingDetailRegistryPages(deps: {
     sections: [
       section(
         'pageHeader',
-        'Page Header',
+        heroSectionLabel('industry-ecommerce'),
         1,
         block('pageHeader', 'pageHeader', {
           label: 'E-Commerce & Marketplaces',
@@ -382,7 +383,7 @@ export function buildMarketingDetailRegistryPages(deps: {
     sections: [
       section(
         'pageHeader',
-        'Page Header',
+        heroSectionLabel('industry-telecom'),
         1,
         block('pageHeader', 'pageHeader', {
           label: 'Telecommunications',
@@ -495,7 +496,7 @@ export function buildMarketingDetailRegistryPages(deps: {
     sections: [
       section(
         'pageHeader',
-        'Page Header',
+        heroSectionLabel('industry-gaming'),
         1,
         block('pageHeader', 'pageHeader', {
           label: 'RMG & E-Sports',
@@ -781,7 +782,7 @@ export function buildMarketingDetailRegistryPages(deps: {
     sections: [
       section(
         'fintechHero',
-        'Fintech Hero',
+        heroSectionLabel('industry-fintech'),
         1,
         block('fintechHero', 'fintechHero', {
           label: 'Trading',
