@@ -17,7 +17,10 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:migrate:fintech-hero-media": "tsx scripts/migrate-fintech-hero-media.ts",
     "db:migrate:fintech-hero-media:dry": "tsx scripts/migrate-fintech-hero-media.ts --dry-run",
-    "db:migrate:fintech-hero-media:dry:one": "tsx scripts/migrate-fintech-hero-media.ts --dry-run --block-key=fintechHero"
+    "db:migrate:fintech-hero-media:dry:one": "tsx scripts/migrate-fintech-hero-media.ts --dry-run --block-key=fintechHero",
+    "db:backfill:death-claim": "tsx scripts/backfill-death-claim.ts",
+    "db:backfill:death-claim:dry": "tsx scripts/backfill-death-claim.ts --dry-run",
+    "db:backfill:death-claim:slug": "tsx scripts/backfill-death-claim.ts --slug-only"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
