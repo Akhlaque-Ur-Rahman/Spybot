@@ -2,7 +2,7 @@
   padding: clamp(3rem, 6vw, 4.5rem) 0;
   background:
     radial-gradient(900px 280px at 15% -18%, rgba(var(--color-primary-rgb), 0.18), transparent 62%),
-    linear-gradient(180deg, var(--color-secondary-600), var(--color-secondary-700));
+    linear-gradient(180deg, var(--color-bg) 0%, var(--color-section-alt) 15%, var(--color-section-alt) 85%, var(--color-bg) 100%);
   border-block: 1px solid color-mix(in srgb, var(--color-border-subtle) 78%, var(--color-primary-300) 22%);
 }
 

@@ -974,6 +974,54 @@ const supplementalMarketingPages: CmsRegistryPage[] = [
     },
   }),
   createSimplePage({
+    key: 'death-proposal',
+    title: 'Death benefit proposal',
+    slug: ROUTES.deathProposal,
+    seoTitle: 'Death benefit proposal & intimation | SpyBot',
+    seoDescription:
+      'Streamline death intimation, nominee verification, and document-led checks for faster proposal decisions with a clear audit trail.',
+    pageHeader: {
+      label: 'Insurance',
+      title: 'Move the proposal stage from',
+      gradientText: 'queues to controlled verification',
+      description:
+        'Collect beneficiary identity, supporting documents, and liveness or assisted checks in one defensible path before underwriting review.',
+      primaryCta: { label: 'Talk to the team', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Industries overview', href: ROUTES.industries },
+      media: MEDIA_CLIPS.industriesHub,
+    },
+    utilityCtaBand: {
+      title: 'Need a proposal flow tuned to your policy terms?',
+      description: 'We can help align checks to your TPA, branch, and digital touchpoints.',
+      primary: { label: 'Book a working session', href: CTA_LINKS.contact },
+      secondary: { label: 'Read FAQs', href: ROUTES.faq },
+    },
+  }),
+  createSimplePage({
+    key: 'death-claim',
+    title: 'Death claim settlement',
+    slug: ROUTES.deathClaim,
+    seoTitle: 'Death claim identity & payout verification | SpyBot',
+    seoDescription:
+      'Support death claim teams with identity, document, and payout-linked verification so settlement stays fast and fraud-resilient.',
+    pageHeader: {
+      label: 'Insurance',
+      title: 'Settle high-trust death claims with',
+      gradientText: 'repeatable evidence, not ad hoc reviews',
+      description:
+        'Verify nominees, relationship proofs, and payout destinations with consistent step-up checks that reduce reversals and disputes.',
+      primaryCta: { label: 'Talk to claim specialists', href: CTA_LINKS.contact },
+      secondaryCta: { label: 'Back to insurance industries', href: ROUTES.insurance },
+      media: MEDIA_CLIPS.industriesHub,
+    },
+    utilityCtaBand: {
+      title: 'Balancing TAT and fraud in claims?',
+      description: 'We can help sequence identity, bank, and document steps around your NEFT and branch workflows.',
+      primary: { label: 'Contact us', href: CTA_LINKS.contact },
+      secondary: { label: 'Support', href: ROUTES.support },
+    },
+  }),
+  createSimplePage({
     key: 'industry-nbfc',
     title: 'NBFC',
     slug: ROUTES.nbfc,

@@ -21,6 +21,10 @@ export const ROUTES = {
   financialVerification: '/solutions/financial-verification',
   videoKyc: '/solutions/video-kyc',
   insurance: '/industries/insurance',
+  /** Insurance — death intimation / proposal workflow (public CMS slug). */
+  deathProposal: '/death-proposal',
+  /** Insurance — death claim / beneficiary settlement workflow (public CMS slug). */
+  deathClaim: '/death-claim',
   nbfc: '/industries/nbfc',
   banks: '/industries/banks',
   fintech: '/industries/fintech',
