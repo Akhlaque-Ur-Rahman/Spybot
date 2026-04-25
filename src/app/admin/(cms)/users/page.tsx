@@ -20,8 +20,9 @@ export default async function AdminUsersPage() {
   const owners = rows.filter((u) => u.role === 'OWNER').length;
   const editors = rows.filter((u) => u.role === 'EDITOR').length;
   const reviewers = rows.filter((u) => u.role === 'REVIEWER').length;
+  const now = new Date().getTime();
   const invitedLast7Days = users.filter((u) => {
-    const diff = Date.now() - u.createdAt.getTime();
+    const diff = now - u.createdAt.getTime();
     return diff <= 7 * 24 * 60 * 60 * 1000;
   }).length;
 
