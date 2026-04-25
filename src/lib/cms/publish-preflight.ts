@@ -1,6 +1,9 @@
 import { isCmsBlockType } from '@/lib/cms/page-registry';
+import type { CmsBlockType } from '@/lib/cms/page-registry';
 import { stableStringify } from '@/lib/cms/json-stable';
 import { validateBlockDraftJson } from '@/lib/cms/block-draft-validation';
+
+const PRIMARY_HERO_BLOCK_TYPES: readonly CmsBlockType[] = ['hero', 'fintechHero'];
 
 type PageWithBlocks = {
   key: string;
@@ -88,6 +91,20 @@ export function runPublishPreflight(page: PageWithBlocks): PublishPreflightRepor
         });
       }
     }
+  }
+
+  let primaryHeroCount = 0;
+  for (const section of page.sections) {
+    for (const block of section.blocks) {
+      if (PRIMARY_HERO_BLOCK_TYPES.includes(block.type as CmsBlockType)) primaryHeroCount += 1;
+    }
+  }
+  if (primaryHeroCount > 1) {
+    errors.push({
+      severity: 'error',
+      message:
+        'Each page allows exactly one primary hero: use either Hero or Fintech hero, not multiple. Remove extra hero sections until only one remains.',
+    });
   }
 
   return {

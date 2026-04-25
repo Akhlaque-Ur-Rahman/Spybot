@@ -9,18 +9,40 @@ import type { CmsIconName } from '@/lib/cms/icon-map';
 import { cmsIconNames, renderCmsIcon } from '@/lib/cms/icon-map';
 import styles from './fields.module.css';
 
+function RequiredAsterisk() {
+  return (
+    <abbr className={styles.requiredAsterisk} title="Required">
+      *
+    </abbr>
+  );
+}
+
 export function TextField({
   label,
   value,
   onChange,
+  required,
+  emphasizeRequired = true,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  /** Publish validation treats this field as required. */
+  required?: boolean;
+  /** When false with `required`, shows only the asterisk (no tinted shell). */
+  emphasizeRequired?: boolean;
 }) {
+  const shell = Boolean(required && emphasizeRequired);
   return (
-    <label className={styles.label}>
-      <span>{label}</span>
+    <label className={`${styles.label} ${shell ? styles.labelRequiredShell : ''}`}>
+      {required ? (
+        <span className={styles.labelHeading}>
+          <span>{label}</span>
+          <RequiredAsterisk />
+        </span>
+      ) : (
+        <span>{label}</span>
+      )}
       <input className={styles.input} value={value} onChange={(event) => onChange(event.target.value)} />
     </label>
   );
@@ -31,15 +53,27 @@ export function TextAreaField({
   value,
   onChange,
   rows = 6,
+  required,
+  emphasizeRequired = true,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   rows?: number;
+  required?: boolean;
+  emphasizeRequired?: boolean;
 }) {
+  const shell = Boolean(required && emphasizeRequired);
   return (
-    <label className={styles.label}>
-      <span>{label}</span>
+    <label className={`${styles.label} ${shell ? styles.labelRequiredShell : ''}`}>
+      {required ? (
+        <span className={styles.labelHeading}>
+          <span>{label}</span>
+          <RequiredAsterisk />
+        </span>
+      ) : (
+        <span>{label}</span>
+      )}
       <textarea className={styles.textarea} value={value} onChange={(event) => onChange(event.target.value)} rows={rows} />
     </label>
   );
@@ -50,15 +84,27 @@ export function SelectField<T extends string>({
   value,
   options,
   onChange,
+  required,
+  emphasizeRequired = true,
 }: {
   label: string;
   value: T;
   options: Array<{ value: T; label: string }>;
   onChange: (value: T) => void;
+  required?: boolean;
+  emphasizeRequired?: boolean;
 }) {
+  const shell = Boolean(required && emphasizeRequired);
   return (
-    <label className={styles.label}>
-      <span>{label}</span>
+    <label className={`${styles.label} ${shell ? styles.labelRequiredShell : ''}`}>
+      {required ? (
+        <span className={styles.labelHeading}>
+          <span>{label}</span>
+          <RequiredAsterisk />
+        </span>
+      ) : (
+        <span>{label}</span>
+      )}
       <select className={styles.select} value={value} onChange={(event) => onChange(event.target.value as T)}>
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -77,6 +123,8 @@ export function NumberField({
   min,
   max,
   step,
+  required,
+  emphasizeRequired = true,
 }: {
   label: string;
   value: number;
@@ -84,10 +132,20 @@ export function NumberField({
   min?: number;
   max?: number;
   step?: number;
+  required?: boolean;
+  emphasizeRequired?: boolean;
 }) {
+  const shell = Boolean(required && emphasizeRequired);
   return (
-    <label className={styles.label}>
-      <span>{label}</span>
+    <label className={`${styles.label} ${shell ? styles.labelRequiredShell : ''}`}>
+      {required ? (
+        <span className={styles.labelHeading}>
+          <span>{label}</span>
+          <RequiredAsterisk />
+        </span>
+      ) : (
+        <span>{label}</span>
+      )}
       <input
         className={styles.number}
         type="number"
@@ -107,31 +165,40 @@ export function LinkFields({
   label,
   value,
   onChange,
+  required,
 }: {
   label: string;
   value: LinkValue;
   onChange: (next: LinkValue) => void;
+  /** Label and URL are both required for publish when true. */
+  required?: boolean;
 }) {
   return (
-    <fieldset className={styles.label} style={{ border: 'none', padding: 0, margin: 0 }}>
-      <legend style={{ marginBottom: 8 }}>{label}</legend>
+    <fieldset
+      className={`${styles.label} ${required ? styles.labelRequiredShell : ''}`}
+      style={{ border: 'none', padding: 0, margin: 0 }}
+    >
+      <legend style={{ marginBottom: 8 }}>
+        <span className={styles.fieldsetLegendRow}>
+          <span>{label}</span>
+          {required ? <RequiredAsterisk /> : null}
+        </span>
+      </legend>
       <div className={styles.fieldGrid2}>
-        <label className={styles.label}>
-          <span>Label</span>
-          <input
-            className={styles.input}
-            value={value.label}
-            onChange={(event) => onChange({ ...value, label: event.target.value })}
-          />
-        </label>
-        <label className={styles.label}>
-          <span>URL / path</span>
-          <input
-            className={styles.input}
-            value={value.href}
-            onChange={(event) => onChange({ ...value, href: event.target.value })}
-          />
-        </label>
+        <TextField
+          label="Label"
+          required={required}
+          emphasizeRequired={false}
+          value={value.label}
+          onChange={(lbl) => onChange({ ...value, label: lbl })}
+        />
+        <TextField
+          label="URL / path"
+          required={required}
+          emphasizeRequired={false}
+          value={value.href}
+          onChange={(href) => onChange({ ...value, href })}
+        />
       </div>
     </fieldset>
   );
@@ -141,17 +208,34 @@ export function CardLinkFields({
   label,
   value,
   onChange,
+  required,
 }: {
   label: string;
   value: LinkValue & { variant?: 'primary' | 'ghost' };
   onChange: (next: LinkValue & { variant?: 'primary' | 'ghost' }) => void;
+  /** When true, button label is required for publish (URL may still be optional per block). */
+  required?: boolean;
 }) {
   const variant = value.variant ?? 'primary';
   return (
-    <fieldset className={styles.label} style={{ border: 'none', padding: 0, margin: 0 }}>
-      <legend style={{ marginBottom: 8 }}>{label}</legend>
+    <fieldset
+      className={`${styles.label} ${required ? styles.labelRequiredShell : ''}`}
+      style={{ border: 'none', padding: 0, margin: 0 }}
+    >
+      <legend style={{ marginBottom: 8 }}>
+        <span className={styles.fieldsetLegendRow}>
+          <span>{label}</span>
+          {required ? <RequiredAsterisk /> : null}
+        </span>
+      </legend>
       <div className={styles.fieldGrid2}>
-        <TextField label="Label" value={value.label} onChange={(label) => onChange({ ...value, label })} />
+        <TextField
+          label="Label"
+          required={required}
+          emphasizeRequired={false}
+          value={value.label}
+          onChange={(lbl) => onChange({ ...value, label: lbl })}
+        />
         <TextField label="URL / path" value={value.href} onChange={(href) => onChange({ ...value, href })} />
         <SelectField
           label="Variant"
@@ -179,14 +263,22 @@ function mediaKind(mimeType: string | null, url: string): 'video' | 'image' | 'o
   return 'other';
 }
 
+const emptyMediaClip: MediaClipMeta = { src: '', title: '', description: '' };
+
 export function MediaClipFields({
   label,
   value,
   onChange,
+  optional = false,
+  required = false,
 }: {
   label: string;
   value: MediaClipMeta;
   onChange: (next: MediaClipMeta) => void;
+  /** When true, first preset option clears media (no clip). */
+  optional?: boolean;
+  /** When true, main clip URL is required for publish; field group is highlighted. */
+  required?: boolean;
 }) {
   const matchedKey = mediaClipKeys.find(
     (k) =>
@@ -227,8 +319,16 @@ export function MediaClipFields({
   }, []);
 
   return (
-    <fieldset className={styles.label} style={{ border: 'none', padding: 0, margin: 0 }}>
-      <legend style={{ marginBottom: 8 }}>{label}</legend>
+    <fieldset
+      className={`${styles.label} ${required ? styles.labelRequiredShell : ''}`}
+      style={{ border: 'none', padding: 0, margin: 0 }}
+    >
+      <legend style={{ marginBottom: 8 }}>
+        <span className={styles.fieldsetLegendRow}>
+          <span>{label}</span>
+          {required ? <RequiredAsterisk /> : null}
+        </span>
+      </legend>
       <label className={styles.label}>
         <span>Preset clip</span>
         <select
@@ -236,11 +336,14 @@ export function MediaClipFields({
           value={preset}
           onChange={(event) => {
             const key = event.target.value as keyof typeof MEDIA_CLIPS | '';
-            if (!key) return;
+            if (!key) {
+              if (optional) onChange({ ...emptyMediaClip });
+              return;
+            }
             onChange({ ...MEDIA_CLIPS[key] });
           }}
         >
-          <option value="">— Custom fields below —</option>
+          <option value="">{optional ? '— No media —' : '— Custom fields below —'}</option>
           {mediaClipKeys.map((k) => (
             <option key={k} value={k}>
               {k}
@@ -249,7 +352,13 @@ export function MediaClipFields({
         </select>
       </label>
       <div className={styles.fieldGrid2} style={{ marginTop: 12 }}>
-        <TextField label="Media src" value={value.src} onChange={(src) => onChange({ ...value, src })} />
+        <TextField
+          label="Media src"
+          required={required}
+          emphasizeRequired={!required}
+          value={value.src}
+          onChange={(src) => onChange({ ...value, src })}
+        />
         <label className={styles.label}>
           <span>From library (media)</span>
           <select
@@ -310,10 +419,12 @@ export function IconSelectField({
   label,
   value,
   onChange,
+  required,
 }: {
   label: string;
   value: CmsIconName;
   onChange: (value: CmsIconName) => void;
+  required?: boolean;
 }) {
   const safe = cmsIconNames.includes(value as CmsIconName) ? value : cmsIconNames[0];
   const [open, setOpen] = useState(false);
@@ -338,8 +449,11 @@ export function IconSelectField({
   }, [open]);
 
   return (
-    <div ref={rootRef} className={styles.iconSelectRoot}>
-      <span className={styles.iconSelectLabel}>{label}</span>
+    <div ref={rootRef} className={`${styles.iconSelectRoot} ${required ? styles.iconSelectRootRequired : ''}`}>
+      <span className={required ? styles.iconSelectLabelRow : styles.iconSelectLabel}>
+        <span>{label}</span>
+        {required ? <RequiredAsterisk /> : null}
+      </span>
       <button
         type="button"
         className={styles.iconSelectTrigger}

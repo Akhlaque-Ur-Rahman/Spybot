@@ -7,6 +7,7 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useEffect, useMemo } from 'react';
 import { normalizeCmsRichTextInput, sanitizeCmsHref } from '@/lib/cms/rich-text';
+import fieldChrome from '@/components/admin/fields.module.css';
 import styles from '@/components/admin/RichTextField.module.css';
 
 function buildExtensions(placeholder: string) {
@@ -41,13 +42,18 @@ export default function RichTextField({
   onChange,
   placeholder = 'Write copy… Use toolbar for headings, bold, italic, links.',
   compact,
+  required,
+  emphasizeRequired = true,
 }: {
   label: string;
   value: unknown;
   onChange: (next: JSONContent) => void;
   placeholder?: string;
   compact?: boolean;
+  required?: boolean;
+  emphasizeRequired?: boolean;
 }) {
+  const shell = Boolean(required && emphasizeRequired);
   const initialContent = useMemo(() => normalizeCmsRichTextInput(value) as JSONContent, [value]);
   const extensions = useMemo(() => buildExtensions(placeholder), [placeholder]);
 
@@ -79,8 +85,17 @@ export default function RichTextField({
 
   if (!editor) {
     return (
-      <label className={styles.label}>
-        <span>{label}</span>
+      <label className={`${styles.label} ${shell ? fieldChrome.labelRequiredShell : ''}`}>
+        {required ? (
+          <span className={fieldChrome.labelHeading}>
+            <span>{label}</span>
+            <abbr className={fieldChrome.requiredAsterisk} title="Required">
+              *
+            </abbr>
+          </span>
+        ) : (
+          <span>{label}</span>
+        )}
         <div className={`${styles.editor} ${compact ? styles.editorCompact : ''}`} aria-busy="true">
           Loading editor…
         </div>
@@ -107,8 +122,17 @@ export default function RichTextField({
   }
 
   return (
-    <label className={styles.label}>
-      <span>{label}</span>
+    <label className={`${styles.label} ${shell ? fieldChrome.labelRequiredShell : ''}`}>
+      {required ? (
+        <span className={fieldChrome.labelHeading}>
+          <span>{label}</span>
+          <abbr className={fieldChrome.requiredAsterisk} title="Required">
+            *
+          </abbr>
+        </span>
+      ) : (
+        <span>{label}</span>
+      )}
       <div className={styles.toolbar} role="toolbar" aria-label="Text formatting">
         <button
           type="button"

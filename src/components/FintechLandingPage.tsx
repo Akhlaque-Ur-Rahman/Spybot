@@ -307,7 +307,8 @@ export default function FintechLandingPage({
   const backgroundKind = resolvedBackground ? mediaSourceKind(resolvedBackground.src) : 'other';
   const backgroundVideoType =
     resolvedBackground && backgroundKind === 'video' ? mediaEncodingFormat(resolvedBackground.src) : undefined;
-  const heroMedia = hero.media;
+  const heroMedia =
+    hero.media && typeof hero.media.src === 'string' && hero.media.src.trim() !== '' ? hero.media : undefined;
   const heroMediaKind = heroMedia ? mediaSourceKind(heroMedia.src) : 'other';
   const heroMediaType = heroMedia && heroMediaKind === 'video' ? mediaEncodingFormat(heroMedia.src) : undefined;
   const heroMediaAspectRatio = hero.mediaAspectRatio?.trim() || '16 / 10';

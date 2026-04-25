@@ -5,6 +5,54 @@
   color: var(--color-text-secondary);
 }
 
+.labelRequiredShell {
+  padding: var(--space-2) var(--space-3);
+  margin: 0 0 var(--space-1) 0;
+  border-radius: var(--radius-md, 8px);
+  border-left: 3px solid var(--color-danger);
+  background: rgba(var(--color-danger-rgb), 0.08);
+  box-shadow: inset 0 0 0 1px rgba(var(--color-danger-rgb), 0.14);
+}
+
+.labelHeading {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35ch;
+  flex-wrap: wrap;
+}
+
+.requiredAsterisk {
+  color: var(--color-danger);
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  cursor: help;
+}
+
+.fieldsetLegendRow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35ch;
+  flex-wrap: wrap;
+}
+
+.iconSelectRootRequired {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md, 8px);
+  border-left: 3px solid var(--color-danger);
+  background: rgba(var(--color-danger-rgb), 0.08);
+  box-shadow: inset 0 0 0 1px rgba(var(--color-danger-rgb), 0.14);
+}
+
+.iconSelectLabelRow {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35ch;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+  color: var(--color-text-secondary);
+}
+
 .input,
 .textarea,
 .select,

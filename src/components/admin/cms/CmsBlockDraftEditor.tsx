@@ -53,6 +53,18 @@ function mediaMeta(v: unknown): MediaClipMeta {
   return out;
 }
 
+/** Like mediaMeta but does not backfill defaults — for optional clips (e.g. fintech hero right media). */
+function mediaMetaLoose(v: unknown): MediaClipMeta {
+  const o = v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
+  const out: MediaClipMeta = {
+    src: str(o.src),
+    title: str(o.title),
+    description: str(o.description),
+  };
+  if (typeof o.poster === 'string' && o.poster.trim()) out.poster = o.poster;
+  return out;
+}
+
 function iconName(v: unknown): CmsIconName {
   const s = str(v, 'globe');
   return (cmsIconNames as readonly string[]).includes(s) ? (s as CmsIconName) : 'globe';
@@ -76,17 +88,29 @@ function EditorHero({ value, onChange }: Props) {
   return (
     <div style={{ display: 'grid', gap: 16 }}>
       <TextField label="Badge" value={str(o.badge)} onChange={(badge) => patch({ badge })} />
-      <TextField label="Headline" value={str(o.headline)} onChange={(headline) => patch({ headline })} />
+      <TextField label="Headline" required value={str(o.headline)} onChange={(headline) => patch({ headline })} />
       <TextField label="Headline gradient" value={str(o.headlineGradient)} onChange={(headlineGradient) => patch({ headlineGradient })} />
-      <RichTextField label="Subheadline" value={o.subheadline} onChange={(subheadline) => patch({ subheadline })} />
+      <RichTextField label="Subheadline" required value={o.subheadline} onChange={(subheadline) => patch({ subheadline })} />
       <LinkFields label="Primary CTA" value={link(o.primaryCta)} onChange={(primaryCta) => patch({ primaryCta })} />
       <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
       <MediaClipFields
-        label="Background media (hero backdrop)"
-        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.heroBackdrop)}
-        onChange={(backgroundMedia) => patch({ backgroundMedia })}
+        optional
+        label="Background media (optional)"
+        value={mediaMetaLoose(o.backgroundMedia)}
+        onChange={(backgroundMedia) => {
+          const src = (backgroundMedia.src ?? '').trim();
+          patch(src ? { backgroundMedia } : { backgroundMedia: undefined });
+        }}
       />
-      <MediaClipFields label="Right media" value={mediaMeta(o.media)} onChange={(media) => patch({ media })} />
+      <MediaClipFields
+        optional
+        label="Right media (optional)"
+        value={mediaMetaLoose(o.media)}
+        onChange={(media) => {
+          const src = (media.src ?? '').trim();
+          patch(src ? { media } : { media: undefined });
+        }}
+      />
       <TextField
         label="Right media aspect ratio (e.g. 16 / 10, 4 / 3)"
         value={str(o.mediaAspectRatio, '16 / 10')}
@@ -149,7 +173,7 @@ function EditorPageHeader({ value, onChange }: Props) {
   return (
     <div style={{ display: 'grid', gap: 16 }}>
       <TextField label="Eyebrow / label" value={str(o.label)} onChange={(label) => patch({ label })} />
-      <TextField label="Title" value={str(o.title)} onChange={(title) => patch({ title })} />
+      <TextField label="Title" required value={str(o.title)} onChange={(title) => patch({ title })} />
       <TextField label="Gradient text" value={str(o.gradientText)} onChange={(gradientText) => patch({ gradientText })} />
       <RichTextField
         label="Description"
@@ -159,11 +183,23 @@ function EditorPageHeader({ value, onChange }: Props) {
       <LinkFields label="Primary CTA" value={link(o.primaryCta)} onChange={(primaryCta) => patch({ primaryCta })} />
       <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
       <MediaClipFields
+        optional
         label="Background media (optional)"
-        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.heroBackdrop)}
-        onChange={(backgroundMedia) => patch({ backgroundMedia })}
+        value={mediaMetaLoose(o.backgroundMedia)}
+        onChange={(backgroundMedia) => {
+          const src = (backgroundMedia.src ?? '').trim();
+          patch(src ? { backgroundMedia } : { backgroundMedia: undefined });
+        }}
       />
-      <MediaClipFields label="Right media (optional)" value={mediaMeta(o.media ?? MEDIA_CLIPS.homeHero)} onChange={(media) => patch({ media })} />
+      <MediaClipFields
+        optional
+        label="Right media (optional)"
+        value={mediaMetaLoose(o.media)}
+        onChange={(media) => {
+          const src = (media.src ?? '').trim();
+          patch(src ? { media } : { media: undefined });
+        }}
+      />
       <TextField
         label="Right media aspect ratio (e.g. 16 / 10, 4 / 3)"
         value={str(o.mediaAspectRatio, '16 / 10')}
@@ -189,8 +225,8 @@ function EditorFintechHero({ value, onChange }: Props) {
   return (
     <div style={{ display: 'grid', gap: 16 }}>
       <TextField label="Label" value={str(o.label)} onChange={(label) => patch({ label })} />
-      <TextField label="Title" value={str(o.title)} onChange={(title) => patch({ title })} />
-      <RichTextField label="Description" value={o.description} onChange={(description) => patch({ description })} />
+      <TextField label="Title" required value={str(o.title)} onChange={(title) => patch({ title })} />
+      <RichTextField label="Description" required value={o.description} onChange={(description) => patch({ description })} />
       <RichTextField
         label="Secondary description (optional)"
         value={o.secondaryDescription}
@@ -199,14 +235,22 @@ function EditorFintechHero({ value, onChange }: Props) {
       <LinkFields label="Primary CTA" value={link(o.primaryCta)} onChange={(primaryCta) => patch({ primaryCta })} />
       <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
       <MediaClipFields
-        label="Background media (hero backdrop)"
-        value={mediaMeta(o.backgroundMedia ?? MEDIA_CLIPS.heroBackdrop)}
-        onChange={(backgroundMedia) => patch({ backgroundMedia })}
+        optional
+        label="Background media (optional)"
+        value={mediaMetaLoose(o.backgroundMedia)}
+        onChange={(backgroundMedia) => {
+          const src = (backgroundMedia.src ?? '').trim();
+          patch(src ? { backgroundMedia } : { backgroundMedia: undefined });
+        }}
       />
       <MediaClipFields
-        label="Right media"
-        value={mediaMeta(o.media ?? MEDIA_CLIPS.homeHero)}
-        onChange={(media) => patch({ media })}
+        optional
+        label="Right media (optional)"
+        value={mediaMetaLoose(o.media)}
+        onChange={(media) => {
+          const src = (media.src ?? '').trim();
+          patch(src ? { media } : { media: undefined });
+        }}
       />
       <TextField
         label="Right media aspect ratio (e.g. 16 / 10, 4 / 3)"
@@ -253,6 +297,7 @@ function EditorCoverageCarousel({ value, onChange }: Props) {
           <RepeatItemShell key={i} title="Coverage item" index={i} onRemove={() => patchItems(items.filter((_, j) => j !== i))}>
             <TextField
               label="Title"
+              required
               value={str(r.title)}
               onChange={(title) => {
                 const next = [...items];
@@ -293,7 +338,7 @@ function EditorDirectoryGrid({ value, onChange }: Props) {
   return (
     <div style={{ display: 'grid', gap: 16 }}>
       <TextField label="Block id (optional)" value={str(o.id)} onChange={(id) => onChange({ ...o, id })} />
-      <TextField label="Heading" value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
+      <TextField label="Heading" required value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
       <RichTextField label="Subheading" value={o.subheading} onChange={(subheading) => onChange({ ...o, subheading })} />
       <div className={styles.repeatToolbar}>
         <strong>Items</strong>
@@ -316,6 +361,7 @@ function EditorDirectoryGrid({ value, onChange }: Props) {
             }} />
             <RichTextField
               label="Description"
+              required
               compact
               value={row.description}
               onChange={(description) => {
@@ -347,7 +393,7 @@ function EditorSliderSection({ value, onChange }: Props) {
   const patchItems = (next: unknown[]) => onChange({ ...o, items: next });
   return (
     <div style={{ display: 'grid', gap: 16 }}>
-      <TextField label="Heading" value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
+      <TextField label="Heading" required value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
       <TextField label="Gradient text" value={str(o.gradientText)} onChange={(gradientText) => onChange({ ...o, gradientText })} />
       <TextField label="Aria label" value={str(o.ariaLabel)} onChange={(ariaLabel) => onChange({ ...o, ariaLabel })} />
       <div className={styles.repeatToolbar}>
@@ -367,6 +413,7 @@ function EditorSliderSection({ value, onChange }: Props) {
             }} />
             <RichTextField
               label="Description"
+              required
               compact
               value={row.desc}
               onChange={(desc) => {
@@ -392,9 +439,9 @@ function EditorUtilityCtaBand({ value, onChange }: Props) {
   const patch = (p: Record<string, unknown>) => onChange({ ...o, ...p });
   return (
     <div style={{ display: 'grid', gap: 16 }}>
-      <TextField label="Title" value={str(o.title)} onChange={(title) => patch({ title })} />
+      <TextField label="Title" required value={str(o.title)} onChange={(title) => patch({ title })} />
       <RichTextField label="Description" value={o.description} onChange={(description) => patch({ description })} />
-      <CardLinkFields label="Primary button" value={cardLink(o.primary)} onChange={(primary) => patch({ primary })} />
+      <CardLinkFields label="Primary button" required value={cardLink(o.primary)} onChange={(primary) => patch({ primary })} />
       <CardLinkFields label="Secondary button (optional)" value={cardLink(o.secondary ?? { label: '', href: '', variant: 'ghost' })} onChange={(secondary) => patch({ secondary })} />
     </div>
   );
@@ -450,7 +497,7 @@ function EditorFaqAccordion({ value, onChange }: Props) {
                     patchGroups(next);
                   }}
                 >
-                  <TextField label="Question" value={str(row.q)} onChange={(q) => {
+                  <TextField label="Question" required value={str(row.q)} onChange={(q) => {
                     const nextItems = [...items];
                     nextItems[qi] = { ...row, q };
                     const next = [...groups];
@@ -459,6 +506,7 @@ function EditorFaqAccordion({ value, onChange }: Props) {
                   }} />
                   <RichTextField
                     label="Answer"
+                    required
                     value={row.a}
                     compact
                     onChange={(a) => {
@@ -485,9 +533,9 @@ function EditorSupportPathways({ value, onChange }: Props) {
   const patchPath = (next: unknown[]) => onChange({ ...o, pathways: next });
   return (
     <div style={{ display: 'grid', gap: 16 }}>
-      <TextField label="Heading" value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
+      <TextField label="Heading" required value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
       <TextField label="Gradient text" value={str(o.gradientText)} onChange={(gradientText) => onChange({ ...o, gradientText })} />
-      <RichTextField label="Subheading" value={o.subheading} onChange={(subheading) => onChange({ ...o, subheading })} />
+      <RichTextField label="Subheading" required value={o.subheading} onChange={(subheading) => onChange({ ...o, subheading })} />
       <div className={styles.repeatToolbar}>
         <strong>Pathways</strong>
         <button
@@ -519,6 +567,7 @@ function EditorSupportPathways({ value, onChange }: Props) {
             }} />
             <RichTextField
               label="Description"
+              required
               compact
               value={row.desc}
               onChange={(desc) => {
@@ -527,7 +576,7 @@ function EditorSupportPathways({ value, onChange }: Props) {
                 patchPath(next);
               }}
             />
-            <LinkFields label="Action link" value={link(row.action)} onChange={(action) => {
+            <LinkFields label="Action link" required value={link(row.action)} onChange={(action) => {
               const next = [...pathways];
               next[i] = { ...row, action };
               patchPath(next);
@@ -545,7 +594,7 @@ function EditorSupportSlaStrip({ value, onChange }: Props) {
   const patchCards = (next: unknown[]) => onChange({ ...o, cards: next });
   return (
     <div style={{ display: 'grid', gap: 16 }}>
-      <TextField label="Heading" value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
+      <TextField label="Heading" required value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
       <div className={styles.repeatToolbar}>
         <strong>Cards</strong>
         <button type="button" className={styles.btnSmall} onClick={() => patchCards([...cards, { kicker: '', value: '', note: '' }])}>
@@ -584,7 +633,7 @@ function EditorResourceGrid({ value, onChange }: Props) {
   const patchTiles = (next: unknown[]) => onChange({ ...o, tiles: next });
   return (
     <div style={{ display: 'grid', gap: 16 }}>
-      <TextField label="Heading" value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
+      <TextField label="Heading" required value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
       <TextField label="Gradient text" value={str(o.gradientText)} onChange={(gradientText) => onChange({ ...o, gradientText })} />
       <div className={styles.repeatToolbar}>
         <strong>Tiles</strong>
@@ -603,6 +652,7 @@ function EditorResourceGrid({ value, onChange }: Props) {
             }} />
             <RichTextField
               label="Description"
+              required
               compact
               value={row.desc}
               onChange={(desc) => {
@@ -634,7 +684,7 @@ function EditorContactHighlights({ value, onChange }: Props) {
   const patchItems = (next: unknown[]) => onChange({ ...o, items: next });
   return (
     <div style={{ display: 'grid', gap: 16 }}>
-      <TextField label="Heading" value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
+      <TextField label="Heading" required value={str(o.heading)} onChange={(heading) => onChange({ ...o, heading })} />
       <TextField label="Gradient text" value={str(o.gradientText)} onChange={(gradientText) => onChange({ ...o, gradientText })} />
       <div className={styles.repeatToolbar}>
         <strong>Highlights</strong>
@@ -658,6 +708,7 @@ function EditorContactHighlights({ value, onChange }: Props) {
             }} />
             <RichTextField
               label="Description"
+              required
               compact
               value={row.desc}
               onChange={(desc) => {
@@ -706,6 +757,7 @@ function EditorNamedItemsBenefits({ value, onChange }: Props) {
             }} />
             <RichTextField
               label="Description"
+              required
               compact
               value={row.desc}
               onChange={(desc) => {
@@ -764,6 +816,7 @@ function EditorChallenges({ value, onChange }: Props) {
             }} />
             <RichTextField
               label="Description"
+              required
               compact
               value={row.desc}
               onChange={(desc) => {
@@ -826,6 +879,7 @@ function EditorLifecycle({ value, onChange }: Props) {
             }} />
             <RichTextField
               label="Description"
+              required
               compact
               value={row.desc}
               onChange={(desc) => {
@@ -849,9 +903,9 @@ function EditorDecisionFlow({ value, onChange }: Props) {
   return (
     <div style={{ display: 'grid', gap: 16 }}>
       <TextField label="Label" value={str(o.label)} onChange={(label) => patch({ label })} />
-      <TextField label="Title" value={str(o.title)} onChange={(title) => patch({ title })} />
+      <TextField label="Title" required value={str(o.title)} onChange={(title) => patch({ title })} />
       <TextField label="Gradient text" value={str(o.gradientText)} onChange={(gradientText) => patch({ gradientText })} />
-      <RichTextField label="Subtitle" value={o.subtitle} onChange={(subtitle) => patch({ subtitle })} />
+      <RichTextField label="Subtitle" required value={o.subtitle} onChange={(subtitle) => patch({ subtitle })} />
       <TextField label="Panel title" value={str(o.panelTitle)} onChange={(panelTitle) => patch({ panelTitle })} />
       <TextField label="Panel badge" value={str(o.panelBadge)} onChange={(panelBadge) => patch({ panelBadge })} />
       <div className={styles.repeatToolbar}>
@@ -905,6 +959,7 @@ function EditorDecisionFlow({ value, onChange }: Props) {
             }} />
             <RichTextField
               label="Description"
+              required
               compact
               value={row.desc}
               onChange={(desc) => {
@@ -917,7 +972,7 @@ function EditorDecisionFlow({ value, onChange }: Props) {
         );
       })}
       <TextField label="Note title" value={str(o.noteTitle)} onChange={(noteTitle) => patch({ noteTitle })} />
-      <RichTextField label="Note text" value={o.noteText} onChange={(noteText) => patch({ noteText })} />
+      <RichTextField label="Note text" required value={o.noteText} onChange={(noteText) => patch({ noteText })} />
     </div>
   );
 }
@@ -936,15 +991,15 @@ function EditorSolutionShowcase({ value, onChange }: Props) {
 
   return (
     <div style={{ display: 'grid', gap: 16 }}>
-      <TextField label="Title" value={str(o.title)} onChange={(title) => patchRoot({ title })} />
+      <TextField label="Title" required value={str(o.title)} onChange={(title) => patchRoot({ title })} />
       <TextField
         label="Title gradient (optional)"
         value={str(o.titleGradient)}
         onChange={(titleGradient) => patchRoot({ titleGradient })}
       />
-      <TextAreaField label="Subtitle" value={str(o.subtitle)} onChange={(subtitle) => patchRoot({ subtitle })} rows={3} />
-      <LinkFields label="Primary CTA" value={link(o.primaryCta)} onChange={(primaryCta) => patchRoot({ primaryCta })} />
-      <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patchRoot({ secondaryCta })} />
+      <TextAreaField label="Subtitle" required value={str(o.subtitle)} onChange={(subtitle) => patchRoot({ subtitle })} rows={3} />
+      <LinkFields label="Primary CTA" required value={link(o.primaryCta)} onChange={(primaryCta) => patchRoot({ primaryCta })} />
+      <LinkFields label="Secondary CTA" required value={link(o.secondaryCta)} onChange={(secondaryCta) => patchRoot({ secondaryCta })} />
 
       <div className={styles.repeatToolbar}>
         <strong>Tabs</strong>
@@ -987,6 +1042,7 @@ function EditorSolutionShowcase({ value, onChange }: Props) {
             <div className={styles.fieldGrid2}>
               <TextField
                 label="Tab id"
+                required
                 value={str(vert.id)}
                 onChange={(id) => {
                   const next = [...verticals];
@@ -996,6 +1052,7 @@ function EditorSolutionShowcase({ value, onChange }: Props) {
               />
               <TextField
                 label="Tab label"
+                required
                 value={str(vert.label)}
                 onChange={(label) => {
                   const next = [...verticals];
@@ -1006,6 +1063,7 @@ function EditorSolutionShowcase({ value, onChange }: Props) {
             </div>
             <TextField
               label="Panel title"
+              required
               value={str(vert.panelTitle)}
               onChange={(panelTitle) => {
                 const next = [...verticals];
@@ -1015,6 +1073,7 @@ function EditorSolutionShowcase({ value, onChange }: Props) {
             />
             <TextAreaField
               label="Panel description"
+              required
               value={str(vert.panelDescription)}
               onChange={(panelDescription) => {
                 const next = [...verticals];
@@ -1040,6 +1099,7 @@ function EditorSolutionShowcase({ value, onChange }: Props) {
                 <RepeatItemShell key={ci} title="Card" index={ci} onRemove={() => patchCards(cards.filter((_, j) => j !== ci))}>
                   <SelectField
                     label="Icon"
+                    required
                     value={showcaseIconValue(card.icon)}
                     options={iconOptions}
                     onChange={(icon) => {
@@ -1050,6 +1110,7 @@ function EditorSolutionShowcase({ value, onChange }: Props) {
                   />
                   <TextField
                     label="Title"
+                    required
                     value={str(card.title)}
                     onChange={(title) => {
                       const nc = [...cards];
@@ -1059,6 +1120,7 @@ function EditorSolutionShowcase({ value, onChange }: Props) {
                   />
                   <TextAreaField
                     label="Description"
+                    required
                     value={str(card.description)}
                     onChange={(description) => {
                       const nc = [...cards];
@@ -1085,18 +1147,18 @@ function EditorDemoSection({ value, onChange }: Props) {
   return (
     <div style={{ display: 'grid', gap: 16 }}>
       <TextField label="Section label" value={str(o.sectionLabel)} onChange={(sectionLabel) => patch({ sectionLabel })} />
-      <TextField label="Title" value={str(o.title)} onChange={(title) => patch({ title })} />
+      <TextField label="Title" required value={str(o.title)} onChange={(title) => patch({ title })} />
       <TextField label="Gradient text" value={str(o.gradientText)} onChange={(gradientText) => patch({ gradientText })} />
-      <RichTextField label="Subtitle" value={o.subtitle} onChange={(subtitle) => patch({ subtitle })} />
+      <RichTextField label="Subtitle" required value={o.subtitle} onChange={(subtitle) => patch({ subtitle })} />
       <TextField label="Social proof rating" value={str(o.socialProofRating)} onChange={(socialProofRating) => patch({ socialProofRating })} />
-      <RichTextField label="Social proof text" value={o.socialProofText} compact onChange={(socialProofText) => patch({ socialProofText })} />
-      <RichTextField label="Social proof subtext" value={o.socialProofSubtext} compact onChange={(socialProofSubtext) => patch({ socialProofSubtext })} />
+      <RichTextField label="Social proof text" required value={o.socialProofText} compact onChange={(socialProofText) => patch({ socialProofText })} />
+      <RichTextField label="Social proof subtext" required value={o.socialProofSubtext} compact onChange={(socialProofSubtext) => patch({ socialProofSubtext })} />
       <TextField label="Form title" value={str(o.formTitle)} onChange={(formTitle) => patch({ formTitle })} />
       <TextField label="Submit label" value={str(o.submitLabel)} onChange={(submitLabel) => patch({ submitLabel })} />
-      <RichTextField label="Form note" value={o.formNote} onChange={(formNote) => patch({ formNote })} />
+      <RichTextField label="Form note" required value={o.formNote} onChange={(formNote) => patch({ formNote })} />
       <TextField label="Loading title" value={str(o.loadingTitle)} onChange={(loadingTitle) => patch({ loadingTitle })} />
       <TextField label="Success title" value={str(o.successTitle)} onChange={(successTitle) => patch({ successTitle })} />
-      <RichTextField label="Success text" value={o.successText} onChange={(successText) => patch({ successText })} />
+      <RichTextField label="Success text" required value={o.successText} onChange={(successText) => patch({ successText })} />
       <TextAreaField label="Success JSON (raw)" value={str(o.successJson)} onChange={(successJson) => patch({ successJson })} rows={3} />
       <LinkFields label="Success action" value={link(o.successAction)} onChange={(successAction) => patch({ successAction })} />
       <MediaClipFields label="Media" value={mediaMeta(o.media)} onChange={(media) => patch({ media })} />
@@ -1122,6 +1184,7 @@ function EditorDemoSection({ value, onChange }: Props) {
             }} />
             <RichTextField
               label="Description"
+              required
               compact
               value={row.desc}
               onChange={(desc) => {

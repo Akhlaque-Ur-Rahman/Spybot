@@ -135,14 +135,6 @@ const refinements: Record<CmsBlockType, Refine> = {
   },
   fintechHero: (o) => {
     if (typeof o.title !== 'string') return 'fintechHero: title (string) required';
-    const mediaObj = o.media;
-    const hasMediaSrc =
-      mediaObj &&
-      typeof mediaObj === 'object' &&
-      !Array.isArray(mediaObj) &&
-      typeof (mediaObj as { src?: unknown }).src === 'string' &&
-      String((mediaObj as { src?: unknown }).src).trim() !== '';
-    if (!hasMediaSrc) return 'fintechHero: media.src required';
     if (o.mediaAspectRatio !== undefined && o.mediaAspectRatio !== null && typeof o.mediaAspectRatio !== 'string') {
       return 'fintechHero: mediaAspectRatio must be a string';
     }
