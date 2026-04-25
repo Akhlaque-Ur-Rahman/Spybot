@@ -27,6 +27,7 @@ import type {
   CmsDemoSectionBlock,
   CmsDirectoryGridBlock,
   CmsFaqAccordionBlock,
+  CmsFintechHeroBlock,
   CmsHeroBlock,
   CmsLifecycleBlock,
   CmsPageHeaderBlock,
@@ -69,6 +70,25 @@ function renderBlock(block: ManagedCmsPage['sections'][number]['blocks'][number]
           media={p.media}
           mediaAspectRatio={p.mediaAspectRatio}
           mediaObjectFit={p.mediaObjectFit}
+        />
+      );
+    }
+    case 'fintechHero': {
+      const h = v as CmsFintechHeroBlock;
+      return (
+        <PageHeader
+          key={key}
+          label={h.label}
+          title={h.title}
+          gradientText=""
+          description={h.description}
+          secondaryDescription={h.secondaryDescription}
+          primaryCta={h.primaryCta}
+          secondaryCta={h.secondaryCta}
+          backgroundMedia={h.backgroundMedia}
+          media={h.media}
+          mediaAspectRatio={h.mediaAspectRatio}
+          mediaObjectFit={h.mediaObjectFit}
         />
       );
     }

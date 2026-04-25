@@ -1,5 +1,5 @@
 'use client';
-import Image, { type ImageLoader } from 'next/image';
+import Image from 'next/image';
 import styles from './Hero.module.css';
 import richTextStyles from '@/components/CmsRichText.module.css';
 import { Rocket } from 'lucide-react';
@@ -10,7 +10,6 @@ import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
 
 const heroClip = MEDIA_CLIPS.homeHero;
-const passthroughLoader: ImageLoader = ({ src }) => src;
 
 const stats = [
   { value: '99.99%', label: 'Uptime SLA' },
@@ -77,7 +76,6 @@ export function HeroSection({ content }: { content?: HeroContent }) {
           </video>
         ) : isBackgroundImage ? (
           <Image
-            loader={passthroughLoader}
             unoptimized
             src={backgroundClip.src}
             alt={backgroundClip.title}
@@ -148,7 +146,6 @@ export function HeroSection({ content }: { content?: HeroContent }) {
             </video>
           ) : isImageSource ? (
             <Image
-              loader={passthroughLoader}
               unoptimized
               src={resolvedClip.src}
               alt={resolvedClip.title}

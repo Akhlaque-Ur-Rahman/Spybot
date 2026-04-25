@@ -1,5 +1,5 @@
 import styles from './PageHeader.module.css';
-import Image, { type ImageLoader } from 'next/image';
+import Image from 'next/image';
 import ViewportVideo from './ViewportVideo';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
@@ -9,13 +9,13 @@ import {
   resolveOptionalHeroBackground,
   type MediaClipMeta,
 } from '@/lib/site-media';
-const passthroughLoader: ImageLoader = ({ src }) => src;
 
 interface PageHeaderProps {
   label: string;
   title: string;
   gradientText: string;
   description: CmsRichTextValue;
+  secondaryDescription?: CmsRichTextValue;
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
   backgroundMedia?: MediaClipMeta;
@@ -32,6 +32,7 @@ export default function PageHeader({
   description,
   primaryCta,
   secondaryCta,
+  secondaryDescription,
   backgroundMedia,
   media,
   mediaAspectRatio,
@@ -65,7 +66,6 @@ export default function PageHeader({
             </video>
           ) : backgroundKind === 'image' ? (
             <Image
-              loader={passthroughLoader}
               unoptimized
               className={styles.backgroundMedia}
               src={resolvedBackground.src}
@@ -85,12 +85,26 @@ export default function PageHeader({
               {label}
             </span>
             <h1 className={styles.title}>
-              {title} <br />
-              <span className="text-gradient">{gradientText}</span>
+              {gradientText?.trim() ? (
+                <>
+                  {title} <br />
+                  <span className="text-gradient">{gradientText}</span>
+                </>
+              ) : (
+                <span className="text-gradient">{title}</span>
+              )}
             </h1>
             <div className={`${styles.subtitle} ${styles.richProse} fade-up`} style={{ animationDelay: '0.1s', opacity: 0 }}>
               {renderCmsRichText(description)}
             </div>
+            {secondaryDescription ? (
+              <div
+                className={`${styles.subtitle} ${styles.richProse} fade-up`}
+                style={{ animationDelay: '0.12s', opacity: 0, marginTop: '0.75rem' }}
+              >
+                {renderCmsRichText(secondaryDescription)}
+              </div>
+            ) : null}
 
             <div className={`${styles.ctas} fade-up`} style={{ animationDelay: '0.2s', opacity: 0 }}>
               {primaryCta && (
@@ -119,7 +133,6 @@ export default function PageHeader({
                 />
               ) : mediaKind === 'image' ? (
                 <Image
-                  loader={passthroughLoader}
                   unoptimized
                   className={styles.mediaVideo}
                   src={media.src}
