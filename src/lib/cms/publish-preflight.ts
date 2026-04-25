@@ -103,7 +103,7 @@ export function runPublishPreflight(page: PageWithBlocks): PublishPreflightRepor
     errors.push({
       severity: 'error',
       message:
-        'Each page allows exactly one primary hero: use either Hero or Fintech hero, not multiple. Remove extra hero sections until only one remains.',
+        'Only one Hero or Fintech hero per page. In Sections, Remove one duplicate hero row.',
     });
   }
 

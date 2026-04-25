@@ -125,6 +125,7 @@ export default function ContentPageEditor({
   /** Empty = custom block type only; otherwise starter template id (matches block type). */
   const [newSectionTemplateId, setNewSectionTemplateId] = useState<string>('');
   const [addingSection, setAddingSection] = useState(false);
+  const [removingSectionKey, setRemovingSectionKey] = useState<string | null>(null);
   const [savingMeta, setSavingMeta] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
   const [deletingPage, setDeletingPage] = useState(false);
@@ -434,6 +435,28 @@ export default function ContentPageEditor({
     }
   }
 
+  async function removeSection(sectionKey: string) {
+    if (sectionKeys.length <= 1) {
+      push('This page must keep at least one section.', 'error');
+      return;
+    }
+    const label = page.sections.find((s) => s.key === sectionKey)?.label ?? sectionKey;
+    if (!window.confirm(`Remove section “${label}”?`)) return;
+    setRemovingSectionKey(sectionKey);
+    try {
+      await fetchJson(`/api/admin/content/${encodeURIComponent(page.key)}/sections/${encodeURIComponent(sectionKey)}`, {
+        method: 'DELETE',
+      });
+      push('Section removed.', 'success');
+      router.refresh();
+    } catch (e) {
+      logAdminClientError('ContentPageEditor.removeSection', e);
+      push(e instanceof Error ? e.message : 'Could not remove section. Please try again.', 'error');
+    } finally {
+      setRemovingSectionKey(null);
+    }
+  }
+
   async function deletePage() {
     if (!deletable) return;
     if (!window.confirm(`Remove “${page.title}” from the site? This cannot be undone.`)) return;
@@ -568,7 +591,7 @@ export default function ContentPageEditor({
       <div className={pageStyles.card}>
         <h4 className={pageStyles.cardTitle}>Sections</h4>
         <p className={pageStyles.lead} style={{ marginTop: 0 }}>
-          Reorder or add sections.
+          Reorder, add, or remove sections.
         </p>
         <div className={pageStyles.row} style={{ marginBottom: 12 }}>
           <label className={pageStyles.lead} style={{ display: 'grid', gap: 6, minWidth: 240, margin: 0 }}>
@@ -655,6 +678,15 @@ export default function ContentPageEditor({
                   }}
                 >
                   Down
+                </button>
+                <button
+                  type="button"
+                  className={`${pageStyles.btn} ${pageStyles.btnDanger}`}
+                  style={{ marginLeft: 4 }}
+                  disabled={sectionKeys.length <= 1 || removingSectionKey !== null}
+                  onClick={() => void removeSection(key)}
+                >
+                  {removingSectionKey === key ? 'Removing…' : 'Remove'}
                 </button>
               </span>
             </li>
