@@ -112,6 +112,9 @@ export function HeroSection({ content }: { content?: HeroContent }) {
               preload="metadata"
               poster={mediaPoster}
               style={{ aspectRatio: mediaAspectRatio, objectFit: mediaObjectFit }}
+              disablePictureInPicture
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
             >
               <source src={resolvedClip.src} type={heroVideoType} />
             </video>

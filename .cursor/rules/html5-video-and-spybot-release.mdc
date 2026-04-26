@@ -1,0 +1,21 @@
+---
+description: HTML5 video context menu handling on Spybot; how production updates ship
+alwaysApply: true
+---
+
+# HTML5 `<video>` and releases
+
+## Right-click / “Save video as”
+
+- The browser shows a **native** context menu on `<video>` (save, copy address, etc.). It is not controlled by CSS alone.
+- **Discourage casual saving:** on client components use `onContextMenu={(e) => e.preventDefault()}`, `draggable={false}`, and `disablePictureInPicture` where PiP is unwanted.
+- **`controlsList="nodownload"`** only affects the **built-in control bar** and is relevant when the element has the **`controls`** attribute. It does not replace `preventDefault` on the context menu for videos without `controls`.
+- **`onContextMenu` / other DOM handlers** require a **Client Component** (`'use client'`) or a small client child. Do not attach them from a Server Component.
+- This is **not DRM**. Anyone with the media URL or DevTools can still fetch the file. Real protection needs signed URLs, short-lived tokens, encrypted streaming, etc.
+
+## Making Spybot changes live (this repo)
+
+- **Canonical path:** commit on `main` and **`git push origin main`** (or `master`). GitHub Actions **`.github/workflows/ci.yml`** runs lint/test/build, then **deploy** (if repo secrets `SSH_PRIVATE_KEY` and `DEPLOY_HOST` are set): `rsync` to the server, `pnpm install --frozen-lockfile`, `pnpm db:push`, `pnpm build`, and **`sudo systemctl restart spybot`** when `spybot.service` is enabled.
+- **Do not assume Vercel** for this project; production is **self-hosted** (Caddy + systemd). See `docs/production-server.md` and `README.md` (CI and deploy).
+- If push or CI is unavailable but the repo is already on the **app server** at the deploy path, you can still apply a verified tree with **`pnpm build`** and **`sudo systemctl restart spybot`** (after `pnpm install` / schema steps as needed). That does not replace pushing for long-term source of truth.
+- **Common pitfall:** the server copy under `/var/www/Spybot` may have **no GitHub SSH key** for `git@github.com`; `git push` then fails with `Permission denied (publickey)`. CI deploy still works when someone pushes from a machine that **can** authenticate to GitHub. To go live **on that server only**, run **`pnpm build`** (from the updated tree) and **`sudo systemctl restart spybot`** so `next start` serves the new `.next` output.

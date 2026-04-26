@@ -73,7 +73,9 @@ export default function ViewportVideo({
       aria-label={ariaLabel}
       style={style}
       disablePictureInPicture
+      draggable={false}
       tabIndex={-1}
+      onContextMenu={(e) => e.preventDefault()}
     >
       <source src={src} type={type} />
     </video>

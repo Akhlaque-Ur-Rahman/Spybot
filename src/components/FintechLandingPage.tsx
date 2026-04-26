@@ -399,6 +399,9 @@ export default function FintechLandingPage({
                   preload="metadata"
                   poster={heroMedia.poster}
                   style={{ aspectRatio: heroMediaAspectRatio, objectFit: heroMediaObjectFit }}
+                  disablePictureInPicture
+                  draggable={false}
+                  onContextMenu={(e) => e.preventDefault()}
                 >
                   <source src={heroMedia.src} type={heroMediaType} />
                 </video>
