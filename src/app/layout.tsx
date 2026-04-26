@@ -15,10 +15,6 @@ import {
 } from '@/lib/cms/service';
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#0C121D' },
-    { media: '(prefers-color-scheme: light)', color: '#F6F8FC' },
-  ],
   width: 'device-width',
   initialScale: 1,
 };
@@ -84,7 +80,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const themeScript = `(function(){try{document.documentElement.classList.add('js');var t=localStorage.getItem('spybot-theme');var r=t==='light'?'light':t==='dark'?'dark':window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',r);}catch(e){}})();`;
+const themeScript = `(function(){try{document.documentElement.classList.add('js');var t=localStorage.getItem('spybot-theme');var r=t==='light'?'light':t==='dark'?'dark':window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',r);var hex=r==='light'?'#F6F8FC':'#0C121D';var all=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<all.length;i++){var n=all[i];n.parentNode&&n.parentNode.removeChild(n);}var m=document.createElement('meta');m.setAttribute('name','theme-color');m.setAttribute('content',hex);document.head.appendChild(m);}catch(e){}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const enableNavEnhancements = process.env.NEXT_PUBLIC_NAV_ENHANCED !== '0';

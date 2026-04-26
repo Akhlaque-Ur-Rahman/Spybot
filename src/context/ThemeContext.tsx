@@ -20,13 +20,29 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
+/** Matches `globals.css` `--color-bg` for dark / light roots (browser chrome / PWA). */
+const THEME_COLOR_HEX: Record<'light' | 'dark', string> = {
+  dark: '#0C121D',
+  light: '#F6F8FC',
+};
+
 function getSystemTheme(): 'light' | 'dark' {
   if (typeof window === 'undefined') return 'dark';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+function syncThemeColorMeta(resolved: 'light' | 'dark') {
+  const hex = THEME_COLOR_HEX[resolved];
+  document.querySelectorAll('meta[name="theme-color"]').forEach((el) => el.remove());
+  const meta = document.createElement('meta');
+  meta.setAttribute('name', 'theme-color');
+  meta.setAttribute('content', hex);
+  document.head.appendChild(meta);
+}
+
 function applyTheme(resolved: 'light' | 'dark') {
   document.documentElement.setAttribute('data-theme', resolved);
+  syncThemeColorMeta(resolved);
 }
 
 function getInitialTheme(): Theme {

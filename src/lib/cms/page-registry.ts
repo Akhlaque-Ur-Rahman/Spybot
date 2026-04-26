@@ -1014,6 +1014,109 @@ const supplementalMarketingPages: CmsRegistryPage[] = [
       secondaryCta: { label: 'Back to insurance industries', href: ROUTES.insurance },
       media: MEDIA_CLIPS.industriesHub,
     },
+    coverageLabel: 'Claim-stage verification coverage',
+    challenges: {
+      label: 'Where claim settlement slows down',
+      title: 'Manual claim reviews create',
+      gradientText: 'avoidable delays and risk',
+      subtitle:
+        'Death claim teams balance empathy, compliance, and fraud prevention. Without structured evidence collection, both TAT and audit quality suffer.',
+      items: [
+        {
+          icon: 'timer',
+          title: 'Document loops increase settlement TAT',
+          desc: 'Missing nominee, relationship, or bank proofs trigger repeated follow-ups across branch and operations teams.',
+          tone: 'warning',
+        },
+        {
+          icon: 'shieldAlert',
+          title: 'Fraud checks are inconsistent across channels',
+          desc: 'When screening logic differs by channel, similar claims can be treated differently and escalate avoidable disputes.',
+          tone: 'danger',
+        },
+        {
+          icon: 'userX',
+          title: 'Complex claims depend on manual judgment',
+          desc: 'High-value or edge cases become person-dependent without guided routing and step-up verification rules.',
+          tone: 'info',
+        },
+      ],
+    },
+    lifecycle: {
+      label: 'How a defensible death-claim flow runs',
+      title: 'From intimation to payout with',
+      gradientText: 'clear evidence at each step',
+      subtitle:
+        'Standardize the claim journey so operations, fraud, and audit teams can make faster decisions with less back-and-forth.',
+      steps: [
+        {
+          num: '01',
+          icon: 'fileText',
+          title: 'Capture intimation and policy context',
+          desc: 'Collect policy identifiers, claimant details, and required claim metadata in a structured intake.',
+        },
+        {
+          num: '02',
+          icon: 'userCheck',
+          title: 'Verify claimant and nominee identity',
+          desc: 'Run identity and relationship checks with step-up rules for mismatch, reuse, or high-risk patterns.',
+        },
+        {
+          num: '03',
+          icon: 'search',
+          title: 'Validate supporting documents',
+          desc: 'Extract and validate certificates, proofs, and declarations while flagging tampering or missing fields.',
+        },
+        {
+          num: '04',
+          icon: 'landmark',
+          title: 'Confirm payout destination controls',
+          desc: 'Validate account ownership and payout readiness before release to reduce reversal and dispute risk.',
+        },
+        {
+          num: '05',
+          icon: 'checkCircle2',
+          title: 'Approve with an audit-ready decision packet',
+          desc: 'Finalize claims with a complete evidence trail across checks, exceptions, and reviewer actions.',
+        },
+      ],
+    },
+    benefits: {
+      label: 'Outcomes for claims operations',
+      title: 'Faster settlement with',
+      gradientText: 'stronger fraud control',
+      subtitle:
+        'Combine automated checks and guided review paths to improve claimant experience while preserving underwriting and compliance standards.',
+      items: [
+        {
+          icon: 'clock',
+          title: 'Shorter settlement cycles',
+          desc: 'Reduce repeated document follow-ups through structured intake, routing, and validation.',
+          highlight: 'primary',
+        },
+        {
+          icon: 'shieldCheck',
+          title: 'Consistent fraud defenses',
+          desc: 'Apply the same risk and step-up policies across assisted, branch, and digital claim channels.',
+          highlight: 'teal',
+        },
+        {
+          icon: 'fileCheck2',
+          title: 'Stronger audit readiness',
+          desc: 'Keep a complete, timestamped claim evidence trail for internal review and external compliance checks.',
+          highlight: 'primary',
+        },
+        {
+          icon: 'shuffle',
+          title: 'Lower operational overload',
+          desc: 'Route exceptions to the right queue so claim specialists focus on high-impact decisions.',
+          highlight: 'teal',
+        },
+      ],
+    },
+    solutionShowcase: getSolutionShowcaseDraft('identity-verification'),
+    decisionFlow: defaultDecisionFlowBlock,
+    demoSection: defaultDemoSectionBlock,
     utilityCtaBand: {
       title: 'Balancing TAT and fraud in claims?',
       description: 'We can help sequence identity, bank, and document steps around your NEFT and branch workflows.',

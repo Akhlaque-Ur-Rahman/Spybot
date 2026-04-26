@@ -1,6 +1,7 @@
 import styles from './PageHeader.module.css';
 import Image from 'next/image';
 import ViewportVideo from './ViewportVideo';
+import LongText from './LongText';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { renderCmsRichText } from '@/lib/cms/rich-text';
 import { mediaEncodingFormat, mediaSourceKind, optionalMediaClip, type MediaClipMeta } from '@/lib/site-media';
@@ -110,8 +111,11 @@ export default function PageHeader({
               </div>
               <figcaption className={styles.mediaCaption}>
                 <strong>{fgClip.title}</strong>
-                <span className={styles.mediaCaptionSep}> — </span>
-                {fgClip.description}
+                <LongText
+                  value={fgClip.description}
+                  contextTitle={fgClip.title}
+                  maxLines={3}
+                />
               </figcaption>
             </figure>
           )}

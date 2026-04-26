@@ -74,7 +74,7 @@
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 700;
-  color: white;
+  color: var(--color-btn-primary-text);
   margin-right: -8px;
 }
 .avatar:last-child { margin-right: 0; }

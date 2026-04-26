@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import FaqAccordion from '@/components/FaqAccordion';
 import SolutionShowcase from '@/components/SolutionShowcase';
+import LongText from '@/components/LongText';
 import { CTA_LINKS, ROUTES } from '@/site';
 import type { SolutionShowcaseData } from '@/lib/solution-showcase-data';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
@@ -427,7 +428,7 @@ export default function FintechLandingPage({
                   {item.icon}
                 </span>
                 <h4>{item.title}</h4>
-                <p>{item.description}</p>
+                <LongText value={item.description} contextTitle={item.title} maxLines={3} />
               </article>
             ))}
           </div>
@@ -490,7 +491,7 @@ export default function FintechLandingPage({
               <Link key={card.title} href={card.href} className={styles.spotlightCard} data-anim-inview>
                 <span className={styles.spotlightBadge}>{card.badge}</span>
                 <h4>{card.title}</h4>
-                <p>{card.description}</p>
+                <LongText value={card.description} contextTitle={card.title} maxLines={3} />
                 <span className={styles.spotlightCta}>{card.cta} →</span>
                 <div className={styles.spotlightMiniVisual} aria-hidden="true">
                   <div className={styles.spotlightMiniBars}>

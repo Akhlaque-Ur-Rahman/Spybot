@@ -18,6 +18,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import type { SolutionShowcaseData, ShowcaseIconKey } from '@/lib/solution-showcase-data';
+import LongText from '@/components/LongText';
 import styles from './SolutionShowcase.module.css';
 
 const ICONS: Record<ShowcaseIconKey, LucideIcon> = {
@@ -79,7 +80,13 @@ export default function SolutionShowcase({ data }: { data: SolutionShowcaseData 
         <div className={styles.tabPanel} role="tabpanel" id={panelId} aria-labelledby={`${tabsId}-${active.id}`}>
           <aside className={styles.panelBand}>
             <h4 className={styles.panelTitle}>{active.panelTitle}</h4>
-            <p className={styles.panelDesc}>{active.panelDescription}</p>
+            <div className={styles.panelDesc}>
+              <LongText
+                value={active.panelDescription}
+                contextTitle={active.panelTitle}
+                maxLines={4}
+              />
+            </div>
             <div className={styles.ctas}>
               <Link href={data.primaryCta.href} className="btn btn-primary btn-sm">
                 {data.primaryCta.label}
@@ -99,7 +106,13 @@ export default function SolutionShowcase({ data }: { data: SolutionShowcaseData 
                     <Icon size={20} strokeWidth={1.75} />
                   </div>
                   <h4 className={styles.cardTitle}>{c.title}</h4>
-                  <p className={styles.cardDesc}>{c.description}</p>
+                  <div className={styles.cardDesc}>
+                    <LongText
+                      value={c.description}
+                      contextTitle={c.title}
+                      maxLines={3}
+                    />
+                  </div>
                 </article>
               );
             })}

@@ -3,7 +3,7 @@
 import styles from './TruncatedReadMore.module.css';
 import richTextStyles from '@/components/CmsRichText.module.css';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useId, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { getCmsRichTextPlainText, renderCmsRichText, sanitizeCmsHref } from '@/lib/cms/rich-text';
 
@@ -13,6 +13,7 @@ type Props = {
   value: CmsRichTextValue | string;
   contextTitle: string;
   maxChars?: number;
+  maxLines?: number;
   href?: string | null;
   tone?: TruncatedReadMoreTone;
   alignCenter?: boolean;
@@ -22,18 +23,22 @@ type Props = {
 export default function TruncatedReadMore({
   value,
   contextTitle,
-  maxChars = 140,
+  maxChars,
+  maxLines = 3,
   href,
   tone = 'lifecycle',
   alignCenter = false,
   linkStickyBottom = false,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [lineOverflow, setLineOverflow] = useState<boolean | null>(null);
   const titleId = useId();
+  const previewRef = useRef<HTMLParagraphElement | null>(null);
   const plain = typeof value === 'string' ? value : getCmsRichTextPlainText(value);
   const safeHref = href ? sanitizeCmsHref(href) : null;
-  const needsTruncate = plain.length > maxChars;
-  const truncated = needsTruncate ? `${plain.slice(0, maxChars).trimEnd()}…` : plain;
+  const charOverflow = typeof maxChars === 'number' ? plain.length > maxChars : false;
+  const previewText = charOverflow ? `${plain.slice(0, maxChars).trimEnd()}…` : plain;
+  const needsTruncate = lineOverflow === true || charOverflow;
 
   const linkClass =
     tone === 'teal'
@@ -43,6 +48,22 @@ export default function TruncatedReadMore({
         : `${styles.link} ${styles.linkLifecycle}`;
 
   const close = useCallback(() => setOpen(false), []);
+
+  useEffect(() => {
+    const el = previewRef.current;
+    if (!el) return;
+
+    const updateOverflow = () => {
+      const next = el.scrollHeight > el.clientHeight + 1;
+      setLineOverflow((prev) => (prev === next ? prev : next));
+    };
+
+    updateOverflow();
+
+    const observer = new ResizeObserver(() => updateOverflow());
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [previewText, maxLines]);
 
   useEffect(() => {
     if (!open) return;
@@ -66,8 +87,14 @@ export default function TruncatedReadMore({
         className={`${styles.wrap}${linkStickyBottom ? ` ${styles.wrapFill}` : ''}`}
         style={alignCenter ? { alignItems: 'center', textAlign: 'center' } : undefined}
       >
-        {needsTruncate ? (
-          <p className={`${styles.preview} ${richTextStyles.prose}`}>{truncated}</p>
+        {needsTruncate || lineOverflow === null ? (
+          <p
+            ref={previewRef}
+            className={`${styles.preview} ${styles.previewClamp} ${richTextStyles.prose}`}
+            style={{ '--line-clamp': String(maxLines) } as React.CSSProperties}
+          >
+            {previewText}
+          </p>
         ) : (
           <div className={richTextStyles.prose}>{renderCmsRichText(value)}</div>
         )}

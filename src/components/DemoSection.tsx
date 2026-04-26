@@ -2,6 +2,7 @@
 import { useRef, useState } from 'react';
 import styles from './DemoSection.module.css';
 import ViewportVideo from './ViewportVideo';
+import LongText from './LongText';
 import richTextStyles from '@/components/CmsRichText.module.css';
 import { Rocket, Target, BarChart3, ShieldCheck, CheckCircle2, Star } from 'lucide-react';
 import { renderCmsIcon, type CmsIconName } from '@/lib/cms/icon-map';
@@ -115,8 +116,12 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
                       <div className={styles.valuePointBody}>
                         <span className={styles.valuePointTitle}>{point.title}</span>
                         {(typeof point.desc !== 'string' || point.desc.trim()) ? (
-                          <div className={`${styles.valuePointDesc} ${richTextStyles.prose}`}>
-                            {renderCmsRichText(point.desc)}
+                          <div className={styles.valuePointDesc}>
+                            <LongText
+                              value={point.desc}
+                              contextTitle={point.title}
+                              maxLines={3}
+                            />
                           </div>
                         ) : null}
                       </div>
@@ -164,8 +169,11 @@ export default function DemoSection({ sectionId = 'demo', headingId = 'demo-head
               />
               <figcaption className={styles.clipCaption}>
                 <strong>{resolvedClip.title}</strong>
-                <span className={styles.clipCaptionSep}> — </span>
-                {resolvedClip.description}
+                <LongText
+                  value={resolvedClip.description}
+                  contextTitle={resolvedClip.title}
+                  maxLines={3}
+                />
               </figcaption>
             </figure>
           </div>

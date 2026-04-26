@@ -50,7 +50,7 @@
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
-  color: var(--color-text-primary);
+  color: var(--color-btn-primary-text);
   background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
   border: 1px solid transparent;
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -85,8 +85,8 @@
   border-color: color-mix(in srgb, var(--color-border) 74%, var(--color-primary-300) 26%);
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--color-primary-100) 68%, white),
-    color-mix(in srgb, var(--color-primary-200) 54%, white)
+    color-mix(in srgb, var(--color-primary-100) 68%, var(--color-surface)),
+    color-mix(in srgb, var(--color-primary-200) 54%, var(--color-surface-raised))
   );
   box-shadow: 0 16px 30px rgba(var(--color-primary-rgb), 0.14);
 }
@@ -100,13 +100,13 @@
 }
 
 :global(html[data-theme='light']) .ghost {
-  color: var(--color-secondary-700);
-  background: rgba(var(--color-secondary-rgb), 0.72);
-  border-color: rgba(var(--color-secondary-rgb), 0.2);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-overlay);
+  border-color: var(--color-border);
 }
 
 :global(html[data-theme='light']) .ghost:hover {
-  border-color: rgba(var(--color-secondary-rgb), 0.36);
+  border-color: var(--color-border-strong);
 }
 
 @media (max-width: 640px) {
