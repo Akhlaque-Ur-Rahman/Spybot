@@ -3,16 +3,8 @@ import './globals.css';
 import './ui-color-contract.css';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { SmoothScrollProvider } from '@/context/SmoothScrollProvider';
-import AppShell from '@/components/AppShell';
 import { buildRootJsonLd } from '@/lib/cms/site-jsonld';
-import {
-  getFooterSettings,
-  getHeaderDropdownConfig,
-  getGlobalSettings,
-  getHeaderMenu,
-  getHeaderUtilityMenu,
-  getSiteRuntimeConfig,
-} from '@/lib/cms/service';
+import { getSiteRuntimeConfig } from '@/lib/cms/service';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -83,16 +75,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const themeScript = `(function(){try{document.documentElement.classList.add('js');var t=localStorage.getItem('spybot-theme');var r=t==='light'?'light':t==='dark'?'dark':window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',r);var hex=r==='light'?'#F6F8FC':'#0C121D';var all=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<all.length;i++){var n=all[i];n.parentNode&&n.parentNode.removeChild(n);}var m=document.createElement('meta');m.setAttribute('name','theme-color');m.setAttribute('content',hex);document.head.appendChild(m);}catch(e){}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const enableNavEnhancements = process.env.NEXT_PUBLIC_NAV_ENHANCED !== '0';
-  const [headerMenu, headerUtilityMenu, headerDropdownConfig, footerSettings, globalSettings, site] = await Promise.all([
-    getHeaderMenu(),
-    getHeaderUtilityMenu(),
-    getHeaderDropdownConfig(),
-    getFooterSettings(),
-    getGlobalSettings<{ primaryCtaHref?: string; primaryCtaText?: string; siteName?: string; supportEmail?: string }>(),
-    getSiteRuntimeConfig(),
-  ]);
-
+  const site = await getSiteRuntimeConfig();
   const jsonLd = buildRootJsonLd(site);
 
   return (
@@ -103,19 +86,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body suppressHydrationWarning>
         <ThemeProvider>
-          <SmoothScrollProvider>
-            <AppShell
-              headerMenu={headerMenu}
-              headerUtilityMenu={headerUtilityMenu}
-              headerDropdownConfig={enableNavEnhancements ? headerDropdownConfig : undefined}
-              enableNavEnhancements={enableNavEnhancements}
-              footerSettings={footerSettings}
-              primaryCtaHref={globalSettings.primaryCtaHref}
-              primaryCtaText={globalSettings.primaryCtaText}
-            >
-              {children}
-            </AppShell>
-          </SmoothScrollProvider>
+          <SmoothScrollProvider>{children}</SmoothScrollProvider>
         </ThemeProvider>
       </body>
     </html>
