@@ -21,6 +21,8 @@ type AppShellProps = {
   footerSettings: CmsFooterSettings;
   primaryCtaHref?: string;
   primaryCtaText?: string;
+  secondaryCtaHref?: string;
+  secondaryCtaText?: string;
 };
 
 const reducedMotionQuery = '(prefers-reduced-motion: reduce)';
@@ -48,6 +50,8 @@ export default function AppShell({
   footerSettings,
   primaryCtaHref,
   primaryCtaText,
+  secondaryCtaHref,
+  secondaryCtaText,
 }: AppShellProps) {
   const pathname = usePathname();
   const isAdminRoute = pathname.startsWith('/admin');
@@ -102,6 +106,8 @@ export default function AppShell({
           enableOverflow={enableNavEnhancements}
           primaryCtaHref={primaryCtaHref}
           primaryCtaText={primaryCtaText}
+          secondaryCtaHref={secondaryCtaHref}
+          secondaryCtaText={secondaryCtaText}
         />
         <div
           className={`${shellStyles.pageStage} ${routeAnim ? shellStyles.pageStageRouteIn : ''}`}

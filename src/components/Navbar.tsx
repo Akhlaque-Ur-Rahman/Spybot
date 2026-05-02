@@ -282,8 +282,10 @@ export default function Navbar({
   utilityMenuItems,
   dropdownConfig,
   enableOverflow = true,
-  primaryCtaHref = CTA_LINKS.demo,
-  primaryCtaText = 'Book a Demo',
+  primaryCtaHref = 'tel:7870295295',
+  primaryCtaText = 'Call @ 7870-295-295',
+  secondaryCtaHref = 'mailto:iqbal@spybots.in',
+  secondaryCtaText = 'Email : iqbal@spybots.in',
 }: {
   menuItems?: NavMenuItem[];
   utilityMenuItems?: NavMenuItem[];
@@ -291,6 +293,8 @@ export default function Navbar({
   enableOverflow?: boolean;
   primaryCtaHref?: string;
   primaryCtaText?: string;
+  secondaryCtaHref?: string;
+  secondaryCtaText?: string;
 }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
@@ -587,12 +591,12 @@ export default function Navbar({
                 <ThemeToggle />
                 <div className={styles.mobileDrawerFooterCtas}>
                   <Link
-                    href={CTA_LINKS.sandbox}
+                    href={secondaryCtaHref}
                     className="btn btn-secondary"
-                    aria-label="Get sandbox access"
+                    aria-label={secondaryCtaText}
                     onClick={closeMobileMenu}
                   >
-                    Get Sandbox Access
+                    {secondaryCtaText}
                   </Link>
                   <Link
                     href={primaryCtaHref}
@@ -800,7 +804,7 @@ export default function Navbar({
 
           {/* CTA buttons */}
           <div className={styles.navCtas}>
-            <Link href={CTA_LINKS.sandbox} className="btn btn-secondary btn-sm" aria-label="Get sandbox access">Get Sandbox Access</Link>
+            <Link href={secondaryCtaHref} className="btn btn-secondary btn-sm" aria-label={secondaryCtaText}>{secondaryCtaText}</Link>
             <Link href={primaryCtaHref} className="btn btn-primary btn-sm" aria-label={primaryCtaText}>{primaryCtaText}</Link>
             <ThemeToggle />
           </div>

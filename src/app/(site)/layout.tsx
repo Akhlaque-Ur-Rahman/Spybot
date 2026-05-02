@@ -14,7 +14,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     getHeaderUtilityMenu(),
     getHeaderDropdownConfig(),
     getFooterSettings(),
-    getGlobalSettings<{ primaryCtaHref?: string; primaryCtaText?: string; siteName?: string; supportEmail?: string }>(),
+    getGlobalSettings<{ primaryCtaHref?: string; primaryCtaText?: string; secondaryCtaHref?: string; secondaryCtaText?: string; siteName?: string; supportEmail?: string }>(),
   ]);
 
   return (
@@ -26,6 +26,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       footerSettings={footerSettings}
       primaryCtaHref={globalSettings.primaryCtaHref}
       primaryCtaText={globalSettings.primaryCtaText}
+      secondaryCtaHref={globalSettings.secondaryCtaHref}
+      secondaryCtaText={globalSettings.secondaryCtaText}
     >
       {children}
     </AppShell>
