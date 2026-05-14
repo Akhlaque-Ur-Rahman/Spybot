@@ -1,0 +1,26 @@
+# Run from repo root:
+#   docker compose --env-file deploy/spybot.compose.env -f deploy/docker-compose.spybot.yml up -d --build
+#
+# spybot.compose.env must set V360_EDGE_NETWORK to the *external* network name that the
+# vahan360 Caddy stack uses (see `docker network ls`, e.g. vahan360_vahan360-network).
+
+name: spybot
+
+services:
+  spybot:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    env_file:
+      - ../.env.production
+    environment:
+      # This repo ships without prisma/migrations; production uses db push until you add migrations.
+      PRISMA_PUSH_ON_BOOT: "1"
+    networks:
+      - vahan360-edge
+    restart: unless-stopped
+
+networks:
+  vahan360-edge:
+    external: true
+    name: ${V360_EDGE_NETWORK}

@@ -47,6 +47,9 @@ yarn-error.log*
 # optional local deploy metadata
 .vercel
 
+# Hostinger / vahan360 edge network env (copy from deploy/spybot.compose.env.example)
+deploy/spybot.compose.env
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

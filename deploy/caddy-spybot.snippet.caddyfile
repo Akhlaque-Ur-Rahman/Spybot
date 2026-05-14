@@ -1,0 +1,9 @@
+# Add this site block to the vahan360 Caddyfile (same Caddy that already binds :80 and :443).
+# Requirements:
+#   - DNS A/AAAA for spybots.in → this VPS public IP
+#   - spybot container attached to the same Docker network as Caddy (see deploy/HOSTINGER-VPS.md)
+#   - Service name on that network must be resolvable as "spybot" (docker compose service name).
+
+spybots.in {
+	reverse_proxy spybot:3000
+}
