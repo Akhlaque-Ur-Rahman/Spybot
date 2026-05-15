@@ -46,6 +46,7 @@ type NavDropdownItem = {
   href: string;
   desc: string;
   icon: ReactNode;
+  subItems?: NavDropdownItem[];
 };
 
 type CanonicalMenuLabel = 'Company' | 'Industries' | 'Solution' | 'Resources';
@@ -321,6 +322,7 @@ export default function Navbar({
     href: link.href,
     desc: '',
     icon: <Layers key={`more-${link.id}`} size={18} strokeWidth={1.5} />,
+    subItems: link.dropdown,
   }));
 
   const closeDropdown = useCallback(() => setActiveDropdown(null), []);
@@ -470,6 +472,35 @@ export default function Navbar({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+  }, [activeDropdown]);
+
+  /*
+   * Wheel-scroll containment for desktop dropdown panels.
+   *
+   * Why JS is needed:
+   *   `overscroll-behavior: contain` only stops scroll chaining at the *boundary*
+   *   (top / bottom of the container). It does NOT redirect wheel events to a
+   *   floating `position:absolute` panel when the browser's native hit-test picks
+   *   the body as the primary scroll target. We therefore intercept wheel events
+   *   with a non-passive listener, call `preventDefault()` to suppress body scroll,
+   *   and manually advance `panel.scrollTop` by the exact deltaY.
+   */
+  useEffect(() => {
+    if (!activeDropdown) return;
+    // `useEffect` runs after the DOM update, so the panel is already in the DOM.
+    const panel = document.getElementById(`nav-menu-${activeDropdown}`) as HTMLElement | null;
+    if (!panel) return;
+
+    const onWheel = (e: WheelEvent) => {
+      // Only intercept when the panel actually overflows (has something to scroll)
+      if (panel.scrollHeight <= panel.clientHeight) return;
+      e.preventDefault(); // stop body/page from scrolling
+      panel.scrollTop += e.deltaY;
+    };
+
+    // Must be non-passive so that preventDefault() is honoured
+    panel.addEventListener('wheel', onWheel, { passive: false });
+    return () => panel.removeEventListener('wheel', onWheel);
   }, [activeDropdown]);
 
   useEffect(() => {
@@ -779,20 +810,36 @@ export default function Navbar({
                     >
                       <div className={styles.dropdownGrid}>
                         {moreDropdownItems.map((item) => (
-                          <Link
-                            key={`${item.label}-${item.href}`}
-                            href={item.href}
-                            className={styles.dropdownItem}
-                            role="menuitem"
-                            onClick={closeDropdown}
-                          >
-                            <span className={styles.dropdownIcon} aria-hidden="true">
-                              {item.icon}
-                            </span>
-                            <div>
-                              <div className={styles.dropdownLabel}>{item.label}</div>
-                            </div>
-                          </Link>
+                          <div key={`${item.label}-${item.href}`} className={styles.moreItemWrapper}>
+                            <Link
+                              href={item.href}
+                              className={styles.dropdownItem}
+                              role="menuitem"
+                              onClick={closeDropdown}
+                            >
+                              <span className={styles.dropdownIcon} aria-hidden="true">
+                                {item.icon}
+                              </span>
+                              <div>
+                                <div className={styles.dropdownLabel}>{item.label}</div>
+                              </div>
+                            </Link>
+                            {item.subItems && (
+                              <div className={styles.moreSublinks}>
+                                {item.subItems.map((sub) => (
+                                  <Link
+                                    key={`${sub.label}-${sub.href}`}
+                                    href={sub.href}
+                                    className={styles.moreSublink}
+                                    role="menuitem"
+                                    onClick={closeDropdown}
+                                  >
+                                    {sub.label}
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </div>
                     </div>
