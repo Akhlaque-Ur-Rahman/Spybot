@@ -1,0 +1,66 @@
+# Spybot on host port 3003 — routed via existing ingress-nginx (k3s) + cert-manager.
+# Apply: kubectl apply -f deploy/k8s-ingress-spybot.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: spybot-external
+  namespace: default
+spec:
+  ports:
+    - name: http
+      port: 3003
+      targetPort: 3003
+      protocol: TCP
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: spybot-external
+  namespace: default
+subsets:
+  - addresses:
+      # Node internal IP — k3s rejects 127.0.0.1 in Endpoints; ingress-nginx uses hostNetwork.
+      - ip: 187.127.145.85
+    ports:
+      - name: http
+        port: 3003
+        protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spybot
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: 64m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - spybots.in
+        - www.spybots.in
+      secretName: spybot-tls
+  rules:
+    - host: spybots.in
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: spybot-external
+                port:
+                  number: 3003
+    - host: www.spybots.in
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: spybot-external
+                port:
+                  number: 3003

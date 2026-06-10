@@ -75,19 +75,38 @@ jobs:
       - name: Build
         run: pnpm build
 
-  # Deploy: set secrets SSH_PRIVATE_KEY, DEPLOY_HOST (optional DEPLOY_USER, DEPLOY_PATH). Job-level `if` cannot use `secrets` — skip is handled in the step below.
-  deploy:
+  # Self-hosted runner on VPS (after: bash deploy/scripts/install-github-runner.sh)
+  deploy-self-hosted:
     needs: lint-test-build
-    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    runs-on: ubuntu-latest
+    if: false  # set to true after Spybot runner registered with label spybot
+    runs-on: [self-hosted, spybot]
     timeout-minutes: 25
     concurrency:
       group: deploy-${{ github.ref }}
       cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: /srv/Spybot
+    steps:
+      - name: Sync repo and Docker deploy
+        run: |
+          set -euo pipefail
+          git fetch origin main master 2>/dev/null || true
+          git checkout -q main 2>/dev/null || git checkout -q master 2>/dev/null || true
+          git pull --ff-only
+          chmod +x deploy/scripts/deploy-docker.sh
+          ./deploy/scripts/deploy-docker.sh
+
+  # SSH deploy to Hostinger VPS (Docker Compose at /srv/Spybot)
+  deploy-ssh:
+    needs: lint-test-build
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
-      - name: Rsync to server and deploy
+      - name: Rsync to server and Docker deploy
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -96,31 +115,20 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${SSH_PRIVATE_KEY:-}" ] || [ -z "${DEPLOY_HOST:-}" ]; then
-            echo "::notice::Deploy skipped — add repository secrets SSH_PRIVATE_KEY and DEPLOY_HOST."
+            echo "::notice::Deploy skipped — add SSH_PRIVATE_KEY and DEPLOY_HOST secrets."
             exit 0
           fi
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
           KEYFILE="$HOME/.ssh/ci_deploy_key"
-          # File + direct -i is more reliable than ssh-add stdin (avoids libcrypto parse issues on bad pastes).
           printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' | sed $'1s/^\xef\xbb\xbf//' > "$KEYFILE"
           chmod 600 "$KEYFILE"
-          if ! ssh-keygen -y -f "$KEYFILE" >/dev/null 2>&1; then
-            echo "::error::SSH_PRIVATE_KEY is not a valid OpenSSH private key (or it has a passphrase). Use the private key matching your Civo key, no passphrase, full BEGIN/END block."
-            exit 1
-          fi
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
-          USER="${DEPLOY_USER:-ubuntu}"
-          REMOTE="${DEPLOY_PATH:-/var/www/Spybot}"
+          USER="${DEPLOY_USER:-root}"
+          REMOTE="${DEPLOY_PATH:-/srv/Spybot}"
           SSH_OPTS="-i $KEYFILE -o IdentitiesOnly=yes -o BatchMode=yes"
           rsync -az --delete \
-            --exclude node_modules \
-            --exclude .next \
-            --exclude .env \
-            --exclude '.env.*' \
-            --exclude .git \
-            -e "ssh $SSH_OPTS" \
-            ./ "${USER}@${DEPLOY_HOST}:${REMOTE}/"
+            --exclude node_modules --exclude .next --exclude .env --exclude '.env.*' --exclude .git \
+            -e "ssh $SSH_OPTS" ./ "${USER}@${DEPLOY_HOST}:${REMOTE}/"
           ssh $SSH_OPTS "${USER}@${DEPLOY_HOST}" \
-            "set -euo pipefail; cd \"${REMOTE}\"; export NODE_ENV=production; pnpm install --frozen-lockfile; pnpm db:push; pnpm build; if systemctl is-enabled spybot >/dev/null 2>&1; then sudo -n systemctl restart spybot; else echo '::warning::Enable spybot.service once — see deploy/spybot.service'; fi"
+            "set -euo pipefail; cd \"${REMOTE}\"; chmod +x deploy/scripts/deploy-docker.sh; ./deploy/scripts/deploy-docker.sh"
           shred -u "$KEYFILE" 2>/dev/null || rm -f "$KEYFILE"
