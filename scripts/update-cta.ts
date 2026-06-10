@@ -7,7 +7,10 @@ async function main() {
     where: { key: 'global' },
   });
 
-  const valueJson = globalSetting?.valueJson ? (globalSetting.valueJson as any) : {};
+  type GlobalCtaSettings = Record<string, unknown>;
+  const valueJson: GlobalCtaSettings = globalSetting?.valueJson
+    ? { ...(globalSetting.valueJson as GlobalCtaSettings) }
+    : {};
   valueJson.primaryCtaText = 'Call @ 7870-295-295';
   valueJson.primaryCtaHref = 'tel:7870295295';
   valueJson.secondaryCtaText = 'Email : iqbal@spybots.in';

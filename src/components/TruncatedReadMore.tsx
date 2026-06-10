@@ -3,7 +3,7 @@
 import styles from './TruncatedReadMore.module.css';
 import richTextStyles from '@/components/CmsRichText.module.css';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import { getCmsRichTextPlainText, renderCmsRichText, sanitizeCmsHref } from '@/lib/cms/rich-text';
@@ -33,7 +33,11 @@ export default function TruncatedReadMore({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [lineOverflow, setLineOverflow] = useState<boolean | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const titleId = useId();
   const previewRef = useRef<HTMLParagraphElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
@@ -52,10 +56,6 @@ export default function TruncatedReadMore({
         : `${styles.link} ${styles.linkLifecycle}`;
 
   const close = useCallback(() => setOpen(false), []);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (open || charOverflow) return;

@@ -7,7 +7,6 @@ import styles from './Navbar.module.css';
 import ThemeToggle from './ThemeToggle';
 import BrandLogoMark from '@/components/BrandLogoMark';
 import {
-  CTA_LINKS,
   ROUTES,
   companyNavItems,
   industryNavItems,

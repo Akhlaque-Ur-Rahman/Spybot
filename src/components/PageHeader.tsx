@@ -29,7 +29,6 @@ export default function PageHeader({
   primaryCta,
   secondaryCta,
   secondaryDescription,
-  backgroundMedia: _backgroundMedia,
   media,
   mediaAspectRatio,
   mediaObjectFit,
