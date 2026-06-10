@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -7,14 +7,17 @@ async function main() {
     where: { key: 'global' },
   });
 
-  type GlobalCtaSettings = Record<string, unknown>;
-  const valueJson: GlobalCtaSettings = globalSetting?.valueJson
-    ? { ...(globalSetting.valueJson as GlobalCtaSettings) }
-    : {};
-  valueJson.primaryCtaText = 'Call @ 7870-295-295';
-  valueJson.primaryCtaHref = 'tel:7870295295';
-  valueJson.secondaryCtaText = 'Email : iqbal@spybots.in';
-  valueJson.secondaryCtaHref = 'mailto:iqbal@spybots.in';
+  const existing =
+    globalSetting?.valueJson && typeof globalSetting.valueJson === 'object' && !Array.isArray(globalSetting.valueJson)
+      ? (globalSetting.valueJson as Record<string, Prisma.InputJsonValue>)
+      : {};
+  const valueJson: Prisma.InputJsonValue = {
+    ...existing,
+    primaryCtaText: 'Call @ 7870-295-295',
+    primaryCtaHref: 'tel:7870295295',
+    secondaryCtaText: 'Email : iqbal@spybots.in',
+    secondaryCtaHref: 'mailto:iqbal@spybots.in',
+  };
 
   await prisma.siteSetting.upsert({
     where: { key: 'global' },
