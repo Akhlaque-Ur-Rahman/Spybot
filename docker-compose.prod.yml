@@ -1,5 +1,7 @@
-# Legacy path — prefer repo-root docker-compose.prod.yml on the VPS.
+# Production stack for Hostinger Docker Manager (project name: spybot).
 #   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Ingress (k8s) and Caddy reach the app on host port 3003.
 
 name: spybot
 
@@ -23,17 +25,19 @@ services:
 
   spybot:
     build:
-      context: ..
+      context: .
       dockerfile: Dockerfile
+    restart: unless-stopped
     env_file:
-      - ../.env
+      - .env
     environment:
       DATABASE_URL: postgresql://spybot:spybotpostgresql@postgres:5432/spybot?schema=public
       PORT: '3000'
+      HOSTNAME: '0.0.0.0'
+      NODE_ENV: production
       PRISMA_PUSH_ON_BOOT: '0'
     ports:
       - '3003:3000'
-    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy

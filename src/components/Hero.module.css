@@ -1,6 +1,6 @@
 .hero {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100dvh - var(--site-header-stack));
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -335,6 +335,13 @@
   .scannerRing { display: none; }
 }
 @media (max-width: 640px) {
+  .hero {
+    min-height: auto;
+  }
+  .heroInner {
+    padding-top: var(--site-hero-padding-top-mobile);
+    padding-bottom: var(--space-8);
+  }
   .statsInner { flex-wrap: wrap; gap: var(--space-6); justify-content: center; }
   .statsInner .statItem { width: calc(50% - var(--space-6)); }
 }

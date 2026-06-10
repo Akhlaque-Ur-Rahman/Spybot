@@ -169,7 +169,10 @@
   --site-header-stack: calc(var(--site-topbar-height) + var(--site-nav-row-height));
   /* Space below sticky chrome for first paint on inner pages + home hero */
   --site-content-below-header: var(--site-header-stack);
-  --site-hero-padding-top: calc(var(--site-header-stack) + var(--space-2));
+  /* Navbar is in document flow — hero inner top spacing only (not header-stack) */
+  --site-hero-padding-top: 60px;
+  --site-hero-padding-top-mobile: 40px;
+  --site-hero-min-height: min(100dvh, 56rem);
 
   /* Mesh / card surface accents */
   --mesh-primary: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(var(--color-primary-rgb), 0.2), transparent 55%);
@@ -244,6 +247,7 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  scrollbar-gutter: stable;
 }
 
 /* Lenis: allow natural height with smooth scroll */

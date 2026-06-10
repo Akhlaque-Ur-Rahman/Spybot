@@ -12,7 +12,7 @@
 
 /* Match `Hero.module.css` split layout: equal columns, homepage padding + gap + media width */
 .sectionWithMedia {
-  min-height: 100vh;
+  min-height: calc(100dvh - var(--site-header-stack));
   flex-direction: column;
   padding: 0;
   background: linear-gradient(180deg, var(--color-hero-bg-start) 0%, var(--color-hero-bg-mid) 50%, var(--color-bg) 100%);
@@ -217,6 +217,11 @@
   }
   .sectionWithMedia {
     padding: 0;
+    min-height: auto;
+  }
+  .split {
+    padding-top: var(--site-hero-padding-top-mobile);
+    padding-bottom: var(--space-8);
   }
   .ctas {
     flex-direction: column;
