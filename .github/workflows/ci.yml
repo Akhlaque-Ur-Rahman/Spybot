@@ -75,10 +75,10 @@ jobs:
       - name: Build
         run: pnpm build
 
-  # Self-hosted runner on VPS (after: bash deploy/scripts/install-github-runner.sh)
+  # Self-hosted runner (enable after: bash /opt/actions-runner-spybot/reinstall-spybot-runner.sh)
   deploy-self-hosted:
     needs: lint-test-build
-    if: false  # set to true after Spybot runner registered with label spybot
+    if: false
     runs-on: [self-hosted, spybot]
     timeout-minutes: 25
     concurrency:
@@ -97,7 +97,7 @@ jobs:
           chmod +x deploy/scripts/deploy-docker.sh
           ./deploy/scripts/deploy-docker.sh
 
-  # SSH deploy to Hostinger VPS (Docker Compose at /srv/Spybot)
+  # SSH deploy — SSH_PRIVATE_KEY must match /root/.ssh/id_ed25519 on VPS
   deploy-ssh:
     needs: lint-test-build
     if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
@@ -125,6 +125,7 @@ jobs:
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
           USER="${DEPLOY_USER:-root}"
           REMOTE="${DEPLOY_PATH:-/srv/Spybot}"
+          echo "Deploying to ${USER}@${DEPLOY_HOST}:${REMOTE}"
           SSH_OPTS="-i $KEYFILE -o IdentitiesOnly=yes -o BatchMode=yes"
           rsync -az --delete \
             --exclude node_modules --exclude .next --exclude .env --exclude '.env.*' --exclude .git \
