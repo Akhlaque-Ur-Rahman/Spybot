@@ -45,12 +45,10 @@ function applyTheme(resolved: 'light' | 'dark') {
   syncThemeColorMeta(resolved);
 }
 
-const THEME_STORAGE_KEY = 'spybot-theme-v2';
+const THEME_STORAGE_KEY = 'spybot-theme-v3';
 
 function getInitialTheme(): Theme {
-  if (typeof window === 'undefined') return 'light';
-  const stored = localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'light';
+  return 'light';
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
