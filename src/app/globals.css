@@ -12,131 +12,279 @@
    Tertiary scale replaced: Teal → Orange, to match brand wordmark
    and poster identity (Navy + Sky Blue + Orange).
    ──────────────────────────────────────────────────────────── */
+/* ============================================================
+   SPYBOT — DESIGN TOKENS
+   Brand: Enterprise AI + Verification + Fraud Intelligence
+   Visual Language: Navy / Blue / Cyan / Orange
+   ============================================================ */
+
+
+/* ─────────────────────────────────────────────────────────────
+   ROOT DESIGN TOKENS
+   ───────────────────────────────────────────────────────────── */
+
    :root {
-    /* Primary — Product Blue (interaction + CTA) */
-    --color-primary-50: #ECF2FF;
-    --color-primary-100: #D8E5FF;
-    --color-primary-200: #B8CCFF;
-    --color-primary-300: #93AEFF;
-    --color-primary-400: #6F92F5;
-    --color-primary-500: #4F74D6;
-    --color-primary-600: #3B59AE;
-    --color-primary-700: #2B417F;
-    --color-primary-800: #1D2C56;
-    --color-primary-900: #121A34;
+
+    /* ==========================================================
+       PRIMARY — SPYBOT BLUE
+       Brand identity / interaction / primary CTA
+       ========================================================== */
   
-    /* Secondary — Slate (structural neutral) */
-    --color-secondary-50: #EEF2F8;
-    --color-secondary-100: #DCE3EF;
-    --color-secondary-200: #BAC7DA;
-    --color-secondary-300: #90A2BC;
-    --color-secondary-400: #667B99;
-    --color-secondary-500: #4B5E79;
-    --color-secondary-600: #36465E;
-    --color-secondary-700: #263446;
-    --color-secondary-800: #18222F;
-    --color-secondary-900: #0D141E;
+    --color-primary-50: #F0F8FF;
+    --color-primary-100: #DCEFFF;
+    --color-primary-200: #B9DEFF;
+    --color-primary-300: #8AC8F5;
+    --color-primary-400: #4FA9EC;
+    --color-primary-500: #0F99F0;
+    --color-primary-600: #0A6CD2;
+    --color-primary-700: #0552AB;
+    --color-primary-800: #033F85;
+    --color-primary-900: #02306B;
   
-    /* Tertiary — Orange (brand accent, replaces Teal) */
-    --color-tertiary-50: #FEF3E8;
-    --color-tertiary-100: #FDE1C6;
-    --color-tertiary-200: #FBC28C;
-    --color-tertiary-300: #F7A252;
-    --color-tertiary-400: #F5821F;
-    --color-tertiary-500: #DB6E10;
-    --color-tertiary-600: #B5590C;
-    --color-tertiary-700: #8A4409;
-    --color-tertiary-800: #5C2D06;
   
-    /* Semantic */
-    --color-success: #37A46E;
-    --color-warning: #C28A33;
-    --color-danger: #D35F6D;
-    --color-info: #4E88D6;
-    --color-success-rgb: 55, 164, 110;
-    --color-warning-rgb: 194, 138, 51;
-    --color-danger-rgb: 211, 95, 109;
-    --color-info-rgb: 78, 136, 214;
-    --color-primary-rgb: 79, 116, 214;
-    --color-secondary-rgb: 75, 94, 121;
-    --color-tertiary-rgb: 245, 130, 31;
+    /* ==========================================================
+       SECONDARY — NAVY
+       Structural color / headings / strong contrast
+       ========================================================== */
   
-    /* Text + surfaces (dark default) */
-    --color-text-primary: #EEF3FB;
-    --color-text-secondary: #C2CCDE;
-    --color-text-muted: #95A3BA;
-    --color-bg: #0C121D;
-    --color-surface: #141C2A;
-    --color-surface-raised: #1C2636;
-    --color-surface-hover: #222E41;
-    --color-surface-active: #29364C;
-    --color-surface-overlay: rgba(148, 163, 184, 0.08);
-    --color-border: #334255;
-    --color-border-subtle: #253244;
-    --color-border-strong: #44556D;
-    --color-focus-ring: rgba(111, 146, 245, 0.42);
+    --color-secondary-50: #EEF7FC;
+    --color-secondary-100: #D8EAF6;
+    --color-secondary-200: #B5D0E4;
+    --color-secondary-300: #8BAEC9;
+    --color-secondary-400: #638BAE;
+    --color-secondary-500: #416D94;
+    --color-secondary-600: #28557E;
+    --color-secondary-700: #173F68;
+    --color-secondary-800: #0B2D51;
+    --color-secondary-900: #021739;
   
-    /* Layout layers */
-    --color-nav-bg: rgba(12, 18, 29, 0.78);
-    --color-nav-scrolled: rgba(12, 18, 29, 0.92);
-    --color-topbar-bg: #0A1018;
-    --color-hero-bg-start: #0B111B;
-    --color-hero-bg-mid: #0E1521;
-    --color-hero-bg-end: #121B2B;
-    --color-section-alt: #101827;
-    --color-footer-bg: #0A1018;
-    --color-btn-secondary-hover: rgba(111, 146, 245, 0.16);
-    --color-badge-primary-bg: rgba(111, 146, 245, 0.16);
-    --color-badge-primary-border: rgba(111, 146, 245, 0.32);
-    --color-badge-teal-bg: rgba(245, 130, 31, 0.14);
-    --color-badge-teal-border: rgba(245, 130, 31, 0.3);
   
-    /* Gradient text tokens */
-    --gradient-text-from: var(--color-primary-300);
-    --gradient-text-to: var(--color-tertiary-300);
-    /* Label accent */
-    --color-accent-label: var(--color-tertiary-300);
-    /* Button system */
-    --color-btn-primary: var(--color-primary-500);
-    --color-btn-primary-hover: var(--color-primary-400);
-    --color-btn-primary-active: var(--color-primary-600);
-    --color-btn-primary-text: #F8FAFF;
-    --color-btn-primary-disabled: #344766;
-    --color-btn-primary-disabled-text: #8FA0BC;
-    --color-btn-secondary: var(--color-primary-300);
-    --color-btn-secondary-border: var(--color-primary-300);
-    --color-btn-ghost-text: var(--color-text-secondary);
+    /* ==========================================================
+       TERTIARY — CYAN
+       AI / technology / intelligence / supporting highlights
+       ========================================================== */
   
-    /* Typography */
+    --color-tertiary-50: #F2FCFF;
+    --color-tertiary-100: #E4F6FC;
+    --color-tertiary-200: #C6EDFA;
+    --color-tertiary-300: #8AD8F9;
+    --color-tertiary-400: #4FC2F4;
+    --color-tertiary-500: #18A9EE;
+    --color-tertiary-600: #0F8FD1;
+    --color-tertiary-700: #0873AD;
+    --color-tertiary-800: #07547E;
+  
+  
+    /* ==========================================================
+       ACCENT — SPYBOT ORANGE
+       Important emphasis / transformation / key highlights
+       
+       IMPORTANT:
+       Use this sparingly. It should remain visually special.
+       ========================================================== */
+  
+    --color-accent-50: #FFF7EF;
+    --color-accent-100: #FDE8D3;
+    --color-accent-200: #FAC393;
+    --color-accent-300: #F9A557;
+    --color-accent-400: #F98C29;
+    --color-accent-500: #F47B16;
+    --color-accent-600: #D9630B;
+    --color-accent-700: #B94F08;
+    --color-accent-800: #8F3B08;
+  
+  
+    /* ==========================================================
+       SEMANTIC COLORS
+       ========================================================== */
+  
+    --color-success: #168A5B;
+    --color-warning: #D47B18;
+    --color-danger: #D9485F;
+    --color-info: #0A6CD2;
+  
+    --color-success-rgb: 22, 138, 91;
+    --color-warning-rgb: 212, 123, 24;
+    --color-danger-rgb: 217, 72, 95;
+    --color-info-rgb: 10, 108, 210;
+  
+    --color-primary-rgb: 15, 153, 240;
+    --color-secondary-rgb: 65, 109, 148;
+    --color-tertiary-rgb: 24, 169, 238;
+    --color-accent-rgb: 249, 140, 41;
+  
+  
+    /* ==========================================================
+       TEXT
+       Light-first visual system
+       ========================================================== */
+  
+    --color-text-primary: #021739;
+    --color-text-secondary: #28557E;
+    --color-text-muted: #638BAE;
+  
+  
+    /* ==========================================================
+       SURFACES
+       ========================================================== */
+  
+    --color-bg: #F8FCFD;
+  
+    --color-surface: #FFFFFF;
+    --color-surface-raised: #FFFFFF;
+  
+    --color-surface-hover: #F0F8FF;
+    --color-surface-active: #E4F6FC;
+  
+    --color-surface-overlay: rgba(15, 153, 240, 0.06);
+  
+  
+    /* ==========================================================
+       BORDERS
+       ========================================================== */
+  
+    --color-border: #C6DDEA;
+    --color-border-subtle: #E2EEF5;
+    --color-border-strong: #8BAEC9;
+  
+    --color-focus-ring: rgba(15, 153, 240, 0.35);
+  
+  
+    /* ==========================================================
+       LAYOUT LAYERS
+       ========================================================== */
+  
+    --color-nav-bg: rgba(255, 255, 255, 0.86);
+    --color-nav-scrolled: rgba(255, 255, 255, 0.96);
+  
+    --color-topbar-bg: #EAF5FB;
+  
+    --color-hero-bg-start: #F0F8FF;
+    --color-hero-bg-mid: #F8FCFD;
+    --color-hero-bg-end: #E4F6FC;
+  
+    --color-section-alt: #F1F8FC;
+  
+    --color-footer-bg: #021739;
+  
+  
+    /* ==========================================================
+       SECONDARY BUTTON / BADGES
+       ========================================================== */
+  
+    --color-btn-secondary-hover:
+      rgba(10, 108, 210, 0.10);
+  
+    --color-badge-primary-bg:
+      rgba(15, 153, 240, 0.10);
+  
+    --color-badge-primary-border:
+      rgba(15, 153, 240, 0.24);
+  
+    --color-badge-teal-bg:
+      rgba(24, 169, 238, 0.10);
+  
+    --color-badge-teal-border:
+      rgba(24, 169, 238, 0.24);
+  
+  
+    /* ==========================================================
+       GRADIENT TEXT
+       ========================================================== */
+  
+    --gradient-text-from: #0552AB;
+    --gradient-text-to: #0F99F0;
+  
+  
+    /* ==========================================================
+       LABEL ACCENT
+       ========================================================== */
+  
+    --color-accent-label: #0F8FD1;
+  
+  
+    /* ==========================================================
+       BUTTON SYSTEM
+       ========================================================== */
+  
+    /* Primary CTA */
+  
+    --color-btn-primary: #0A6CD2;
+    --color-btn-primary-hover: #0552AB;
+    --color-btn-primary-active: #033F85;
+    --color-btn-primary-text: #FFFFFF;
+  
+    --color-btn-primary-disabled: #B9CDE0;
+    --color-btn-primary-disabled-text: #6D849B;
+  
+  
+    /* Secondary CTA */
+  
+    --color-btn-secondary: #FFFFFF;
+    --color-btn-secondary-border: #0A6CD2;
+  
+  
+    /* Ghost */
+  
+    --color-btn-ghost-text: #28557E;
+  
+  
+    /* ==========================================================
+       TYPOGRAPHY
+       ========================================================== */
+  
     --font-display: 'Nasalization', 'Orbitron', sans-serif;
     --font-body: 'Inter', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
   
-    /* Type Scale */
+  
+    /* ==========================================================
+       TYPE SCALE
+       ========================================================== */
+  
     --text-display: 4rem;
     --text-h1: 3rem;
     --text-h2: 2.25rem;
     --text-h3: 1.75rem;
     --text-h4: 1.25rem;
     --text-h5: 1.125rem;
+  
     --text-body-lg: 1.125rem;
     --text-body: 1rem;
     --text-body-sm: 0.875rem;
     --text-xs: 0.75rem;
   
-    /* Semantic heading scale (kept separate from card/body title tokens) */
+  
+    /* ==========================================================
+       SEMANTIC HEADING SCALE
+       ========================================================== */
+  
     --heading-h1: 3.125rem; /* 50px */
     --heading-h2: 2.5rem;   /* 40px */
     --heading-h3: 2rem;     /* 32px */
     --heading-h4: 1.625rem; /* 26px */
     --heading-h5: 1.375rem; /* 22px */
-    --heading-h1-fluid: clamp(2rem, 5vw, var(--heading-h1));
-    --heading-h2-fluid: clamp(1.7rem, 4vw, var(--heading-h2));
-    --heading-h3-fluid: clamp(1.45rem, 3.1vw, var(--heading-h3));
-    --heading-h4-fluid: clamp(1.2rem, 2.2vw, var(--heading-h4));
-    --heading-h5-fluid: clamp(1.05rem, 1.8vw, var(--heading-h5));
   
-    /* Spacing */
+    --heading-h1-fluid:
+      clamp(2rem, 5vw, var(--heading-h1));
+  
+    --heading-h2-fluid:
+      clamp(1.7rem, 4vw, var(--heading-h2));
+  
+    --heading-h3-fluid:
+      clamp(1.45rem, 3.1vw, var(--heading-h3));
+  
+    --heading-h4-fluid:
+      clamp(1.2rem, 2.2vw, var(--heading-h4));
+  
+    --heading-h5-fluid:
+      clamp(1.05rem, 1.8vw, var(--heading-h5));
+  
+  
+    /* ==========================================================
+       SPACING
+       ========================================================== */
+  
     --space-1: 4px;
     --space-2: 8px;
     --space-3: 12px;
@@ -150,7 +298,11 @@
     --space-20: 80px;
     --space-24: 96px;
   
-    /* Border Radius */
+  
+    /* ==========================================================
+       BORDER RADIUS
+       ========================================================== */
+  
     --radius-sm: 4px;
     --radius-md: 8px;
     --radius-lg: 12px;
@@ -158,86 +310,472 @@
     --radius-2xl: 24px;
     --radius-full: 9999px;
   
-    /* Shadows & Glows */
-    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.28);
-    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.36);
-    --shadow-lg: 0 12px 34px rgba(0, 0, 0, 0.42);
-    --glow-primary: 0 0 20px rgba(var(--color-primary-rgb), 0.24);
-    --glow-teal: 0 0 20px rgba(var(--color-tertiary-rgb), 0.2);
-    --glow-hero: 0 0 52px rgba(var(--color-primary-rgb), 0.2);
   
-    /* Sticky header stack — utility bar + main nav (must match Navbar.module.css) */
+    /* ==========================================================
+       SHADOWS
+       ========================================================== */
+  
+    --shadow-sm:
+      0 1px 4px rgba(2, 23, 57, 0.08);
+  
+    --shadow-md:
+      0 6px 18px rgba(2, 23, 57, 0.12);
+  
+    --shadow-lg:
+      0 12px 34px rgba(2, 23, 57, 0.16);
+  
+  
+    /* ==========================================================
+       GLOWS
+       ========================================================== */
+  
+    --glow-primary:
+      0 0 20px rgba(var(--color-primary-rgb), 0.24);
+  
+    --glow-teal:
+      0 0 20px rgba(var(--color-tertiary-rgb), 0.20);
+  
+    --glow-accent:
+      0 0 20px rgba(var(--color-accent-rgb), 0.18);
+  
+    --glow-hero:
+      0 0 52px rgba(var(--color-primary-rgb), 0.18);
+  
+  
+    /* ==========================================================
+       STICKY HEADER STACK
+       Must match Navbar.module.css
+       ========================================================== */
+  
     --site-topbar-height: 33px;
+  
     --site-nav-row-height: 68px;
-    --site-header-stack: calc(var(--site-topbar-height) + var(--site-nav-row-height));
-    /* Space below sticky chrome for first paint on inner pages + home hero */
-    --site-content-below-header: var(--site-header-stack);
-    /* Navbar is in document flow — hero inner top spacing only (not header-stack) */
+  
+    --site-header-stack:
+      calc(
+        var(--site-topbar-height) +
+        var(--site-nav-row-height)
+      );
+  
+  
+    /* ==========================================================
+       CONTENT / HERO SPACING
+       ========================================================== */
+  
+    --site-content-below-header:
+      var(--site-header-stack);
+  
     --site-hero-padding-top: 60px;
     --site-hero-padding-top-mobile: 40px;
-    --site-hero-min-height: min(100dvh, 56rem);
   
-    /* Mesh / card surface accents */
-    --mesh-primary: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(var(--color-primary-rgb), 0.2), transparent 55%);
-    --mesh-teal: radial-gradient(ellipse 70% 50% at 85% 15%, rgba(var(--color-tertiary-rgb), 0.14), transparent 50%);
-    --mesh-muted: radial-gradient(ellipse 60% 40% at 50% 100%, rgba(var(--color-secondary-rgb), 0.12), transparent 55%);
+    --site-hero-min-height:
+      min(100dvh, 56rem);
+  
+  
+    /* ==========================================================
+       MESH / BACKGROUND ACCENTS
+       ========================================================== */
+  
+    --mesh-primary:
+      radial-gradient(
+        ellipse 80% 60% at 20% 20%,
+        rgba(var(--color-primary-rgb), 0.16),
+        transparent 55%
+      );
+  
+    --mesh-teal:
+      radial-gradient(
+        ellipse 70% 50% at 85% 15%,
+        rgba(var(--color-tertiary-rgb), 0.14),
+        transparent 50%
+      );
+  
+    --mesh-muted:
+      radial-gradient(
+        ellipse 60% 40% at 50% 100%,
+        rgba(var(--color-secondary-rgb), 0.10),
+        transparent 55%
+      );
+  
   }
   
-  /* ─── Light Theme Overrides ─────────────────────────────────── */
+  
+  /* ============================================================
+     LIGHT THEME
+     ============================================================ */
+  
   [data-theme="light"] {
-    --color-text-primary: #111A2A;
-    --color-text-secondary: #3B4B64;
-    --color-text-muted: #667995;
-    --color-bg: #F6F8FC;
+  
+    /* ──────────────────────────────────────────────────────────
+       TEXT
+       ────────────────────────────────────────────────────────── */
+  
+    --color-text-primary: #021739;
+    --color-text-secondary: #28557E;
+    --color-text-muted: #638BAE;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       BACKGROUND
+       ────────────────────────────────────────────────────────── */
+  
+    --color-bg: #F8FCFD;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       SURFACES
+       ────────────────────────────────────────────────────────── */
+  
     --color-surface: #FFFFFF;
-    --color-surface-raised: #F8FAFD;
-    --color-surface-hover: #F1F5FB;
-    --color-surface-active: #E8EEF8;
-    --color-surface-overlay: rgba(79, 116, 214, 0.06);
-    --color-border: #D0D9E6;
-    --color-border-subtle: #E3EAF4;
-    --color-border-strong: #B3C1D4;
-    --color-focus-ring: rgba(79, 116, 214, 0.34);
+    --color-surface-raised: #FFFFFF;
   
-    /* Layout */
-    --color-nav-bg: rgba(248, 250, 253, 0.82);
-    --color-nav-scrolled: rgba(248, 250, 253, 0.94);
-    --color-topbar-bg: #EEF3F9;
-    --color-hero-bg-start: #F2F6FD;
-    --color-hero-bg-mid: #F6F8FC;
-    --color-hero-bg-end: #EEF3FA;
-    --color-section-alt: #F1F5FA;
-    --color-footer-bg: #1A2436;
-    --color-btn-secondary-hover: rgba(79, 116, 214, 0.1);
-    --color-badge-primary-bg: rgba(79, 116, 214, 0.1);
-    --color-badge-primary-border: rgba(79, 116, 214, 0.2);
-    --color-badge-teal-bg: rgba(219, 110, 16, 0.1);
-    --color-badge-teal-border: rgba(219, 110, 16, 0.22);
+    --color-surface-hover: #F0F8FF;
+    --color-surface-active: #E4F6FC;
   
-    /* Adjusted glows for light bg */
-    --glow-primary: 0 0 16px rgba(79, 116, 214, 0.14);
-    --glow-teal: 0 0 16px rgba(219, 110, 16, 0.14);
-    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --color-surface-overlay:
+      rgba(15, 153, 240, 0.06);
   
-    /* Light mode: darker gradient text for contrast on white */
-    --gradient-text-from: var(--color-primary-600);
-    --gradient-text-to: var(--color-tertiary-600);
-    /* Section label — darker orange for contrast */
-    --color-accent-label: var(--color-tertiary-600);
-    /* Button secondary — darker blue for contrast */
-    --color-btn-secondary: var(--color-primary-600);
-    --color-btn-secondary-border: var(--color-primary-600);
-    --color-btn-primary: var(--color-primary-500);
-    --color-btn-primary-hover: var(--color-primary-400);
-    --color-btn-primary-active: var(--color-primary-600);
+  
+    /* ──────────────────────────────────────────────────────────
+       BORDERS
+       ────────────────────────────────────────────────────────── */
+  
+    --color-border: #C6DDEA;
+    --color-border-subtle: #E2EEF5;
+    --color-border-strong: #8BAEC9;
+  
+    --color-focus-ring:
+      rgba(15, 153, 240, 0.34);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       NAVIGATION
+       ────────────────────────────────────────────────────────── */
+  
+    --color-nav-bg:
+      rgba(255, 255, 255, 0.86);
+  
+    --color-nav-scrolled:
+      rgba(255, 255, 255, 0.96);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       TOP BAR
+       ────────────────────────────────────────────────────────── */
+  
+    --color-topbar-bg: #EAF5FB;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       HERO
+       ────────────────────────────────────────────────────────── */
+  
+    --color-hero-bg-start: #F0F8FF;
+    --color-hero-bg-mid: #F8FCFD;
+    --color-hero-bg-end: #E4F6FC;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       ALTERNATE SECTION
+       ────────────────────────────────────────────────────────── */
+  
+    --color-section-alt: #F1F8FC;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       FOOTER
+       ────────────────────────────────────────────────────────── */
+  
+    --color-footer-bg: #021739;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       SECONDARY BUTTON
+       ────────────────────────────────────────────────────────── */
+  
+    --color-btn-secondary-hover:
+      rgba(10, 108, 210, 0.10);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       PRIMARY BADGE
+       ────────────────────────────────────────────────────────── */
+  
+    --color-badge-primary-bg:
+      rgba(15, 153, 240, 0.10);
+  
+    --color-badge-primary-border:
+      rgba(15, 153, 240, 0.22);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       CYAN / AI BADGE
+       ────────────────────────────────────────────────────────── */
+  
+    --color-badge-teal-bg:
+      rgba(24, 169, 238, 0.10);
+  
+    --color-badge-teal-border:
+      rgba(24, 169, 238, 0.22);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       GRADIENT TEXT
+       ────────────────────────────────────────────────────────── */
+  
+    --gradient-text-from: #02306B;
+    --gradient-text-to: #0F99F0;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       SECTION LABEL
+       ────────────────────────────────────────────────────────── */
+  
+    --color-accent-label: #0873AD;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       SECONDARY BUTTON
+       ────────────────────────────────────────────────────────── */
+  
+    --color-btn-secondary: #FFFFFF;
+    --color-btn-secondary-border: #0A6CD2;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       PRIMARY BUTTON
+       ────────────────────────────────────────────────────────── */
+  
+    --color-btn-primary: #0A6CD2;
+    --color-btn-primary-hover: #0552AB;
+    --color-btn-primary-active: #033F85;
+  
     --color-btn-primary-text: #FFFFFF;
-    --color-btn-primary-disabled: #C5D1E4;
-    --color-btn-primary-disabled-text: #7387A8;
-    --color-btn-ghost-text: var(--color-text-secondary);
   
-    /* Badge tints stay readable on light */
+    --color-btn-primary-disabled: #C8D8E6;
+    --color-btn-primary-disabled-text: #70869B;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       GHOST BUTTON
+       ────────────────────────────────────────────────────────── */
+  
+    --color-btn-ghost-text: #28557E;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       LIGHT MODE GLOWS
+       ────────────────────────────────────────────────────────── */
+  
+    --glow-primary:
+      0 0 16px rgba(15, 153, 240, 0.14);
+  
+    --glow-teal:
+      0 0 16px rgba(24, 169, 238, 0.12);
+  
+    --glow-accent:
+      0 0 16px rgba(249, 140, 41, 0.12);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       LIGHT MODE SHADOWS
+       ────────────────────────────────────────────────────────── */
+  
+    --shadow-sm:
+      0 1px 4px rgba(2, 23, 57, 0.08);
+  
+    --shadow-md:
+      0 4px 16px rgba(2, 23, 57, 0.10);
+  
+    --shadow-lg:
+      0 8px 32px rgba(2, 23, 57, 0.12);
+  }
+  
+  
+  /* ============================================================
+     OPTIONAL — DARK THEME
+     ============================================================
+     
+     Your original system was dark-first. I'm keeping a proper
+     dark theme here so you don't lose the ability to support it.
+  
+     The visual language remains SpyBot:
+     Navy + Blue + Cyan + Orange.
+     ============================================================ */
+  
+  [data-theme="dark"] {
+  
+    /* ──────────────────────────────────────────────────────────
+       TEXT
+       ────────────────────────────────────────────────────────── */
+  
+    --color-text-primary: #EEF8FF;
+    --color-text-secondary: #C3D9EA;
+    --color-text-muted: #8BAEC9;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       BACKGROUND
+       ────────────────────────────────────────────────────────── */
+  
+    --color-bg: #06111F;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       SURFACES
+       ────────────────────────────────────────────────────────── */
+  
+    --color-surface: #0B1B2E;
+    --color-surface-raised: #10253D;
+  
+    --color-surface-hover: #15314E;
+    --color-surface-active: #1A3B5D;
+  
+    --color-surface-overlay:
+      rgba(15, 153, 240, 0.08);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       BORDERS
+       ────────────────────────────────────────────────────────── */
+  
+    --color-border: #23425F;
+    --color-border-subtle: #19344F;
+    --color-border-strong: #365D7E;
+  
+    --color-focus-ring:
+      rgba(15, 153, 240, 0.42);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       NAVIGATION
+       ────────────────────────────────────────────────────────── */
+  
+    --color-nav-bg:
+      rgba(6, 17, 31, 0.82);
+  
+    --color-nav-scrolled:
+      rgba(6, 17, 31, 0.94);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       TOP BAR
+       ────────────────────────────────────────────────────────── */
+  
+    --color-topbar-bg: #04101D;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       HERO
+       ────────────────────────────────────────────────────────── */
+  
+    --color-hero-bg-start: #061321;
+    --color-hero-bg-mid: #081A2D;
+    --color-hero-bg-end: #0B2138;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       ALTERNATE SECTION
+       ────────────────────────────────────────────────────────── */
+  
+    --color-section-alt: #081827;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       FOOTER
+       ────────────────────────────────────────────────────────── */
+  
+    --color-footer-bg: #02111F;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       SECONDARY BUTTON
+       ────────────────────────────────────────────────────────── */
+  
+    --color-btn-secondary-hover:
+      rgba(15, 153, 240, 0.14);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       BADGES
+       ────────────────────────────────────────────────────────── */
+  
+    --color-badge-primary-bg:
+      rgba(15, 153, 240, 0.14);
+  
+    --color-badge-primary-border:
+      rgba(15, 153, 240, 0.30);
+  
+    --color-badge-teal-bg:
+      rgba(24, 169, 238, 0.12);
+  
+    --color-badge-teal-border:
+      rgba(24, 169, 238, 0.28);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       GRADIENT TEXT
+       ────────────────────────────────────────────────────────── */
+  
+    --gradient-text-from: #8AC8F5;
+    --gradient-text-to: #4FC2F4;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       LABEL ACCENT
+       ────────────────────────────────────────────────────────── */
+  
+    --color-accent-label: #4FC2F4;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       BUTTONS
+       ────────────────────────────────────────────────────────── */
+  
+    --color-btn-primary: #0A6CD2;
+    --color-btn-primary-hover: #0F99F0;
+    --color-btn-primary-active: #0552AB;
+  
+    --color-btn-primary-text: #FFFFFF;
+  
+    --color-btn-primary-disabled: #294766;
+    --color-btn-primary-disabled-text: #7891A8;
+  
+    --color-btn-secondary: #10253D;
+    --color-btn-secondary-border: #0F99F0;
+  
+    --color-btn-ghost-text: #C3D9EA;
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       DARK MODE GLOWS
+       ────────────────────────────────────────────────────────── */
+  
+    --glow-primary:
+      0 0 24px rgba(15, 153, 240, 0.28);
+  
+    --glow-teal:
+      0 0 24px rgba(24, 169, 238, 0.24);
+  
+    --glow-accent:
+      0 0 24px rgba(249, 140, 41, 0.22);
+  
+    --glow-hero:
+      0 0 64px rgba(15, 153, 240, 0.24);
+  
+  
+    /* ──────────────────────────────────────────────────────────
+       DARK MODE SHADOWS
+       ────────────────────────────────────────────────────────── */
+  
+    --shadow-sm:
+      0 1px 4px rgba(0, 0, 0, 0.30);
+  
+    --shadow-md:
+      0 6px 18px rgba(0, 0, 0, 0.38);
+  
+    --shadow-lg:
+      0 12px 34px rgba(0, 0, 0, 0.48);
   }
 
 /* ─── Reset & Base ───────────────────────────────────────────── */
