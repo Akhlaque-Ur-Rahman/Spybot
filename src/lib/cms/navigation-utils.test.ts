@@ -1,9 +1,77 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import {
+  canonicalMenuLabel,
   computeOverflowStartIndex,
   normalizeHeaderDropdownConfig,
+  resolveNavDropdownItems,
 } from '@/lib/cms/navigation-utils';
+describe('canonicalMenuLabel', () => {
+  test('does not treat Home / as Company', () => {
+    assert.equal(canonicalMenuLabel({ label: 'Home', href: '/' }), null);
+    assert.equal(canonicalMenuLabel({ label: 'Home', href: '/home' }), null);
+  });
+
+  test('maps canonical menus by label', () => {
+    assert.equal(canonicalMenuLabel({ label: 'Solutions', href: '/solutions' }), 'Solution');
+    assert.equal(canonicalMenuLabel({ label: 'Company', href: '/' }), 'Company');
+  });
+});
+
+describe('resolveNavDropdownItems', () => {
+  const defaults = {
+    Company: [{ label: 'About Us', href: '/about-us' }],
+    Industries: [{ label: 'Fintech', href: '/industries/fintech' }],
+    Solution: [{ label: 'Identity Verification', href: '/solutions/identity-verification' }],
+    Resources: [{ label: 'Blog', href: '/blog' }],
+  };
+
+  test('uses CMS items only and does not prepend code defaults', () => {
+    const result = resolveNavDropdownItems(
+      { label: 'Solutions', href: '/solutions' },
+      'Solution',
+      {
+        company: [],
+        industries: [],
+        solution: [{ label: 'Face Recognition', href: '/face-recognition' }],
+        resources: [],
+      },
+      defaults
+    );
+    assert.deepEqual(result, [{ label: 'Face Recognition', href: '/face-recognition' }]);
+  });
+
+  test('does not revive code defaults when CMS group is empty', () => {
+    const result = resolveNavDropdownItems(
+      { label: 'Industries', href: '/industries' },
+      'Industries',
+      {
+        company: [],
+        industries: [],
+        solution: [],
+        resources: [],
+      },
+      defaults
+    );
+    assert.equal(result, undefined);
+  });
+
+  test('uses insurance CMS group for a custom top-level item', () => {
+    const result = resolveNavDropdownItems(
+      { label: 'Insurance', href: '/industries/insurance' },
+      null,
+      {
+        company: [],
+        industries: [],
+        solution: [],
+        resources: [],
+        insurance: [{ label: 'Motor-OD', href: '/motor-od' }],
+      },
+      defaults
+    );
+    assert.deepEqual(result, [{ label: 'Motor-OD', href: '/motor-od' }]);
+  });
+});
 
 describe('normalizeHeaderDropdownConfig', () => {
   test('returns empty groups for invalid values', () => {

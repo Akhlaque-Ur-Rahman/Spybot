@@ -46,6 +46,58 @@ export function normalizeHeaderDropdownConfig(value: unknown): HeaderDropdownCon
   return next;
 }
 
+function normalizeNavLabel(value: string) {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+export type CanonicalMenuLabel = 'Company' | 'Industries' | 'Solution' | 'Resources';
+
+export function canonicalMenuLabel(item: Pick<NavMenuItem, 'label' | 'href'>): CanonicalMenuLabel | null {
+  const label = normalizeNavLabel(item.label);
+  const href = item.href.trim().toLowerCase().replace(/\/+$/, '') || '/';
+
+  if (label === 'company') return 'Company';
+  if (label === 'industries' || href === '/industries') return 'Industries';
+  if (label === 'solution' || label === 'solutions' || href === '/solutions') return 'Solution';
+  if (label === 'resources' || href === '/resources') return 'Resources';
+  return null;
+}
+
+function canonicalLabelToGroupKey(label: CanonicalMenuLabel): string {
+  if (label === 'Company') return 'company';
+  if (label === 'Industries') return 'industries';
+  if (label === 'Solution') return 'solution';
+  return 'resources';
+}
+
+export function dropdownGroupKeyForItem(item: Pick<NavMenuItem, 'label' | 'href'>, canonical: CanonicalMenuLabel | null): string {
+  if (canonical) return canonicalLabelToGroupKey(canonical);
+  return item.label
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
+ * CMS dropdowns win when present. Do not prepend code/registry defaults —
+ * that resurrects retired KYC/industry links next to the live CMS menu.
+ */
+export function resolveNavDropdownItems(
+  item: Pick<NavMenuItem, 'label' | 'href'>,
+  canonical: CanonicalMenuLabel | null,
+  dropdownConfig: HeaderDropdownConfig | undefined,
+  defaultsByCanonical: Record<CanonicalMenuLabel, NavMenuItem[]>
+): NavMenuItem[] | undefined {
+  const defaults = canonical ? defaultsByCanonical[canonical] : undefined;
+  if (!dropdownConfig) return defaults;
+
+  const group = dropdownConfig[dropdownGroupKeyForItem(item, canonical)];
+  if (Array.isArray(group) && group.length > 0) return group;
+  return undefined;
+}
+
 export function computeOverflowStartIndex(
   widths: readonly number[],
   availableWidth: number,

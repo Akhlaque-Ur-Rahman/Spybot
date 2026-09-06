@@ -13,7 +13,12 @@ import {
   resourceNavItems,
   solutionNavItems,
 } from '@/site';
-import { computeOverflowStartIndex } from '@/lib/cms/navigation-utils';
+import {
+  canonicalMenuLabel,
+  computeOverflowStartIndex,
+  resolveNavDropdownItems,
+  type CanonicalMenuLabel,
+} from '@/lib/cms/navigation-utils';
 import {
   BadgeCheck,
   BookOpen,
@@ -48,14 +53,20 @@ type NavDropdownItem = {
   subItems?: NavDropdownItem[];
 };
 
-type CanonicalMenuLabel = 'Company' | 'Industries' | 'Solution' | 'Resources';
-type CanonicalMenuGroupKey = 'company' | 'industries' | 'solution' | 'resources';
-
 function toDropdownItems(items: ReadonlyArray<{ label: string; href: string; desc?: string }>): NavDropdownItem[] {
   return items.map((item) => ({
     label: item.label,
     href: item.href,
     desc: item.desc ?? '',
+    icon: getNavIcon(item.label),
+  }));
+}
+
+function toDropdownItemsFromNav(items: NavMenuItem[]): NavDropdownItem[] {
+  return items.map((item) => ({
+    label: item.label,
+    href: item.href,
+    desc: (item.description ?? '').trim(),
     icon: getNavIcon(item.label),
   }));
 }
@@ -66,24 +77,6 @@ const defaultDropdownByCanonical: Record<CanonicalMenuLabel, NavDropdownItem[]> 
   Solution: toDropdownItems(solutionNavItems),
   Resources: toDropdownItems(resourceNavItems),
 };
-
-function canonicalLabelToGroupKey(label: CanonicalMenuLabel): CanonicalMenuGroupKey {
-  if (label === 'Company') return 'company';
-  if (label === 'Industries') return 'industries';
-  if (label === 'Solution') return 'solution';
-  return 'resources';
-}
-
-function dropdownGroupKeyForItem(item: NavMenuItem, canonical: CanonicalMenuLabel | null): string {
-  if (canonical) return canonicalLabelToGroupKey(canonical);
-  const normalized = item.label
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/-{2,}/g, '-')
-    .replace(/^-+|-+$/g, '');
-  return normalized;
-}
 
 type NavLink = {
   id: string;
@@ -153,22 +146,6 @@ function navOverviewCopy(label: CanonicalMenuLabel | null | undefined) {
   }
 }
 
-function normalizeLabel(value: string) {
-  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, ' ');
-}
-
-function canonicalMenuLabel(item: NavMenuItem) {
-  const label = normalizeLabel(item.label);
-  const href = item.href.trim().toLowerCase();
-
-  if (label === 'company' || href === ROUTES.home) return 'Company';
-  if (label === 'industries' || href === ROUTES.industries) return 'Industries';
-  if (label === 'solution' || label === 'solutions' || href === ROUTES.solutions) return 'Solution';
-  if (label === 'resources' || href === ROUTES.resources) return 'Resources';
-
-  return null;
-}
-
 function defaultLinkByCanonical(label: CanonicalMenuLabel) {
   return navLinks.find((link) => link.canonicalLabel === label) ?? null;
 }
@@ -178,30 +155,15 @@ function resolveDropdownItems(
   canonical: CanonicalMenuLabel | null,
   dropdownConfig?: HeaderDropdownConfig
 ): NavDropdownItem[] | undefined {
-  const defaults = canonical ? defaultDropdownByCanonical[canonical] : undefined;
-  if (!dropdownConfig) return defaults;
-  const group = dropdownConfig[dropdownGroupKeyForItem(item, canonical)];
-  if (!group?.length) return defaults;
-  const parsed = group
-    .map((item) => ({
-      label: item.label.trim(),
-      href: item.href.trim(),
-      desc: (item.description ?? '').trim(),
-    }))
-    .filter((item) => item.label && item.href)
-    .map((item) => ({ ...item, icon: getNavIcon(item.label) }));
-  if (!parsed.length) return defaults;
-  if (!defaults?.length) return parsed;
-
-  const seen = new Set(defaults.map((item) => `${item.href.toLowerCase()}|${item.label.toLowerCase()}`));
-  const merged = [...defaults];
-  for (const item of parsed) {
-    const key = `${item.href.toLowerCase()}|${item.label.toLowerCase()}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    merged.push(item);
-  }
-  return merged;
+  const defaultsByCanonical: Record<CanonicalMenuLabel, NavMenuItem[]> = {
+    Company: companyNavItems.map((row) => ({ label: row.label, href: row.href, description: row.desc })),
+    Industries: industryNavItems.map((row) => ({ label: row.label, href: row.href, description: row.desc })),
+    Solution: solutionNavItems.map((row) => ({ label: row.label, href: row.href, description: row.desc })),
+    Resources: resourceNavItems.map((row) => ({ label: row.label, href: row.href, description: row.desc })),
+  };
+  const resolved = resolveNavDropdownItems(item, canonical, dropdownConfig, defaultsByCanonical);
+  if (!resolved?.length) return undefined;
+  return toDropdownItemsFromNav(resolved);
 }
 
 function getNavIcon(label: string) {
