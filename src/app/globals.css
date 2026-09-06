@@ -8,234 +8,237 @@
   font-display: swap;
 }
 
-/* ─── Design Tokens ─────────────────────────────────────────── */
-:root {
-  /* Primary — Product Blue (interaction + CTA) */
-  --color-primary-50: #ECF2FF;
-  --color-primary-100: #D8E5FF;
-  --color-primary-200: #B8CCFF;
-  --color-primary-300: #93AEFF;
-  --color-primary-400: #6F92F5;
-  --color-primary-500: #4F74D6;
-  --color-primary-600: #3B59AE;
-  --color-primary-700: #2B417F;
-  --color-primary-800: #1D2C56;
-  --color-primary-900: #121A34;
-
-  /* Secondary — Slate (structural neutral) */
-  --color-secondary-50: #EEF2F8;
-  --color-secondary-100: #DCE3EF;
-  --color-secondary-200: #BAC7DA;
-  --color-secondary-300: #90A2BC;
-  --color-secondary-400: #667B99;
-  --color-secondary-500: #4B5E79;
-  --color-secondary-600: #36465E;
-  --color-secondary-700: #263446;
-  --color-secondary-800: #18222F;
-  --color-secondary-900: #0D141E;
-
-  /* Tertiary — Teal (supporting accent only) */
-  --color-tertiary-50: #E8F7F4;
-  --color-tertiary-100: #CDEFE8;
-  --color-tertiary-200: #9FDFD3;
-  --color-tertiary-300: #6CC7B8;
-  --color-tertiary-400: #45AF9F;
-  --color-tertiary-500: #2E9687;
-  --color-tertiary-600: #227668;
-  --color-tertiary-700: #19584D;
-  --color-tertiary-800: #113B34;
-
-  /* Semantic */
-  --color-success: #37A46E;
-  --color-warning: #C28A33;
-  --color-danger: #D35F6D;
-  --color-info: #4E88D6;
-  --color-success-rgb: 55, 164, 110;
-  --color-warning-rgb: 194, 138, 51;
-  --color-danger-rgb: 211, 95, 109;
-  --color-info-rgb: 78, 136, 214;
-  --color-primary-rgb: 79, 116, 214;
-  --color-secondary-rgb: 75, 94, 121;
-  --color-tertiary-rgb: 46, 150, 135;
-
-  /* Text + surfaces (dark default) */
-  --color-text-primary: #EEF3FB;
-  --color-text-secondary: #C2CCDE;
-  --color-text-muted: #95A3BA;
-  --color-bg: #0C121D;
-  --color-surface: #141C2A;
-  --color-surface-raised: #1C2636;
-  --color-surface-hover: #222E41;
-  --color-surface-active: #29364C;
-  --color-surface-overlay: rgba(148, 163, 184, 0.08);
-  --color-border: #334255;
-  --color-border-subtle: #253244;
-  --color-border-strong: #44556D;
-  --color-focus-ring: rgba(111, 146, 245, 0.42);
-
-  /* Layout layers */
-  --color-nav-bg: rgba(12, 18, 29, 0.78);
-  --color-nav-scrolled: rgba(12, 18, 29, 0.92);
-  --color-topbar-bg: #0A1018;
-  --color-hero-bg-start: #0B111B;
-  --color-hero-bg-mid: #0E1521;
-  --color-hero-bg-end: #121B2B;
-  --color-section-alt: #101827;
-  --color-footer-bg: #0A1018;
-  --color-btn-secondary-hover: rgba(111, 146, 245, 0.16);
-  --color-badge-primary-bg: rgba(111, 146, 245, 0.16);
-  --color-badge-primary-border: rgba(111, 146, 245, 0.32);
-  --color-badge-teal-bg: rgba(69, 175, 159, 0.14);
-  --color-badge-teal-border: rgba(69, 175, 159, 0.3);
-
-  /* Gradient text tokens */
-  --gradient-text-from: var(--color-primary-300);
-  --gradient-text-to: var(--color-tertiary-300);
-  /* Label accent */
-  --color-accent-label: var(--color-tertiary-300);
-  /* Button system */
-  --color-btn-primary: var(--color-primary-500);
-  --color-btn-primary-hover: var(--color-primary-400);
-  --color-btn-primary-active: var(--color-primary-600);
-  --color-btn-primary-text: #F8FAFF;
-  --color-btn-primary-disabled: #344766;
-  --color-btn-primary-disabled-text: #8FA0BC;
-  --color-btn-secondary: var(--color-primary-300);
-  --color-btn-secondary-border: var(--color-primary-300);
-  --color-btn-ghost-text: var(--color-text-secondary);
-
-  /* Typography */
-  --font-display: 'Nasalization', 'Orbitron', sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-
-  /* Type Scale */
-  --text-display: 4rem;
-  --text-h1: 3rem;
-  --text-h2: 2.25rem;
-  --text-h3: 1.75rem;
-  --text-h4: 1.25rem;
-  --text-h5: 1.125rem;
-  --text-body-lg: 1.125rem;
-  --text-body: 1rem;
-  --text-body-sm: 0.875rem;
-  --text-xs: 0.75rem;
-
-  /* Semantic heading scale (kept separate from card/body title tokens) */
-  --heading-h1: 3.125rem; /* 50px */
-  --heading-h2: 2.5rem;   /* 40px */
-  --heading-h3: 2rem;     /* 32px */
-  --heading-h4: 1.625rem; /* 26px */
-  --heading-h5: 1.375rem; /* 22px */
-  --heading-h1-fluid: clamp(2rem, 5vw, var(--heading-h1));
-  --heading-h2-fluid: clamp(1.7rem, 4vw, var(--heading-h2));
-  --heading-h3-fluid: clamp(1.45rem, 3.1vw, var(--heading-h3));
-  --heading-h4-fluid: clamp(1.2rem, 2.2vw, var(--heading-h4));
-  --heading-h5-fluid: clamp(1.05rem, 1.8vw, var(--heading-h5));
-
-  /* Spacing */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
-  --space-20: 80px;
-  --space-24: 96px;
-
-  /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 24px;
-  --radius-full: 9999px;
-
-  /* Shadows & Glows */
-  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.28);
-  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.36);
-  --shadow-lg: 0 12px 34px rgba(0, 0, 0, 0.42);
-  --glow-primary: 0 0 20px rgba(var(--color-primary-rgb), 0.24);
-  --glow-teal: 0 0 20px rgba(var(--color-tertiary-rgb), 0.2);
-  --glow-hero: 0 0 52px rgba(var(--color-primary-rgb), 0.2);
-
-  /* Sticky header stack — utility bar + main nav (must match Navbar.module.css) */
-  --site-topbar-height: 33px;
-  --site-nav-row-height: 68px;
-  --site-header-stack: calc(var(--site-topbar-height) + var(--site-nav-row-height));
-  /* Space below sticky chrome for first paint on inner pages + home hero */
-  --site-content-below-header: var(--site-header-stack);
-  /* Navbar is in document flow — hero inner top spacing only (not header-stack) */
-  --site-hero-padding-top: 60px;
-  --site-hero-padding-top-mobile: 40px;
-  --site-hero-min-height: min(100dvh, 56rem);
-
-  /* Mesh / card surface accents */
-  --mesh-primary: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(var(--color-primary-rgb), 0.2), transparent 55%);
-  --mesh-teal: radial-gradient(ellipse 70% 50% at 85% 15%, rgba(var(--color-tertiary-rgb), 0.14), transparent 50%);
-  --mesh-muted: radial-gradient(ellipse 60% 40% at 50% 100%, rgba(var(--color-secondary-rgb), 0.12), transparent 55%);
-}
-
-/* ─── Light Theme Overrides ─────────────────────────────────── */
-[data-theme="light"] {
-  --color-text-primary: #111A2A;
-  --color-text-secondary: #3B4B64;
-  --color-text-muted: #667995;
-  --color-bg: #F6F8FC;
-  --color-surface: #FFFFFF;
-  --color-surface-raised: #F8FAFD;
-  --color-surface-hover: #F1F5FB;
-  --color-surface-active: #E8EEF8;
-  --color-surface-overlay: rgba(79, 116, 214, 0.06);
-  --color-border: #D0D9E6;
-  --color-border-subtle: #E3EAF4;
-  --color-border-strong: #B3C1D4;
-  --color-focus-ring: rgba(79, 116, 214, 0.34);
-
-  /* Layout */
-  --color-nav-bg: rgba(248, 250, 253, 0.82);
-  --color-nav-scrolled: rgba(248, 250, 253, 0.94);
-  --color-topbar-bg: #EEF3F9;
-  --color-hero-bg-start: #F2F6FD;
-  --color-hero-bg-mid: #F6F8FC;
-  --color-hero-bg-end: #EEF3FA;
-  --color-section-alt: #F1F5FA;
-  --color-footer-bg: #1A2436;
-  --color-btn-secondary-hover: rgba(79, 116, 214, 0.1);
-  --color-badge-primary-bg: rgba(79, 116, 214, 0.1);
-  --color-badge-primary-border: rgba(79, 116, 214, 0.2);
-  --color-badge-teal-bg: rgba(46, 150, 135, 0.1);
-  --color-badge-teal-border: rgba(46, 150, 135, 0.2);
-
-  /* Adjusted glows for light bg */
-  --glow-primary: 0 0 16px rgba(79, 116, 214, 0.14);
-  --glow-teal: 0 0 16px rgba(46, 150, 135, 0.12);
-  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-
-  /* Light mode: darker gradient text for contrast on white */
-  --gradient-text-from: var(--color-primary-600);
-  --gradient-text-to: var(--color-tertiary-600);
-  /* Section label — darker teal for contrast */
-  --color-accent-label: var(--color-tertiary-600);
-  /* Button secondary — darker blue for contrast */
-  --color-btn-secondary: var(--color-primary-600);
-  --color-btn-secondary-border: var(--color-primary-600);
-  --color-btn-primary: var(--color-primary-500);
-  --color-btn-primary-hover: var(--color-primary-400);
-  --color-btn-primary-active: var(--color-primary-600);
-  --color-btn-primary-text: #FFFFFF;
-  --color-btn-primary-disabled: #C5D1E4;
-  --color-btn-primary-disabled-text: #7387A8;
-  --color-btn-ghost-text: var(--color-text-secondary);
-
-  /* Badge tints stay readable on light */
-}
+/* ─── Design Tokens (SpyBot Brand Aligned) ─────────────────────
+   Tertiary scale replaced: Teal → Orange, to match brand wordmark
+   and poster identity (Navy + Sky Blue + Orange).
+   ──────────────────────────────────────────────────────────── */
+   :root {
+    /* Primary — Product Blue (interaction + CTA) */
+    --color-primary-50: #ECF2FF;
+    --color-primary-100: #D8E5FF;
+    --color-primary-200: #B8CCFF;
+    --color-primary-300: #93AEFF;
+    --color-primary-400: #6F92F5;
+    --color-primary-500: #4F74D6;
+    --color-primary-600: #3B59AE;
+    --color-primary-700: #2B417F;
+    --color-primary-800: #1D2C56;
+    --color-primary-900: #121A34;
+  
+    /* Secondary — Slate (structural neutral) */
+    --color-secondary-50: #EEF2F8;
+    --color-secondary-100: #DCE3EF;
+    --color-secondary-200: #BAC7DA;
+    --color-secondary-300: #90A2BC;
+    --color-secondary-400: #667B99;
+    --color-secondary-500: #4B5E79;
+    --color-secondary-600: #36465E;
+    --color-secondary-700: #263446;
+    --color-secondary-800: #18222F;
+    --color-secondary-900: #0D141E;
+  
+    /* Tertiary — Orange (brand accent, replaces Teal) */
+    --color-tertiary-50: #FEF3E8;
+    --color-tertiary-100: #FDE1C6;
+    --color-tertiary-200: #FBC28C;
+    --color-tertiary-300: #F7A252;
+    --color-tertiary-400: #F5821F;
+    --color-tertiary-500: #DB6E10;
+    --color-tertiary-600: #B5590C;
+    --color-tertiary-700: #8A4409;
+    --color-tertiary-800: #5C2D06;
+  
+    /* Semantic */
+    --color-success: #37A46E;
+    --color-warning: #C28A33;
+    --color-danger: #D35F6D;
+    --color-info: #4E88D6;
+    --color-success-rgb: 55, 164, 110;
+    --color-warning-rgb: 194, 138, 51;
+    --color-danger-rgb: 211, 95, 109;
+    --color-info-rgb: 78, 136, 214;
+    --color-primary-rgb: 79, 116, 214;
+    --color-secondary-rgb: 75, 94, 121;
+    --color-tertiary-rgb: 245, 130, 31;
+  
+    /* Text + surfaces (dark default) */
+    --color-text-primary: #EEF3FB;
+    --color-text-secondary: #C2CCDE;
+    --color-text-muted: #95A3BA;
+    --color-bg: #0C121D;
+    --color-surface: #141C2A;
+    --color-surface-raised: #1C2636;
+    --color-surface-hover: #222E41;
+    --color-surface-active: #29364C;
+    --color-surface-overlay: rgba(148, 163, 184, 0.08);
+    --color-border: #334255;
+    --color-border-subtle: #253244;
+    --color-border-strong: #44556D;
+    --color-focus-ring: rgba(111, 146, 245, 0.42);
+  
+    /* Layout layers */
+    --color-nav-bg: rgba(12, 18, 29, 0.78);
+    --color-nav-scrolled: rgba(12, 18, 29, 0.92);
+    --color-topbar-bg: #0A1018;
+    --color-hero-bg-start: #0B111B;
+    --color-hero-bg-mid: #0E1521;
+    --color-hero-bg-end: #121B2B;
+    --color-section-alt: #101827;
+    --color-footer-bg: #0A1018;
+    --color-btn-secondary-hover: rgba(111, 146, 245, 0.16);
+    --color-badge-primary-bg: rgba(111, 146, 245, 0.16);
+    --color-badge-primary-border: rgba(111, 146, 245, 0.32);
+    --color-badge-teal-bg: rgba(245, 130, 31, 0.14);
+    --color-badge-teal-border: rgba(245, 130, 31, 0.3);
+  
+    /* Gradient text tokens */
+    --gradient-text-from: var(--color-primary-300);
+    --gradient-text-to: var(--color-tertiary-300);
+    /* Label accent */
+    --color-accent-label: var(--color-tertiary-300);
+    /* Button system */
+    --color-btn-primary: var(--color-primary-500);
+    --color-btn-primary-hover: var(--color-primary-400);
+    --color-btn-primary-active: var(--color-primary-600);
+    --color-btn-primary-text: #F8FAFF;
+    --color-btn-primary-disabled: #344766;
+    --color-btn-primary-disabled-text: #8FA0BC;
+    --color-btn-secondary: var(--color-primary-300);
+    --color-btn-secondary-border: var(--color-primary-300);
+    --color-btn-ghost-text: var(--color-text-secondary);
+  
+    /* Typography */
+    --font-display: 'Nasalization', 'Orbitron', sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  
+    /* Type Scale */
+    --text-display: 4rem;
+    --text-h1: 3rem;
+    --text-h2: 2.25rem;
+    --text-h3: 1.75rem;
+    --text-h4: 1.25rem;
+    --text-h5: 1.125rem;
+    --text-body-lg: 1.125rem;
+    --text-body: 1rem;
+    --text-body-sm: 0.875rem;
+    --text-xs: 0.75rem;
+  
+    /* Semantic heading scale (kept separate from card/body title tokens) */
+    --heading-h1: 3.125rem; /* 50px */
+    --heading-h2: 2.5rem;   /* 40px */
+    --heading-h3: 2rem;     /* 32px */
+    --heading-h4: 1.625rem; /* 26px */
+    --heading-h5: 1.375rem; /* 22px */
+    --heading-h1-fluid: clamp(2rem, 5vw, var(--heading-h1));
+    --heading-h2-fluid: clamp(1.7rem, 4vw, var(--heading-h2));
+    --heading-h3-fluid: clamp(1.45rem, 3.1vw, var(--heading-h3));
+    --heading-h4-fluid: clamp(1.2rem, 2.2vw, var(--heading-h4));
+    --heading-h5-fluid: clamp(1.05rem, 1.8vw, var(--heading-h5));
+  
+    /* Spacing */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
+    --space-24: 96px;
+  
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+  
+    /* Shadows & Glows */
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.28);
+    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.36);
+    --shadow-lg: 0 12px 34px rgba(0, 0, 0, 0.42);
+    --glow-primary: 0 0 20px rgba(var(--color-primary-rgb), 0.24);
+    --glow-teal: 0 0 20px rgba(var(--color-tertiary-rgb), 0.2);
+    --glow-hero: 0 0 52px rgba(var(--color-primary-rgb), 0.2);
+  
+    /* Sticky header stack — utility bar + main nav (must match Navbar.module.css) */
+    --site-topbar-height: 33px;
+    --site-nav-row-height: 68px;
+    --site-header-stack: calc(var(--site-topbar-height) + var(--site-nav-row-height));
+    /* Space below sticky chrome for first paint on inner pages + home hero */
+    --site-content-below-header: var(--site-header-stack);
+    /* Navbar is in document flow — hero inner top spacing only (not header-stack) */
+    --site-hero-padding-top: 60px;
+    --site-hero-padding-top-mobile: 40px;
+    --site-hero-min-height: min(100dvh, 56rem);
+  
+    /* Mesh / card surface accents */
+    --mesh-primary: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(var(--color-primary-rgb), 0.2), transparent 55%);
+    --mesh-teal: radial-gradient(ellipse 70% 50% at 85% 15%, rgba(var(--color-tertiary-rgb), 0.14), transparent 50%);
+    --mesh-muted: radial-gradient(ellipse 60% 40% at 50% 100%, rgba(var(--color-secondary-rgb), 0.12), transparent 55%);
+  }
+  
+  /* ─── Light Theme Overrides ─────────────────────────────────── */
+  [data-theme="light"] {
+    --color-text-primary: #111A2A;
+    --color-text-secondary: #3B4B64;
+    --color-text-muted: #667995;
+    --color-bg: #F6F8FC;
+    --color-surface: #FFFFFF;
+    --color-surface-raised: #F8FAFD;
+    --color-surface-hover: #F1F5FB;
+    --color-surface-active: #E8EEF8;
+    --color-surface-overlay: rgba(79, 116, 214, 0.06);
+    --color-border: #D0D9E6;
+    --color-border-subtle: #E3EAF4;
+    --color-border-strong: #B3C1D4;
+    --color-focus-ring: rgba(79, 116, 214, 0.34);
+  
+    /* Layout */
+    --color-nav-bg: rgba(248, 250, 253, 0.82);
+    --color-nav-scrolled: rgba(248, 250, 253, 0.94);
+    --color-topbar-bg: #EEF3F9;
+    --color-hero-bg-start: #F2F6FD;
+    --color-hero-bg-mid: #F6F8FC;
+    --color-hero-bg-end: #EEF3FA;
+    --color-section-alt: #F1F5FA;
+    --color-footer-bg: #1A2436;
+    --color-btn-secondary-hover: rgba(79, 116, 214, 0.1);
+    --color-badge-primary-bg: rgba(79, 116, 214, 0.1);
+    --color-badge-primary-border: rgba(79, 116, 214, 0.2);
+    --color-badge-teal-bg: rgba(219, 110, 16, 0.1);
+    --color-badge-teal-border: rgba(219, 110, 16, 0.22);
+  
+    /* Adjusted glows for light bg */
+    --glow-primary: 0 0 16px rgba(79, 116, 214, 0.14);
+    --glow-teal: 0 0 16px rgba(219, 110, 16, 0.14);
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  
+    /* Light mode: darker gradient text for contrast on white */
+    --gradient-text-from: var(--color-primary-600);
+    --gradient-text-to: var(--color-tertiary-600);
+    /* Section label — darker orange for contrast */
+    --color-accent-label: var(--color-tertiary-600);
+    /* Button secondary — darker blue for contrast */
+    --color-btn-secondary: var(--color-primary-600);
+    --color-btn-secondary-border: var(--color-primary-600);
+    --color-btn-primary: var(--color-primary-500);
+    --color-btn-primary-hover: var(--color-primary-400);
+    --color-btn-primary-active: var(--color-primary-600);
+    --color-btn-primary-text: #FFFFFF;
+    --color-btn-primary-disabled: #C5D1E4;
+    --color-btn-primary-disabled-text: #7387A8;
+    --color-btn-ghost-text: var(--color-text-secondary);
+  
+    /* Badge tints stay readable on light */
+  }
 
 /* ─── Reset & Base ───────────────────────────────────────────── */
 *, *::before, *::after {

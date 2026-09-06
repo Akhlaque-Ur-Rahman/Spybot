@@ -141,6 +141,13 @@ export const MEDIA_CLIPS = {
     description:
       'Vertical snapshots for fintech, marketplaces, telecom, and gaming—where checks, routing, and audit evidence differ most.',
   },
+  industriesInsurance: {
+    src: '/media/industries-insurance.webm',
+    poster: MEDIA_BRAND_LOGO,
+    title: 'Insurance verification patterns',
+    description:
+      'Identity, document, and payout-linked controls for insurance onboarding and claims.',
+  },
   trustOps: {
     src: '/media/media9.webm',
     poster: MEDIA_BRAND_LOGO,

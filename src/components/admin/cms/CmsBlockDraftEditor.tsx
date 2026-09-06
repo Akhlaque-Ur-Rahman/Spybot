@@ -95,16 +95,7 @@ function EditorHero({ value, onChange }: Props) {
       <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
       <MediaClipFields
         optional
-        label="Background media (optional)"
-        value={mediaMetaLoose(o.backgroundMedia)}
-        onChange={(backgroundMedia) => {
-          const src = (backgroundMedia.src ?? '').trim();
-          patch(src ? { backgroundMedia } : { backgroundMedia: undefined });
-        }}
-      />
-      <MediaClipFields
-        optional
-        label="Right media (optional)"
+        label="Hero media (optional)"
         value={mediaMetaLoose(o.media)}
         onChange={(media) => {
           const src = (media.src ?? '').trim();
@@ -112,12 +103,12 @@ function EditorHero({ value, onChange }: Props) {
         }}
       />
       <TextField
-        label="Right media aspect ratio (e.g. 16 / 10, 4 / 3)"
+        label="Hero media aspect ratio (e.g. 16 / 10, 4 / 3)"
         value={str(o.mediaAspectRatio, '16 / 10')}
         onChange={(mediaAspectRatio) => patch({ mediaAspectRatio })}
       />
       <SelectField
-        label="Right media fit"
+        label="Hero media fit"
         value={mediaObjectFit}
         options={mediaObjectFitOptions.map((fit) => ({ value: fit, label: fit }))}
         onChange={(fit) => patch({ mediaObjectFit: fit })}
@@ -184,16 +175,7 @@ function EditorPageHeader({ value, onChange }: Props) {
       <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
       <MediaClipFields
         optional
-        label="Background media (optional)"
-        value={mediaMetaLoose(o.backgroundMedia)}
-        onChange={(backgroundMedia) => {
-          const src = (backgroundMedia.src ?? '').trim();
-          patch(src ? { backgroundMedia } : { backgroundMedia: undefined });
-        }}
-      />
-      <MediaClipFields
-        optional
-        label="Right media (optional)"
+        label="Hero media (optional)"
         value={mediaMetaLoose(o.media)}
         onChange={(media) => {
           const src = (media.src ?? '').trim();
@@ -201,12 +183,12 @@ function EditorPageHeader({ value, onChange }: Props) {
         }}
       />
       <TextField
-        label="Right media aspect ratio (e.g. 16 / 10, 4 / 3)"
+        label="Hero media aspect ratio (e.g. 16 / 10, 4 / 3)"
         value={str(o.mediaAspectRatio, '16 / 10')}
         onChange={(mediaAspectRatio) => patch({ mediaAspectRatio })}
       />
       <SelectField
-        label="Right media fit"
+        label="Hero media fit"
         value={mediaObjectFit}
         options={mediaObjectFitOptions.map((fit) => ({ value: fit, label: fit }))}
         onChange={(fit) => patch({ mediaObjectFit: fit })}

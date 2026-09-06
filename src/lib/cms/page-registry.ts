@@ -957,13 +957,13 @@ const supplementalMarketingPages: CmsRegistryPage[] = [
       'Support insurance onboarding, policy issuance, and claims-linked identity checks with verification workflows designed for trust and speed.',
     pageHeader: {
       label: 'Insurance',
-      title: 'Policy onboarding that stays',
-      gradientText: 'fast and defensible',
+      title: 'When policy fraud slows acquisition,',
+      gradientText: 'keep onboarding fast and defensible',
       description:
-        'Insurance teams need identity, document, and payout-linked controls that reduce fraud while keeping acquisition and servicing smooth.',
+        'Give insurance teams identity, document, and payout-linked controls that reduce fraud while keeping acquisition and servicing smooth.',
       primaryCta: { label: 'Talk to insurance specialists', href: CTA_LINKS.contact },
       secondaryCta: { label: 'Explore industries', href: ROUTES.industries },
-      media: MEDIA_CLIPS.industriesHub,
+      media: MEDIA_CLIPS.industriesInsurance,
     },
     utilityCtaBand: {
       title: 'Need help with policyholder verification?',
