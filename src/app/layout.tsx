@@ -72,14 +72,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const themeScript = `(function(){try{document.documentElement.classList.add('js');var t=localStorage.getItem('spybot-theme');var r=t==='light'?'light':t==='dark'?'dark':window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',r);var hex=r==='light'?'#F6F8FC':'#0C121D';var all=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<all.length;i++){var n=all[i];n.parentNode&&n.parentNode.removeChild(n);}var m=document.createElement('meta');m.setAttribute('name','theme-color');m.setAttribute('content',hex);document.head.appendChild(m);}catch(e){}})();`;
+const themeScript = `(function(){try{document.documentElement.classList.add('js');var t=localStorage.getItem('spybot-theme-v2');var r=t==='dark'?'dark':t==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):'light';document.documentElement.setAttribute('data-theme',r);var hex=r==='light'?'#F5FBFD':'#03183A';var all=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<all.length;i++){var n=all[i];n.parentNode&&n.parentNode.removeChild(n);}var m=document.createElement('meta');m.setAttribute('name','theme-color');m.setAttribute('content',hex);document.head.appendChild(m);}catch(e){}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const site = await getSiteRuntimeConfig();
   const jsonLd = buildRootJsonLd(site);
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-theme="light" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />

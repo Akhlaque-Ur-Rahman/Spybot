@@ -11,8 +11,8 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: 'system',
-  resolvedTheme: 'dark',
+  theme: 'light',
+  resolvedTheme: 'light',
   setTheme: () => {},
 });
 
@@ -22,12 +22,12 @@ export function useTheme() {
 
 /** Matches `globals.css` `--color-bg` for dark / light roots (browser chrome / PWA). */
 const THEME_COLOR_HEX: Record<'light' | 'dark', string> = {
-  dark: '#0C121D',
-  light: '#F6F8FC',
+  dark: '#03183A',
+  light: '#F5FBFD',
 };
 
 function getSystemTheme(): 'light' | 'dark' {
-  if (typeof window === 'undefined') return 'dark';
+  if (typeof window === 'undefined') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
@@ -45,16 +45,18 @@ function applyTheme(resolved: 'light' | 'dark') {
   syncThemeColorMeta(resolved);
 }
 
+const THEME_STORAGE_KEY = 'spybot-theme-v2';
+
 function getInitialTheme(): Theme {
-  if (typeof window === 'undefined') return 'system';
-  const stored = localStorage.getItem('spybot-theme');
-  return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+  if (typeof window === 'undefined') return 'light';
+  const stored = localStorage.getItem(THEME_STORAGE_KEY);
+  return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'light';
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('system');
-  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('dark');
-  const themeRef = useRef<Theme>('system');
+  const [theme, setThemeState] = useState<Theme>('light');
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('light');
+  const themeRef = useRef<Theme>('light');
 
   const resolvedTheme = theme === 'system' ? systemTheme : theme;
 
@@ -86,7 +88,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = (t: Theme) => {
     setThemeState(t);
-    localStorage.setItem('spybot-theme', t);
+    localStorage.setItem(THEME_STORAGE_KEY, t);
     if (t === 'system') {
       const s = getSystemTheme();
       setSystemTheme(s);
