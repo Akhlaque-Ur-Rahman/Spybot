@@ -72,14 +72,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const themeScript = `(function(){try{document.documentElement.classList.add('js');localStorage.removeItem('spybot-theme');localStorage.removeItem('spybot-theme-v2');document.documentElement.setAttribute('data-theme','light');var all=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<all.length;i++){var n=all[i];n.parentNode&&n.parentNode.removeChild(n);}var m=document.createElement('meta');m.setAttribute('name','theme-color');m.setAttribute('content','#F5FBFD');document.head.appendChild(m);}catch(e){}})();`;
+const themeScript = `(function(){try{document.documentElement.classList.add('js');var t=localStorage.getItem('spybot-theme-v4');var r=t==='light'?'light':t==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):'dark';document.documentElement.setAttribute('data-theme',r);var hex=r==='light'?'#F7F8FA':'#0A0E14';var all=document.querySelectorAll('meta[name="theme-color"]');for(var i=0;i<all.length;i++){var n=all[i];n.parentNode&&n.parentNode.removeChild(n);}var m=document.createElement('meta');m.setAttribute('name','theme-color');m.setAttribute('content',hex);document.head.appendChild(m);}catch(e){}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const site = await getSiteRuntimeConfig();
   const jsonLd = buildRootJsonLd(site);
 
   return (
-    <html lang="en" data-theme="light" suppressHydrationWarning>
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />

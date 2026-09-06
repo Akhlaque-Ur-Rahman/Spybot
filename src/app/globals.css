@@ -26,524 +26,145 @@
    SpyBot visual identity / supplied reference artwork.
    ============================================================ */
 
+/* ─── Design Tokens — Approved Palette ──────────────────────────
+   Primary = Blue (60%, dominant — structure, CTAs, links)
+   Tertiary = Orange (30%, supporting — highlights, active states)
+   Secondary = Neutral gray (10%, structural only — borders, muted)
+   Same variable names as before; values now match the approved swatch.
+   ──────────────────────────────────────────────────────────────*/
    :root {
-
-    /* ============================================================
-       BRAND BLUE
-       ============================================================
-       Primary SpyBot identity.
-       Use for major CTAs, active states, links, icons and
-       important interface elements.
-       ============================================================ */
-  
-    --color-primary-50:  #EFF9FE;
-    --color-primary-100: #D7F0FA;
-    --color-primary-200: #ACD7F1;
-    --color-primary-300: #83BDE8;
-    --color-primary-400: #4B9BDD;
-    --color-primary-500: #0E76D8;
-    --color-primary-600: #0556B5;
-    --color-primary-700: #054189;
-    --color-primary-800: #01306D;
-    --color-primary-900: #03183A;
-  
-  
-    /* ============================================================
-       SECONDARY — SECURITY NAVY
-       ============================================================
-       Structural hierarchy, headings, navigation, dark surfaces
-       and high-trust areas.
-       ============================================================ */
-  
-    --color-secondary-50:  #F0F5FA;
-    --color-secondary-100: #DCE8F3;
-    --color-secondary-200: #B9CDE0;
-    --color-secondary-300: #8FAED3;
-    --color-secondary-400: #618CBE;
-    --color-secondary-500: #3B669A;
-    --color-secondary-600: #214F84;
-    --color-secondary-700: #0E3D73;
-    --color-secondary-800: #062D60;
-    --color-secondary-900: #03183A;
-  
-  
-    /* ============================================================
-       TERTIARY — AI CYAN
-       ============================================================
-       Technology, AI, intelligence, data flow, verification
-       indicators and futuristic visual effects.
-       ============================================================ */
-  
-    --color-tertiary-50:  #F3FCFF;
-    --color-tertiary-100: #DDF7FE;
-    --color-tertiary-200: #B7EAFB;
-    --color-tertiary-300: #83D6F8;
-    --color-tertiary-400: #53C2F7;
-    --color-tertiary-500: #149FF3;
-    --color-tertiary-600: #087FD5;
-    --color-tertiary-700: #0565B4;
-    --color-tertiary-800: #034B89;
-    --color-tertiary-900: #02335F;
-  
-  
-    /* ============================================================
-       ACCENT — SPYBOT ORANGE
-       ============================================================
-       Transformation, emphasis, highlighted words and selected
-       CTA details.
-  
-       DO NOT use this as a general-purpose secondary color.
-       ============================================================ */
-  
-    --color-accent-50:  #FFF8F1;
-    --color-accent-100: #FFEBD9;
-    --color-accent-200: #FAC496;
-    --color-accent-300: #F9A65A;
-    --color-accent-400: #FA8D28;
-    --color-accent-500: #F37A12;
-    --color-accent-600: #D96208;
-    --color-accent-700: #B84D05;
-    --color-accent-800: #873700;
-    --color-accent-900: #5C2400;
-  
-  
-    /* ============================================================
-       PURE / NEUTRAL COLORS
-       ============================================================ */
-  
-    --color-white: #FFFFFF;
-    --color-black: #000000;
-  
-    --color-neutral-50:  #F5FBFD;
-    --color-neutral-100: #EDF7FB;
-    --color-neutral-200: #DDEEF5;
-    --color-neutral-300: #C6DFEA;
-    --color-neutral-400: #A9C6D5;
-    --color-neutral-500: #7D9CAC;
-    --color-neutral-600: #5B7A8B;
-    --color-neutral-700: #3E5C6C;
-    --color-neutral-800: #243E4D;
-    --color-neutral-900: #102A3A;
-  
-  
-    /* ============================================================
-       SEMANTIC COLORS
-       ============================================================ */
-  
-    --color-success: #15966A;
-    --color-warning: #E08A19;
-    --color-danger: #D94A5C;
-    --color-info: #0E76D8;
-  
-    --color-success-rgb: 21, 150, 106;
-    --color-warning-rgb: 224, 138, 25;
-    --color-danger-rgb: 217, 74, 92;
-    --color-info-rgb: 14, 118, 216;
-  
-    --color-primary-rgb: 14, 118, 216;
-    --color-secondary-rgb: 59, 102, 154;
-    --color-tertiary-rgb: 20, 159, 243;
-    --color-accent-rgb: 250, 141, 40;
-  
-  
-    /* ============================================================
-       TEXT
-       ============================================================ */
-  
-    --color-text-primary: #03183A;
-    --color-text-secondary: #214F84;
-    --color-text-muted: #618CBE;
-    --color-text-inverse: #FFFFFF;
-    --color-text-link: #0556B5;
-    --color-text-link-hover: #0E76D8;
-  
-  
-    /* ============================================================
-       APPLICATION BACKGROUND
-       ============================================================ */
-  
-    --color-bg: #F5FBFD;
-  
-    --color-surface: #FFFFFF;
-  
-    --color-surface-raised: #FFFFFF;
-  
-    --color-surface-hover: #EFF9FE;
-  
-    --color-surface-active: #D7F0FA;
-  
-    --color-surface-overlay:
-      rgba(1, 48, 109, 0.045);
-  
-  
-    /* ============================================================
-       BORDERS
-       ============================================================ */
-  
-    --color-border: #C6DFEA;
-  
-    --color-border-subtle: #DDEEF5;
-  
-    --color-border-strong: #83BDE8;
-  
-    --color-border-focus: #149FF3;
-  
-    --color-focus-ring:
-      rgba(20, 159, 243, 0.35);
-  
-  
-    /* ============================================================
-       NAVIGATION
-       ============================================================ */
-  
-    --color-nav-bg:
-      rgba(245, 251, 253, 0.88);
-  
-    --color-nav-scrolled:
-      rgba(255, 255, 255, 0.96);
-  
-    --color-nav-border:
-      rgba(1, 48, 109, 0.10);
-  
-    --color-nav-text: #03183A;
-  
-    --color-nav-text-hover: #0556B5;
-  
-    --color-nav-active: #0E76D8;
-  
-  
-    /* ============================================================
-       TOP BAR
-       ============================================================ */
-  
-    --color-topbar-bg: #EAF6FB;
-  
-    --color-topbar-text: #214F84;
-  
-    --color-topbar-border:
-      rgba(5, 65, 137, 0.12);
-  
-  
-    /* ============================================================
-       HERO
-       ============================================================
-       Hero is deliberately light.
-  
-       The reference image gets its visual intensity from the
-       blue/cyan technology artwork rather than from a dark page.
-       ============================================================ */
-  
-    --color-hero-bg-start: #EAF7FC;
-  
-    --color-hero-bg-mid: #F5FBFD;
-  
-    --color-hero-bg-end: #D7F0FA;
-  
-  
-    /* ============================================================
-       ALTERNATE SECTIONS
-       ============================================================ */
-  
-    --color-section-alt: #EDF7FB;
-  
-    --color-section-blue: #F0F8FC;
-  
-    --color-section-dark: #01306D;
-  
-  
-    /* ============================================================
-       FOOTER
-       ============================================================ */
-  
-    --color-footer-bg: #03183A;
-  
-    --color-footer-surface: #054189;
-  
-    --color-footer-text: #FFFFFF;
-  
-    --color-footer-text-secondary: #ACD7F1;
-  
-    --color-footer-border:
-      rgba(172, 215, 241, 0.20);
-  
-  
-    /* ============================================================
-       PRIMARY BUTTON
-       ============================================================ */
-  
-    --color-btn-primary: #0556B5;
-  
-    --color-btn-primary-hover: #0E76D8;
-  
-    --color-btn-primary-active: #054189;
-  
-    --color-btn-primary-text: #FFFFFF;
-  
-    --color-btn-primary-disabled: #A9C6D5;
-  
-    --color-btn-primary-disabled-text: #5B7A8B;
-  
-  
-    /* ============================================================
-       SECONDARY BUTTON
-       ============================================================ */
-  
-    --color-btn-secondary: #FFFFFF;
-  
-    --color-btn-secondary-hover: #EFF9FE;
-  
-    --color-btn-secondary-active: #D7F0FA;
-  
-    --color-btn-secondary-border: #0E76D8;
-  
-    --color-btn-secondary-text: #0556B5;
-  
-  
-    /* ============================================================
-       GHOST BUTTON
-       ============================================================ */
-  
-    --color-btn-ghost-text: #214F84;
-  
-    --color-btn-ghost-hover:
-      rgba(14, 118, 216, 0.08);
-  
-  
-    /* ============================================================
-       ORANGE CTA / EMPHASIS
-       ============================================================ */
-  
-    --color-btn-accent: #FA8D28;
-  
-    --color-btn-accent-hover: #F37A12;
-  
-    --color-btn-accent-active: #D96208;
-  
-    --color-btn-accent-text: #FFFFFF;
-  
-  
-    /* ============================================================
-       BADGES — BLUE
-       ============================================================ */
-  
-    --color-badge-primary-bg:
-      rgba(14, 118, 216, 0.09);
-  
-    --color-badge-primary-border:
-      rgba(14, 118, 216, 0.24);
-  
-    --color-badge-primary-text:
-      #0556B5;
-  
-  
-    /* ============================================================
-       BADGES — AI / CYAN
-       ============================================================ */
-  
-    --color-badge-teal-bg:
-      rgba(20, 159, 243, 0.09);
-  
-    --color-badge-teal-border:
-      rgba(20, 159, 243, 0.25);
-  
-    --color-badge-teal-text:
-      #0565B4;
-  
-  
-    /* ============================================================
-       BADGES — ORANGE
-       ============================================================ */
-  
-    --color-badge-accent-bg:
-      rgba(250, 141, 40, 0.10);
-  
-    --color-badge-accent-border:
-      rgba(250, 141, 40, 0.28);
-  
-    --color-badge-accent-text:
-      #B84D05;
-  
-  
-    /* ============================================================
-       GRADIENT TEXT
-       ============================================================ */
-  
-    --gradient-text-from: #01306D;
-  
-    --gradient-text-mid: #0556B5;
-  
-    --gradient-text-to: #149FF3;
-  
-  
-    /* ============================================================
-       AI / TECHNOLOGY GRADIENT
-       ============================================================ */
-  
-    --gradient-ai:
-      linear-gradient(
-        135deg,
-        #0556B5 0%,
-        #0E76D8 48%,
-        #149FF3 100%
-      );
-  
-  
-    /* ============================================================
-       BRAND GRADIENT
-       ============================================================ */
-  
-    --gradient-brand:
-      linear-gradient(
-        135deg,
-        #01306D 0%,
-        #0556B5 55%,
-        #0E76D8 100%
-      );
-  
-  
-    /* ============================================================
-       BLUE → CYAN HERO GRADIENT
-       ============================================================ */
-  
-    --gradient-hero:
-      linear-gradient(
-        135deg,
-        #EAF7FC 0%,
-        #F5FBFD 48%,
-        #D7F0FA 100%
-      );
-  
-  
-    /* ============================================================
-       BLUE → ORANGE ACCENT GRADIENT
-       ============================================================
-       Use ONLY for special branded moments.
-       ============================================================ */
-  
-    --gradient-accent:
-      linear-gradient(
-        135deg,
-        #0556B5 0%,
-        #0E76D8 60%,
-        #FA8D28 100%
-      );
-  
-  
-    /* ============================================================
-       LABEL / EYEBROW
-       ============================================================ */
-  
-    --color-accent-label: #0565B4;
-  
-  
-    /* ============================================================
-       ICON COLORS
-       ============================================================ */
-  
-    --color-icon-primary: #0556B5;
-  
-    --color-icon-secondary: #0E76D8;
-  
-    --color-icon-ai: #149FF3;
-  
-    --color-icon-accent: #FA8D28;
-  
-    --color-icon-dark: #01306D;
-  
-    --color-icon-muted: #618CBE;
-  
-  
-    /* ============================================================
-       DATA VISUALIZATION
-       ============================================================ */
-  
-    --color-chart-1: #01306D;
-    --color-chart-2: #0556B5;
-    --color-chart-3: #0E76D8;
-    --color-chart-4: #149FF3;
-    --color-chart-5: #53C2F7;
-    --color-chart-6: #FA8D28;
-  
-  
-    /* ============================================================
-       TYPOGRAPHY
-       ============================================================ */
-  
-    --font-display:
-      'Nasalization',
-      'Orbitron',
-      sans-serif;
-  
-    --font-body:
-      'Inter',
-      system-ui,
-      sans-serif;
-  
-    --font-mono:
-      'JetBrains Mono',
-      monospace;
-  
-  
-    /* ============================================================
-       TYPE SCALE
-       ============================================================ */
-  
+    /* Primary — Blue */
+    --color-primary-50:  #E9F3FE;
+    --color-primary-100: #C9E4FD;
+    --color-primary-200: #97CBFB;
+    --color-primary-300: #5EA8F5;
+    --color-primary-400: #337FE0;
+    --color-primary-500: #1565C0;
+    --color-primary-600: #0F4E99;
+    --color-primary-700: #0C3A72;
+    --color-primary-800: #0B2A4A;
+    --color-primary-900: #071A2E;
+  
+    /* Secondary — Neutral gray (structural only, not brand color) */
+    --color-secondary-50:  #F7F7F8;
+    --color-secondary-100: #EBEBED;
+    --color-secondary-200: #D3D4D8;
+    --color-secondary-300: #B0B2B9;
+    --color-secondary-400: #888B94;
+    --color-secondary-500: #666971;
+    --color-secondary-600: #4A4D55;
+    --color-secondary-700: #34363C;
+    --color-secondary-800: #202127;
+    --color-secondary-900: #131316;
+  
+    /* Tertiary — Orange (secondary brand color) */
+    --color-tertiary-50:  #FFF3E7;
+    --color-tertiary-100: #FFDFB8;
+    --color-tertiary-200: #FFC17E;
+    --color-tertiary-300: #FFA347;
+    --color-tertiary-400: #FA8A24;
+    --color-tertiary-500: #F5821F;
+    --color-tertiary-600: #D96A0F;
+    --color-tertiary-700: #AB520C;
+    --color-tertiary-800: #783A09;
+  
+    /* RGB triplets for opacity utilities */
+    --color-primary-rgb:   21, 101, 192;
+    --color-secondary-rgb: 102, 105, 113;
+    --color-tertiary-rgb:  245, 130, 31;
+  
+    /* Semantic */
+    --color-success: #2FB574;
+    --color-warning: #E0A83A;
+    --color-danger:  #E05A6A;
+    --color-info:    #3FA0E0;
+    --color-success-rgb: 47, 181, 116;
+    --color-warning-rgb: 224, 168, 58;
+    --color-danger-rgb:  224, 90, 106;
+    --color-info-rgb:    63, 160, 224;
+  
+    /* ── Dark theme surfaces (default) ─────────────────────── */
+    --color-text-primary:   #F5F6F8;
+    --color-text-secondary: #C6C9CE;
+    --color-text-muted:     #8B8F97;
+  
+    --color-bg:             #0A0E14;
+    --color-surface:        #12171F;
+    --color-surface-raised: #1A212B;
+    --color-surface-hover:  #212A36;
+    --color-surface-active: #2A3542;
+    --color-surface-overlay: rgba(151, 203, 251, 0.10);
+  
+    --color-border:        #2E3742;
+    --color-border-subtle: #1E252E;
+    --color-border-strong: #454F5C;
+    --color-focus-ring:    rgba(51, 127, 224, 0.55);
+  
+    /* Layout layers */
+    --color-nav-bg:          rgba(10, 14, 20, 0.85);
+    --color-nav-scrolled:    rgba(10, 14, 20, 0.96);
+    --color-topbar-bg:       #070A0F;
+    --color-hero-bg-start:   #0A121D;
+    --color-hero-bg-mid:     #0C1826;
+    --color-hero-bg-end:     #0B2A4A;
+    --color-section-alt:     #0D1420;
+    --color-footer-bg:       #070A0F;
+  
+    /* Buttons — primary CTA solid orange, secondary outline blue */
+    --color-btn-primary:          var(--color-tertiary-500);
+    --color-btn-primary-hover:    var(--color-tertiary-400);
+    --color-btn-primary-active:   var(--color-tertiary-600);
+    --color-btn-primary-text:     #FFFFFF;
+    --color-btn-primary-disabled: #4A3A28;
+    --color-btn-primary-disabled-text: #8A7A63;
+  
+    --color-btn-secondary:        var(--color-primary-300);
+    --color-btn-secondary-border: var(--color-primary-300);
+    --color-btn-secondary-hover:  rgba(94, 168, 245, 0.16);
+    --color-btn-ghost-text:       var(--color-text-secondary);
+  
+    /* Badges */
+    --color-badge-primary-bg:     rgba(94, 168, 245, 0.20);
+    --color-badge-primary-border: rgba(94, 168, 245, 0.45);
+    --color-badge-teal-bg:        rgba(245, 130, 31, 0.20);
+    --color-badge-teal-border:    rgba(245, 130, 31, 0.48);
+    --color-badge-neutral-bg:     rgba(136, 139, 148, 0.18);
+    --color-badge-neutral-border: rgba(136, 139, 148, 0.35);
+  
+    /* Gradient text */
+    --gradient-text-from: var(--color-primary-300);
+    --gradient-text-to:   var(--color-tertiary-400);
+    --color-accent-label: var(--color-tertiary-400);
+  
+    /* Typography */
+    --font-display: 'Nasalization', 'Orbitron', sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  
+    /* Type Scale */
     --text-display: 4rem;
-  
     --text-h1: 3rem;
-  
     --text-h2: 2.25rem;
-  
     --text-h3: 1.75rem;
-  
     --text-h4: 1.25rem;
-  
     --text-h5: 1.125rem;
-  
     --text-body-lg: 1.125rem;
-  
     --text-body: 1rem;
-  
     --text-body-sm: 0.875rem;
-  
     --text-xs: 0.75rem;
   
-  
-    /* ============================================================
-       SEMANTIC HEADING SCALE
-       ============================================================ */
-  
     --heading-h1: 3.125rem;
-  
     --heading-h2: 2.5rem;
-  
     --heading-h3: 2rem;
-  
     --heading-h4: 1.625rem;
-  
     --heading-h5: 1.375rem;
+    --heading-h1-fluid: clamp(2rem, 5vw, var(--heading-h1));
+    --heading-h2-fluid: clamp(1.7rem, 4vw, var(--heading-h2));
+    --heading-h3-fluid: clamp(1.45rem, 3.1vw, var(--heading-h3));
+    --heading-h4-fluid: clamp(1.2rem, 2.2vw, var(--heading-h4));
+    --heading-h5-fluid: clamp(1.05rem, 1.8vw, var(--heading-h5));
   
-  
-    --heading-h1-fluid:
-      clamp(2rem, 5vw, var(--heading-h1));
-  
-    --heading-h2-fluid:
-      clamp(1.7rem, 4vw, var(--heading-h2));
-  
-    --heading-h3-fluid:
-      clamp(1.45rem, 3.1vw, var(--heading-h3));
-  
-    --heading-h4-fluid:
-      clamp(1.2rem, 2.2vw, var(--heading-h4));
-  
-    --heading-h5-fluid:
-      clamp(1.05rem, 1.8vw, var(--heading-h5));
-  
-  
-    /* ============================================================
-       SPACING
-       ============================================================ */
-  
+    /* Spacing */
     --space-1: 4px;
     --space-2: 8px;
     --space-3: 12px;
@@ -557,11 +178,7 @@
     --space-20: 80px;
     --space-24: 96px;
   
-  
-    /* ============================================================
-       BORDER RADIUS
-       ============================================================ */
-  
+    /* Border Radius */
     --radius-sm: 4px;
     --radius-md: 8px;
     --radius-lg: 12px;
@@ -569,427 +186,84 @@
     --radius-2xl: 24px;
     --radius-full: 9999px;
   
+    /* Shadows & Glows */
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 14px 40px rgba(0, 0, 0, 0.55);
+    --glow-primary: 0 0 28px rgba(var(--color-primary-rgb), 0.4);
+    --glow-teal:    0 0 28px rgba(var(--color-tertiary-rgb), 0.35);
+    --glow-hero:    0 0 64px rgba(var(--color-primary-rgb), 0.32);
   
-    /* ============================================================
-       SHADOWS
-       ============================================================ */
-  
-    --shadow-sm:
-      0 1px 4px rgba(3, 24, 58, 0.08);
-  
-    --shadow-md:
-      0 6px 18px rgba(3, 24, 58, 0.12);
-  
-    --shadow-lg:
-      0 12px 34px rgba(3, 24, 58, 0.16);
-  
-    --shadow-xl:
-      0 20px 55px rgba(3, 24, 58, 0.20);
-  
-  
-    /* ============================================================
-       BLUE GLOWS
-       ============================================================ */
-  
-    --glow-primary:
-      0 0 22px rgba(14, 118, 216, 0.24);
-  
-    --glow-blue:
-      0 0 28px rgba(5, 86, 181, 0.26);
-  
-    --glow-cyan:
-      0 0 28px rgba(20, 159, 243, 0.28);
-  
-    --glow-accent:
-      0 0 22px rgba(250, 141, 40, 0.20);
-  
-    --glow-hero:
-      0 0 60px rgba(20, 159, 243, 0.18);
-  
-  
-    /* ============================================================
-       MESH BACKGROUNDS
-       ============================================================ */
-  
-    --mesh-primary:
-      radial-gradient(
-        ellipse 80% 60% at 20% 20%,
-        rgba(14, 118, 216, 0.15),
-        transparent 58%
-      );
-  
-    --mesh-cyan:
-      radial-gradient(
-        ellipse 70% 55% at 85% 15%,
-        rgba(20, 159, 243, 0.15),
-        transparent 55%
-      );
-  
-    --mesh-light:
-      radial-gradient(
-        ellipse 70% 50% at 50% 100%,
-        rgba(215, 240, 250, 0.70),
-        transparent 65%
-      );
-  
-    --mesh-orange:
-      radial-gradient(
-        ellipse 40% 35% at 85% 85%,
-        rgba(250, 141, 40, 0.08),
-        transparent 65%
-      );
-  
-  
-    /* ============================================================
-       STICKY HEADER
-       ============================================================ */
-  
+    /* Sticky header stack */
     --site-topbar-height: 33px;
-  
     --site-nav-row-height: 68px;
-  
-    --site-header-stack:
-      calc(
-        var(--site-topbar-height) +
-        var(--site-nav-row-height)
-      );
-  
-    --site-content-below-header:
-      var(--site-header-stack);
-  
+    --site-header-stack: calc(var(--site-topbar-height) + var(--site-nav-row-height));
+    --site-content-below-header: var(--site-header-stack);
     --site-hero-padding-top: 60px;
-  
     --site-hero-padding-top-mobile: 40px;
+    --site-hero-min-height: min(100dvh, 56rem);
   
-    --site-hero-min-height:
-      min(100dvh, 56rem);
+    /* Mesh / card surface accents */
+    --mesh-primary: radial-gradient(ellipse 85% 65% at 15% 15%, rgba(var(--color-primary-rgb), 0.3), transparent 60%);
+    --mesh-teal:    radial-gradient(ellipse 75% 55% at 90% 10%, rgba(var(--color-tertiary-rgb), 0.2), transparent 55%);
+    --mesh-muted:   radial-gradient(ellipse 65% 45% at 50% 100%, rgba(var(--color-secondary-rgb), 0.16), transparent 60%);
   }
   
-  
-  /* ================================================================
-     LIGHT THEME
-     ================================================================ */
-  
+  /* ─── Light Theme Overrides ─────────────────────────────────── */
   [data-theme="light"] {
-  
-    --color-text-primary: #03183A;
-    --color-text-secondary: #214F84;
-    --color-text-muted: #618CBE;
-    --color-text-inverse: #FFFFFF;
-  
-    --color-bg: #F5FBFD;
-  
-    --color-surface: #FFFFFF;
-  
-    --color-surface-raised: #FFFFFF;
-  
-    --color-surface-hover: #EFF9FE;
-  
-    --color-surface-active: #D7F0FA;
-  
-    --color-surface-overlay:
-      rgba(1, 48, 109, 0.045);
-  
-    --color-border: #C6DFEA;
-  
-    --color-border-subtle: #DDEEF5;
-  
-    --color-border-strong: #83BDE8;
-  
-    --color-border-focus: #149FF3;
-  
-    --color-focus-ring:
-      rgba(20, 159, 243, 0.32);
-  
-  
-    /* Navigation */
-  
-    --color-nav-bg:
-      rgba(245, 251, 253, 0.88);
-  
-    --color-nav-scrolled:
-      rgba(255, 255, 255, 0.96);
-  
-    --color-nav-border:
-      rgba(1, 48, 109, 0.10);
-  
-  
-    /* Top bar */
-  
-    --color-topbar-bg: #EAF6FB;
-  
-  
-    /* Hero */
-  
-    --color-hero-bg-start: #EAF7FC;
-  
-    --color-hero-bg-mid: #F5FBFD;
-  
-    --color-hero-bg-end: #D7F0FA;
-  
-  
-    /* Sections */
-  
-    --color-section-alt: #EDF7FB;
-  
-    --color-section-blue: #F0F8FC;
-  
-    --color-section-dark: #01306D;
-  
-  
-    /* Footer */
-  
-    --color-footer-bg: #03183A;
-  
-    --color-footer-surface: #054189;
-  
-    --color-footer-text: #FFFFFF;
-  
-    --color-footer-text-secondary: #ACD7F1;
-  
-  
-    /* Buttons */
-  
-    --color-btn-primary: #0556B5;
-  
-    --color-btn-primary-hover: #0E76D8;
-  
-    --color-btn-primary-active: #054189;
-  
-    --color-btn-primary-text: #FFFFFF;
-  
-    --color-btn-primary-disabled: #A9C6D5;
-  
-    --color-btn-primary-disabled-text: #5B7A8B;
-  
-  
-    --color-btn-secondary: #FFFFFF;
-  
-    --color-btn-secondary-hover: #EFF9FE;
-  
-    --color-btn-secondary-active: #D7F0FA;
-  
-    --color-btn-secondary-border: #0E76D8;
-  
-    --color-btn-secondary-text: #0556B5;
-  
-  
-    --color-btn-ghost-text: #214F84;
-  
-    --color-btn-ghost-hover:
-      rgba(14, 118, 216, 0.08);
-  
-  
-    /* Gradient text */
-  
-    --gradient-text-from: #01306D;
-  
-    --gradient-text-mid: #0556B5;
-  
-    --gradient-text-to: #149FF3;
-  
-  
-    /* Label */
-  
-    --color-accent-label: #0565B4;
-  
-  
-    /* Light mode shadows */
-  
-    --shadow-sm:
-      0 1px 4px rgba(3, 24, 58, 0.07);
-  
-    --shadow-md:
-      0 6px 18px rgba(3, 24, 58, 0.10);
-  
-    --shadow-lg:
-      0 12px 34px rgba(3, 24, 58, 0.13);
-  
-    --shadow-xl:
-      0 20px 55px rgba(3, 24, 58, 0.16);
-  
-  
-    /* Light mode glows */
-  
-    --glow-primary:
-      0 0 20px rgba(14, 118, 216, 0.16);
-  
-    --glow-blue:
-      0 0 24px rgba(5, 86, 181, 0.18);
-  
-    --glow-cyan:
-      0 0 24px rgba(20, 159, 243, 0.20);
-  
-    --glow-accent:
-      0 0 20px rgba(250, 141, 40, 0.14);
-  
-    --glow-hero:
-      0 0 52px rgba(20, 159, 243, 0.14);
-  }
-  
-  
-  /* ================================================================
-     DARK THEME
-     ================================================================
-     Dark mode is intentionally much closer to the actual SpyBot
-     navy identity instead of simply inverting the light palette.
-     ================================================================ */
-  
-  [data-theme="dark"] {
-  
-    --color-text-primary: #F5FBFD;
-    --color-text-secondary: #D7F0FA;
-    --color-text-muted: #8FAED3;
-    --color-text-inverse: #03183A;
-  
-    --color-bg: #03183A;
-  
-    --color-surface: #062D60;
-  
-    --color-surface-raised: #0E3D73;
-  
-    --color-surface-hover: #214F84;
-  
-    --color-surface-active: #0556B5;
-  
-    --color-surface-overlay:
-      rgba(20, 159, 243, 0.08);
-  
-    --color-border: #214F84;
-  
-    --color-border-subtle: #0E3D73;
-  
-    --color-border-strong: #3B669A;
-  
-    --color-border-focus: #53C2F7;
-  
-    --color-focus-ring:
-      rgba(83, 194, 247, 0.42);
-  
-  
-    /* Navigation */
-  
-    --color-nav-bg:
-      rgba(3, 24, 58, 0.84);
-  
-    --color-nav-scrolled:
-      rgba(3, 24, 58, 0.96);
-  
-    --color-nav-border:
-      rgba(83, 194, 247, 0.16);
-  
-  
-    /* Top bar */
-  
-    --color-topbar-bg: #02132F;
-  
-  
-    /* Hero */
-  
-    --color-hero-bg-start: #02132F;
-  
-    --color-hero-bg-mid: #03183A;
-  
-    --color-hero-bg-end: #062D60;
-  
-  
-    /* Sections */
-  
-    --color-section-alt: #062448;
-  
-    --color-section-blue: #062D60;
-  
-    --color-section-dark: #02132F;
-  
-  
-    /* Footer */
-  
-    --color-footer-bg: #02132F;
-  
-    --color-footer-surface: #062D60;
-  
-    --color-footer-text: #FFFFFF;
-  
-    --color-footer-text-secondary: #ACD7F1;
-  
-  
-    /* Buttons */
-  
-    --color-btn-primary: #0E76D8;
-  
-    --color-btn-primary-hover: #149FF3;
-  
-    --color-btn-primary-active: #0556B5;
-  
-    --color-btn-primary-text: #FFFFFF;
-  
-    --color-btn-primary-disabled: #214F84;
-  
-    --color-btn-primary-disabled-text: #8FAED3;
-  
-  
-    --color-btn-secondary: #062D60;
-  
-    --color-btn-secondary-hover: #0E3D73;
-  
-    --color-btn-secondary-active: #214F84;
-  
-    --color-btn-secondary-border: #53C2F7;
-  
-    --color-btn-secondary-text: #D7F0FA;
-  
-  
-    --color-btn-ghost-text: #D7F0FA;
-  
-    --color-btn-ghost-hover:
-      rgba(20, 159, 243, 0.12);
-  
-  
-    /* Gradient text */
-  
-    --gradient-text-from: #53C2F7;
-  
-    --gradient-text-mid: #149FF3;
-  
-    --gradient-text-to: #ACD7F1;
-  
-  
-    /* Label */
-  
-    --color-accent-label: #53C2F7;
-  
-  
-    /* Dark mode shadows */
-  
-    --shadow-sm:
-      0 1px 5px rgba(0, 0, 0, 0.30);
-  
-    --shadow-md:
-      0 7px 20px rgba(0, 0, 0, 0.38);
-  
-    --shadow-lg:
-      0 14px 38px rgba(0, 0, 0, 0.46);
-  
-    --shadow-xl:
-      0 24px 60px rgba(0, 0, 0, 0.52);
-  
-  
-    /* Dark mode glows */
-  
-    --glow-primary:
-      0 0 24px rgba(14, 118, 216, 0.30);
-  
-    --glow-blue:
-      0 0 30px rgba(5, 86, 181, 0.34);
-  
-    --glow-cyan:
-      0 0 32px rgba(20, 159, 243, 0.34);
-  
-    --glow-accent:
-      0 0 24px rgba(250, 141, 40, 0.24);
-  
-    --glow-hero:
-      0 0 68px rgba(20, 159, 243, 0.28);
+    --color-text-primary:   #131316;
+    --color-text-secondary: #4A4D55;
+    --color-text-muted:     #888B94;
+  
+    --color-bg:             #F7F8FA;
+    --color-surface:        #FFFFFF;
+    --color-surface-raised: #F7F7F8;
+    --color-surface-hover:  #EBEBED;
+    --color-surface-active: #D3D4D8;
+    --color-surface-overlay: rgba(21, 101, 192, 0.06);
+  
+    --color-border:        #D3D4D8;
+    --color-border-subtle: #EBEBED;
+    --color-border-strong: #B0B2B9;
+    --color-focus-ring:    rgba(21, 101, 192, 0.4);
+  
+    --color-nav-bg:        rgba(255, 255, 255, 0.88);
+    --color-nav-scrolled:  rgba(255, 255, 255, 0.97);
+    --color-topbar-bg:     #EBEBED;
+    --color-hero-bg-start: #E9F3FE;
+    --color-hero-bg-mid:   #F7F8FA;
+    --color-hero-bg-end:   #E9F3FE;
+    --color-section-alt:   #F7F7F8;
+    --color-footer-bg:     #0B2A4A;
+  
+    --color-btn-primary:          var(--color-tertiary-500);
+    --color-btn-primary-hover:    var(--color-tertiary-400);
+    --color-btn-primary-active:   var(--color-tertiary-600);
+    --color-btn-primary-text:     #FFFFFF;
+    --color-btn-primary-disabled: #F0DCC5;
+    --color-btn-primary-disabled-text: #B39A7D;
+  
+    --color-btn-secondary:        var(--color-primary-600);
+    --color-btn-secondary-border: var(--color-primary-600);
+    --color-btn-secondary-hover:  rgba(21, 101, 192, 0.1);
+    --color-btn-ghost-text:       var(--color-text-secondary);
+  
+    --color-badge-primary-bg:     rgba(21, 101, 192, 0.12);
+    --color-badge-primary-border: rgba(21, 101, 192, 0.3);
+    --color-badge-teal-bg:        rgba(245, 130, 31, 0.14);
+    --color-badge-teal-border:    rgba(245, 130, 31, 0.35);
+    --color-badge-neutral-bg:     rgba(102, 105, 113, 0.12);
+    --color-badge-neutral-border: rgba(102, 105, 113, 0.3);
+  
+    --gradient-text-from: var(--color-primary-600);
+    --gradient-text-to:   var(--color-tertiary-600);
+    --color-accent-label: var(--color-tertiary-600);
+  
+    --glow-primary: 0 0 20px rgba(21, 101, 192, 0.16);
+    --glow-teal:    0 0 20px rgba(245, 130, 31, 0.18);
+    --shadow-sm: 0 1px 4px rgba(11, 22, 38, 0.08);
+    --shadow-md: 0 6px 18px rgba(11, 22, 38, 0.1);
+    --shadow-lg: 0 12px 36px rgba(11, 22, 38, 0.14);
   }
 
 /* ─── Reset & Base ───────────────────────────────────────────── */

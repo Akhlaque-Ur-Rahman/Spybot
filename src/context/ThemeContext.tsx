@@ -11,8 +11,8 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: 'light',
-  resolvedTheme: 'light',
+  theme: 'dark',
+  resolvedTheme: 'dark',
   setTheme: () => {},
 });
 
@@ -22,12 +22,12 @@ export function useTheme() {
 
 /** Matches `globals.css` `--color-bg` for dark / light roots (browser chrome / PWA). */
 const THEME_COLOR_HEX: Record<'light' | 'dark', string> = {
-  dark: '#03183A',
-  light: '#F5FBFD',
+  dark: '#0A0E14',
+  light: '#F7F8FA',
 };
 
 function getSystemTheme(): 'light' | 'dark' {
-  if (typeof window === 'undefined') return 'light';
+  if (typeof window === 'undefined') return 'dark';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
@@ -45,16 +45,18 @@ function applyTheme(resolved: 'light' | 'dark') {
   syncThemeColorMeta(resolved);
 }
 
-const THEME_STORAGE_KEY = 'spybot-theme-v3';
+const THEME_STORAGE_KEY = 'spybot-theme-v4';
 
 function getInitialTheme(): Theme {
-  return 'light';
+  if (typeof window === 'undefined') return 'dark';
+  const stored = localStorage.getItem(THEME_STORAGE_KEY);
+  return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'dark';
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
-  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('light');
-  const themeRef = useRef<Theme>('light');
+  const [theme, setThemeState] = useState<Theme>('dark');
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('dark');
+  const themeRef = useRef<Theme>('dark');
 
   const resolvedTheme = theme === 'system' ? systemTheme : theme;
 
