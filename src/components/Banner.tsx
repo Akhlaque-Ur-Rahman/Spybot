@@ -93,26 +93,28 @@ export default function Banner({ content }: { content: CmsBannerBlock }) {
         }
       >
         <div className={styles.fullBleed}>
-          <BannerResponsiveMedia
-            className={styles.bleedMedia}
-            desktop={desktop}
-            mobile={mobile}
-            objectFit="cover"
-          />
-          {hasCopy ? (
-            <div className={styles.overlay}>
-              <div className={`container ${styles.overlayInner}`}>
-                <BannerCopy
-                  headline={headline}
-                  body={body}
-                  primary={primary}
-                  secondary={secondaryCta}
-                  headlineClassName={styles.headline}
-                  bodyClassName={styles.body}
-                />
+          <div className={styles.bleedFrame}>
+            <BannerResponsiveMedia
+              className={styles.bleedMedia}
+              desktop={desktop}
+              mobile={mobile}
+              objectFit="cover"
+            />
+            {hasCopy ? (
+              <div className={styles.overlay}>
+                <div className={`container ${styles.overlayInner}`}>
+                  <BannerCopy
+                    headline={headline}
+                    body={body}
+                    primary={primary}
+                    secondary={secondaryCta}
+                    headlineClassName={styles.headline}
+                    bodyClassName={styles.body}
+                  />
+                </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
       </section>
     );
