@@ -98,7 +98,7 @@ export default function Banner({ content }: { content: CmsBannerBlock }) {
               className={styles.bleedMedia}
               desktop={desktop}
               mobile={mobile}
-              objectFit="cover"
+              objectFit={objectFit}
             />
             {hasCopy ? (
               <div className={styles.overlay}>

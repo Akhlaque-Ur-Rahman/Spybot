@@ -278,14 +278,13 @@ function EditorBanner({ value, onChange }: Props) {
             onChange={(mobileAspectRatio) => patch({ mobileAspectRatio })}
           />
         </>
-      ) : (
-        <SelectField
-          label="Media fit"
-          value={mediaObjectFit}
-          options={mediaObjectFitOptions.map((fit) => ({ value: fit, label: fit }))}
-          onChange={(fit) => patch({ mediaObjectFit: fit })}
-        />
-      )}
+      ) : null}
+      <SelectField
+        label="Media fit"
+        value={mediaObjectFit}
+        options={mediaObjectFitOptions.map((fit) => ({ value: fit, label: fit }))}
+        onChange={(fit) => patch({ mediaObjectFit: fit })}
+      />
     </div>
   );
 }
