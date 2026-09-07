@@ -16,6 +16,8 @@ import {
 import {
   canonicalMenuLabel,
   computeOverflowStartIndex,
+  filterOverflowNavGroups,
+  hasNavDropdownItems,
   resolveNavDropdownItems,
   type CanonicalMenuLabel,
 } from '@/lib/cms/navigation-utils';
@@ -277,8 +279,9 @@ export default function Navbar({
   const resolvedLinks: NavLink[] = menuItems?.length ? mergeMenuWithDefaults(menuItems, dropdownConfig) : navLinks;
   const visibleLinks = !enableOverflow || overflowStartIdx === null ? resolvedLinks : resolvedLinks.slice(0, overflowStartIdx);
   const overflowLinks = !enableOverflow || overflowStartIdx === null ? [] : resolvedLinks.slice(overflowStartIdx);
-  const hasOverflow = overflowLinks.length > 0;
-  const moreDropdownItems: NavDropdownItem[] = overflowLinks.map((link) => ({
+  const overflowGroups = filterOverflowNavGroups(overflowLinks);
+  const hasOverflow = overflowGroups.length > 0;
+  const moreDropdownItems: NavDropdownItem[] = overflowGroups.map((link) => ({
     label: link.label,
     href: link.href,
     desc: '',
@@ -785,7 +788,7 @@ export default function Navbar({
                                 <div className={styles.dropdownLabel}>{item.label}</div>
                               </div>
                             </Link>
-                            {item.subItems && (
+                            {hasNavDropdownItems(item.subItems) ? (
                               <div className={styles.moreSublinks}>
                                 {item.subItems.map((sub) => (
                                   <Link
@@ -799,7 +802,7 @@ export default function Navbar({
                                   </Link>
                                 ))}
                               </div>
-                            )}
+                            ) : null}
                           </div>
                         ))}
                       </div>

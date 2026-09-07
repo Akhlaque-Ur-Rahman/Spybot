@@ -114,3 +114,16 @@ export function computeOverflowStartIndex(
   }
   return cutoff >= widths.length ? null : cutoff;
 }
+
+export function hasNavDropdownItems(
+  items: readonly unknown[] | null | undefined
+): items is readonly unknown[] {
+  return Array.isArray(items) && items.length > 0;
+}
+
+/** More menu only lists overflow groups that have at least one child link. */
+export function filterOverflowNavGroups<T extends { dropdown?: readonly unknown[] | null | undefined }>(
+  overflow: readonly T[]
+): T[] {
+  return overflow.filter((item) => hasNavDropdownItems(item.dropdown));
+}

@@ -3,6 +3,8 @@ import { describe, test } from 'node:test';
 import {
   canonicalMenuLabel,
   computeOverflowStartIndex,
+  filterOverflowNavGroups,
+  hasNavDropdownItems,
   normalizeHeaderDropdownConfig,
   resolveNavDropdownItems,
 } from '@/lib/cms/navigation-utils';
@@ -110,5 +112,30 @@ describe('computeOverflowStartIndex', () => {
   test('returns cutoff when overflow is required', () => {
     const result = computeOverflowStartIndex([110, 120, 130, 140], 360, 92);
     assert.equal(result, 2);
+  });
+});
+
+describe('filterOverflowNavGroups', () => {
+  test('treats missing or empty dropdowns as no group', () => {
+    assert.equal(hasNavDropdownItems(undefined), false);
+    assert.equal(hasNavDropdownItems(null), false);
+    assert.equal(hasNavDropdownItems([]), false);
+    assert.equal(hasNavDropdownItems([{ label: 'FAQs', href: '/faqs' }]), true);
+  });
+
+  test('omits overflow groups that have no child links', () => {
+    const result = filterOverflowNavGroups([
+      { label: 'Industries', href: '/industries', dropdown: undefined },
+      { label: 'Resources', href: '/resources', dropdown: [] },
+      {
+        label: 'Staffing',
+        href: '/staffing',
+        dropdown: [{ label: 'Employee Background Check', href: '/staffing/background-check' }],
+      },
+    ]);
+    assert.deepEqual(
+      result.map((item) => item.label),
+      ['Staffing']
+    );
   });
 });
