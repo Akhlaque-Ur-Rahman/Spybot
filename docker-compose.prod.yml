@@ -38,6 +38,10 @@ services:
       PRISMA_PUSH_ON_BOOT: '0'
     ports:
       - '3003:3000'
+    # CMS uploads land in /app/public/media. Without this bind, recreate/rebuild
+    # drops files while MediaAsset rows and selected CMS srcs still point at them.
+    volumes:
+      - ./public/media:/app/public/media
     depends_on:
       postgres:
         condition: service_healthy

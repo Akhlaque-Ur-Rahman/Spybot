@@ -16,6 +16,7 @@ import SupportPathways from '@/components/SupportPathways';
 import SupportSlaStrip from '@/components/SupportSlaStrip';
 import SolutionShowcase from '@/components/SolutionShowcase';
 import { HeroSection } from '@/components/Hero';
+import Banner from '@/components/Banner';
 import { SectionScrollReveal } from '@/components/motion/SectionScrollReveal';
 import { getManagedBlock, type ManagedCmsPage } from '@/lib/cms/page-content';
 import type {
@@ -28,6 +29,7 @@ import type {
   CmsDirectoryGridBlock,
   CmsFaqAccordionBlock,
   CmsFintechHeroBlock,
+  CmsBannerBlock,
   CmsHeroBlock,
   CmsLifecycleBlock,
   CmsPageHeaderBlock,
@@ -55,6 +57,8 @@ function renderBlock(block: ManagedCmsPage['sections'][number]['blocks'][number]
   switch (block.type) {
     case 'hero':
       return <HeroSection key={key} content={v as CmsHeroBlock} />;
+    case 'banner':
+      return <Banner key={key} content={v as CmsBannerBlock} />;
     case 'pageHeader': {
       const p = v as CmsPageHeaderBlock;
       return (
@@ -223,7 +227,8 @@ export default function CmsManagedPageBody({
   const hasHeroBlock = blocksFlat.some((b) => b.type === 'hero');
   const showsPageHeader = blocksFlat.some((b) => b.type === 'pageHeader') && !preferFintechHero;
   const showsFintechHero = preferFintechHero;
-  const hasTopHero = hasHeroBlock || showsPageHeader || showsFintechHero;
+  const bannerLeads = blocksFlat[0]?.type === 'banner';
+  const hasTopHero = hasHeroBlock || showsPageHeader || showsFintechHero || bannerLeads;
 
   if (!hasTopHero) {
     const heroValue = getManagedBlock(page, 'hero', 'hero');

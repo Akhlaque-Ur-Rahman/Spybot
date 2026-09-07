@@ -1,3 +1,4 @@
+import type { CmsBannerLayout } from '@/lib/cms/banner';
 import type { CmsRichTextValue } from '@/lib/cms/rich-text';
 import type { MediaClipMeta } from '@/lib/site-media';
 import { MEDIA_CLIPS, MEDIA_HERO_BACKDROP } from '@/lib/site-media';
@@ -47,6 +48,20 @@ export type CmsHeroBlock = {
   stats: CmsHeroStat[];
   media: MediaClipMeta;
   mediaAspectRatio?: string;
+  mediaObjectFit?: 'cover' | 'contain';
+};
+
+export type CmsBannerBlock = {
+  layout: CmsBannerLayout;
+  headline?: string;
+  body?: CmsRichTextValue;
+  primaryCta?: CmsLink;
+  secondaryCta?: CmsLink;
+  media: MediaClipMeta;
+  secondaryMedia?: MediaClipMeta;
+  mobileMedia?: MediaClipMeta;
+  desktopAspectRatio?: string;
+  mobileAspectRatio?: string;
   mediaObjectFit?: 'cover' | 'contain';
 };
 
@@ -301,6 +316,7 @@ export type CmsFintechApiKeyBlock = {
 export const CMS_BLOCK_TYPES = [
   'hero',
   'pageHeader',
+  'banner',
   'coverageCarousel',
   'directoryGrid',
   'solutionShowcase',
@@ -331,6 +347,7 @@ export type CmsBlockType = (typeof CMS_BLOCK_TYPES)[number];
 export const CMS_BLOCK_TYPE_LABELS = {
   hero: 'Hero',
   pageHeader: 'Page header',
+  banner: 'Banner',
   coverageCarousel: 'Coverage carousel',
   directoryGrid: 'Directory grid',
   solutionShowcase: 'Verification lanes (tabbed grid)',
@@ -367,6 +384,7 @@ export function cmsBlockTypeLabel(blockType: string): string {
 export type CmsBlockValueMap = {
   hero: CmsHeroBlock;
   pageHeader: CmsPageHeaderBlock;
+  banner: CmsBannerBlock;
   coverageCarousel: CmsCoverageCarouselBlock;
   directoryGrid: CmsDirectoryGridBlock;
   solutionShowcase: CmsSolutionShowcaseBlock;
@@ -727,6 +745,22 @@ export const homeHeroBlock: CmsHeroBlock = {
     description: 'Homepage hero media preview for identity and onboarding workflows.',
   },
   mediaAspectRatio: '16 / 10',
+  mediaObjectFit: 'cover',
+};
+
+export const homeBannerBlock: CmsBannerBlock = {
+  layout: 'fullImage',
+  headline: '',
+  body: '',
+  primaryCta: { label: '', href: '' },
+  secondaryCta: { label: '', href: '' },
+  media: {
+    src: '/media/homepage.webp',
+    title: 'Homepage',
+    description: 'Homepage banner',
+  },
+  desktopAspectRatio: '16 / 9',
+  mobileAspectRatio: '4 / 5',
   mediaObjectFit: 'cover',
 };
 
@@ -1310,6 +1344,7 @@ export const cmsRegistryPages: CmsRegistryPage[] = [
     seoDescription:
       'Reduce onboarding friction with SpyBot identity verification, KYB, financial verification, and orchestration workflows built for modern digital businesses.',
     sections: [
+      section('banner', 'Banner', 0, block('banner', 'banner', homeBannerBlock)),
       section('hero', heroSectionLabel('home'), 1, block('hero', 'hero', homeHeroBlock)),
       section(
         'challenges',

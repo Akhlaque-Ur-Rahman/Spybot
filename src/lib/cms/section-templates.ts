@@ -26,6 +26,7 @@ export const CMS_SECTION_TEMPLATES: readonly CmsSectionTemplate[] = (
   [
     'hero',
     'pageHeader',
+    'banner',
     'coverageCarousel',
     'directoryGrid',
     'solutionShowcase',

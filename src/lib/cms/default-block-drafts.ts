@@ -32,6 +32,18 @@ export function defaultDraftForBlockType(type: CmsBlockType): unknown {
         mediaAspectRatio: '16 / 10',
         mediaObjectFit: 'cover',
       };
+    case 'banner':
+      return {
+        layout: 'splitTextMedia',
+        headline: '',
+        body: '',
+        primaryCta: { label: '', href: '' },
+        secondaryCta: { label: '', href: '' },
+        media: clone(homeHeroBlock.media),
+        desktopAspectRatio: '16 / 9',
+        mobileAspectRatio: '4 / 5',
+        mediaObjectFit: 'cover',
+      };
     case 'coverageCarousel':
       return { label: 'Coverage', items: [...defaultCoverageItems] };
     case 'directoryGrid':

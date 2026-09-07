@@ -1,4 +1,5 @@
 import { HeroSection } from '@/components/Hero';
+import Banner from '@/components/Banner';
 import Challenges from '@/components/Challenges';
 import Lifecycle from '@/components/Lifecycle';
 import Benefits from '@/components/Benefits';
@@ -38,6 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
   const cmsPage = await getManagedPageBySlug('/');
+  const banner = getManagedBlock(cmsPage, 'banner', 'banner');
   const hero = getManagedBlock(cmsPage, 'hero', 'hero');
   const challenges = getManagedBlock(cmsPage, 'challenges', 'challenges');
   const lifecycle = getManagedBlock(cmsPage, 'lifecycle', 'lifecycle');
@@ -55,6 +57,7 @@ export default async function Home() {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(heroVideoJsonLd) }}
       />
+      {banner ? <Banner content={banner} /> : null}
       <HeroSection content={hero ?? undefined} />
       <Challenges content={challenges ?? undefined} />
       <Lifecycle content={lifecycle ?? undefined} />

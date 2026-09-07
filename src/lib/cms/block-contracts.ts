@@ -1,5 +1,6 @@
 import { validateCmsRichTextField } from '@/lib/cms/rich-text';
 import { SHOWCASE_ICON_KEYS } from '@/lib/solution-showcase-data';
+import { validateBannerDraft } from '@/lib/cms/banner';
 import { CMS_BLOCK_TYPES, type CmsBlockType } from '@/lib/cms/page-registry';
 
 type Refine = (o: Record<string, unknown>) => string | null;
@@ -15,6 +16,7 @@ const showcaseIconSet = new Set<string>(SHOWCASE_ICON_KEYS);
 const typedEditorBlocks = new Set<CmsBlockType>([
   'hero',
   'pageHeader',
+  'banner',
   'coverageCarousel',
   'directoryGrid',
   'solutionShowcase',
@@ -70,6 +72,7 @@ const refinements: Record<CmsBlockType, Refine> = {
     if (o.description === undefined || o.description === null) return null;
     return validateCmsRichTextField(o.description);
   },
+  banner: (o) => validateBannerDraft(o),
   coverageCarousel: (o) => {
     if (o.items === undefined || o.items === null) return null;
     if (!Array.isArray(o.items)) return 'coverageCarousel: items must be an array';

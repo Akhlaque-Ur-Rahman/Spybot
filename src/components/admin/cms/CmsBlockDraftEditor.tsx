@@ -17,6 +17,17 @@ import type { CmsIconName } from '@/lib/cms/icon-map';
 import { cmsIconNames } from '@/lib/cms/icon-map';
 import type { MediaClipMeta } from '@/lib/site-media';
 import { MEDIA_CLIPS } from '@/lib/site-media';
+import {
+  BANNER_DEFAULT_DESKTOP_RATIO,
+  BANNER_DEFAULT_MOBILE_RATIO,
+  CMS_BANNER_LAYOUT_LABELS,
+  CMS_BANNER_LAYOUTS,
+  bannerNeedsMobileMedia,
+  isCmsBannerLayout,
+  isDualMediaBannerLayout,
+  isFullBleedBannerLayout,
+  type CmsBannerLayout,
+} from '@/lib/cms/banner';
 import { SHOWCASE_ICON_KEYS, type ShowcaseIconKey } from '@/lib/solution-showcase-data';
 import styles from '@/components/admin/fields.module.css';
 import { CMS_BLOCK_CONTRACTS } from '@/lib/cms/block-contracts';
@@ -90,12 +101,9 @@ function EditorHero({ value, onChange }: Props) {
       <TextField label="Badge" value={str(o.badge)} onChange={(badge) => patch({ badge })} />
       <TextField label="Headline" required value={str(o.headline)} onChange={(headline) => patch({ headline })} />
       <TextField label="Headline gradient" value={str(o.headlineGradient)} onChange={(headlineGradient) => patch({ headlineGradient })} />
-      <RichTextField label="Subheadline" required value={o.subheadline} onChange={(subheadline) => patch({ subheadline })} />
-      <LinkFields label="Primary CTA" value={link(o.primaryCta)} onChange={(primaryCta) => patch({ primaryCta })} />
-      <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
       <MediaClipFields
         optional
-        label="Hero media (optional)"
+        label="Right media (optional)"
         value={mediaMetaLoose(o.media)}
         onChange={(media) => {
           const src = (media.src ?? '').trim();
@@ -103,16 +111,19 @@ function EditorHero({ value, onChange }: Props) {
         }}
       />
       <TextField
-        label="Hero media aspect ratio (e.g. 16 / 10, 4 / 3)"
+        label="Right media aspect ratio (e.g. 16 / 10, 4 / 3)"
         value={str(o.mediaAspectRatio, '16 / 10')}
         onChange={(mediaAspectRatio) => patch({ mediaAspectRatio })}
       />
       <SelectField
-        label="Hero media fit"
+        label="Right media fit"
         value={mediaObjectFit}
         options={mediaObjectFitOptions.map((fit) => ({ value: fit, label: fit }))}
         onChange={(fit) => patch({ mediaObjectFit: fit })}
       />
+      <RichTextField label="Subheadline" required value={o.subheadline} onChange={(subheadline) => patch({ subheadline })} />
+      <LinkFields label="Primary CTA" value={link(o.primaryCta)} onChange={(primaryCta) => patch({ primaryCta })} />
+      <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
       <TextAreaField
         label="Trust items (one per line)"
         value={trustItems.join('\n')}
@@ -175,7 +186,7 @@ function EditorPageHeader({ value, onChange }: Props) {
       <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
       <MediaClipFields
         optional
-        label="Hero media (optional)"
+        label="Right media (optional)"
         value={mediaMetaLoose(o.media)}
         onChange={(media) => {
           const src = (media.src ?? '').trim();
@@ -183,16 +194,98 @@ function EditorPageHeader({ value, onChange }: Props) {
         }}
       />
       <TextField
-        label="Hero media aspect ratio (e.g. 16 / 10, 4 / 3)"
+        label="Right media aspect ratio (e.g. 16 / 10, 4 / 3)"
         value={str(o.mediaAspectRatio, '16 / 10')}
         onChange={(mediaAspectRatio) => patch({ mediaAspectRatio })}
       />
       <SelectField
-        label="Hero media fit"
+        label="Right media fit"
         value={mediaObjectFit}
         options={mediaObjectFitOptions.map((fit) => ({ value: fit, label: fit }))}
         onChange={(fit) => patch({ mediaObjectFit: fit })}
       />
+    </div>
+  );
+}
+
+function EditorBanner({ value, onChange }: Props) {
+  const o = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+  const patch = (p: Record<string, unknown>) => onChange({ ...o, ...p });
+  const layout: CmsBannerLayout = isCmsBannerLayout(o.layout) ? o.layout : 'splitTextMedia';
+  const mediaObjectFit =
+    mediaObjectFitOptions.includes(o.mediaObjectFit as (typeof mediaObjectFitOptions)[number])
+      ? (o.mediaObjectFit as (typeof mediaObjectFitOptions)[number])
+      : 'cover';
+  const fullBleed = isFullBleedBannerLayout(layout);
+  const dualMedia = isDualMediaBannerLayout(layout);
+  const mobileRequired = bannerNeedsMobileMedia(layout);
+
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <SelectField
+        label="Layout"
+        required
+        value={layout}
+        options={CMS_BANNER_LAYOUTS.map((item) => ({ value: item, label: CMS_BANNER_LAYOUT_LABELS[item] }))}
+        onChange={(next) => patch({ layout: next })}
+      />
+      <TextField label="Headline" value={str(o.headline)} onChange={(headline) => patch({ headline })} />
+      <RichTextField label="Body" value={o.body} onChange={(body) => patch({ body })} />
+      <LinkFields label="Primary CTA" value={link(o.primaryCta)} onChange={(primaryCta) => patch({ primaryCta })} />
+      <LinkFields label="Secondary CTA" value={link(o.secondaryCta)} onChange={(secondaryCta) => patch({ secondaryCta })} />
+      <MediaClipFields
+        required
+        label="Media"
+        value={mediaMetaLoose(o.media)}
+        onChange={(media) => {
+          const src = (media.src ?? '').trim();
+          patch(src ? { media } : { media: { src: '', title: '', description: '' } });
+        }}
+      />
+      {dualMedia ? (
+        <MediaClipFields
+          required
+          label="Secondary media"
+          value={mediaMetaLoose(o.secondaryMedia)}
+          onChange={(secondaryMedia) => {
+            const src = (secondaryMedia.src ?? '').trim();
+            patch(src ? { secondaryMedia } : { secondaryMedia: undefined });
+          }}
+        />
+      ) : null}
+      {fullBleed ? (
+        <MediaClipFields
+          optional={!mobileRequired}
+          required={mobileRequired}
+          label="Mobile media"
+          value={mediaMetaLoose(o.mobileMedia)}
+          onChange={(mobileMedia) => {
+            const src = (mobileMedia.src ?? '').trim();
+            patch(src ? { mobileMedia } : { mobileMedia: undefined });
+          }}
+        />
+      ) : null}
+      {fullBleed ? (
+        <>
+          <TextField
+            label="Desktop aspect ratio"
+            value={str(o.desktopAspectRatio, BANNER_DEFAULT_DESKTOP_RATIO)}
+            onChange={(desktopAspectRatio) => patch({ desktopAspectRatio })}
+          />
+          <TextField
+            label="Mobile aspect ratio"
+            value={str(o.mobileAspectRatio, BANNER_DEFAULT_MOBILE_RATIO)}
+            onChange={(mobileAspectRatio) => patch({ mobileAspectRatio })}
+          />
+        </>
+      ) : (
+        <SelectField
+          label="Media fit"
+          value={mediaObjectFit}
+          options={mediaObjectFitOptions.map((fit) => ({ value: fit, label: fit }))}
+          onChange={(fit) => patch({ mediaObjectFit: fit })}
+        />
+      )}
     </div>
   );
 }
@@ -1218,6 +1311,7 @@ function EditorDemoSection({ value, onChange }: Props) {
 const REGISTRY: Record<string, (p: Props) => ReactNode> = {
   hero: EditorHero,
   pageHeader: EditorPageHeader,
+  banner: EditorBanner,
   fintechHero: EditorFintechHero,
   coverageCarousel: EditorCoverageCarousel,
   directoryGrid: EditorDirectoryGrid,
